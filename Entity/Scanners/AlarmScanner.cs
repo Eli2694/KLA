@@ -23,6 +23,20 @@ namespace Entity.Scanners
             }
             return alaramsDictionary;
         }
+        public bool compareFileWithDB(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        {
+            foreach (var alarmDB in db)
+            {
+                foreach (var alarmXML in xml)
+                {
+                    if (alarmDB.Value.Name == alarmXML.Value.Name || alarmDB.Value.ID == alarmXML.Value.ID )
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
         //public Dictionary<string, M_UniqueIds> RetriveFromDB(List<M_UniqueIds> ListFromDB)
         //{

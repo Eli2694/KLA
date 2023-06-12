@@ -45,5 +45,20 @@ namespace Entity.Scanners
             }
             return dataVariablesDictionary;
         }
+
+        public bool compareFileWithDB(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        {
+            foreach (var variableDB in db)
+            {
+                foreach (var variableXML in xml)
+                {
+                    if (variableDB.Value.Name == variableXML.Value.Name || variableDB.Value.ID == variableXML.Value.ID)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 }

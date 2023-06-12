@@ -57,35 +57,31 @@ public class App
                    else
                    {
                        cliOptions = Options;
-                       Dictionary<string, Dictionary<string, M_UniqueIds>>? xmlAsDictionary = _mainManager.XmlToObjectsDictionary(cliOptions.filePath);
-                       Dictionary<string, Dictionary<string, M_UniqueIds>>? DbAsDictionary = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+                       M_SeperatedScopes? xmlScopes = _mainManager.XmlToObjectsDictionary(cliOptions.filePath);
+                       M_SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
                        
                        Console.WriteLine("verifying: " + cliOptions.filePath.Trim());
                        //verifying
-                       if (xmlAsDictionary != null)
+                       if (xmlScopes != null)
                        {
                            // go through all the dictionaries and compare their values with db
-                           foreach (var scope in xmlAsDictionary)
+                           if (_mainManager.compareXmlFileWithDB(xmlScopes, DbScopes))
                            {
-                               string result = scope.Value.Aggregate("",
-                                           (current, pair) => current + $"{pair.Key}: {pair.Value.Name}, {pair.Value.EntityType}\n");
+                               Console.WriteLine("no conflictions");
 
-                               Console.WriteLine(result);
-                           }
+                               //if user selected the --update cliCommand option
+                               if (cliOptions.isUpdate)
+                               {
+                                   Console.WriteLine("updating");
+                               }
+                           } 
                        }
                        else
                        {
                            //cant be null to continue
                            //log
                            throw new Exception();
-                       }
-
-
-                       //if user selected the --update cliCommand option
-                       if (cliOptions.isUpdate)
-                       {
-                           Console.WriteLine("updating");
-                       }
+                       }                      
                    }
                })
                 //if user enterd wrong arguments

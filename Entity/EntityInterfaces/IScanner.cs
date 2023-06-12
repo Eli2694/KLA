@@ -11,6 +11,8 @@ namespace Entity.EntityInterfaces
     {
         Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar);
 
-       // Dictionary<string, M_UniqueIds> RetriveFromDB(List< M_UniqueIds> ListFromDB);
+        // Dictionary<string, M_UniqueIds> RetriveFromDB(List< M_UniqueIds> ListFromDB);
+
+        bool compareFileWithDB(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db);
     }
 }

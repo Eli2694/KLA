@@ -27,7 +27,7 @@ namespace Entity
             _unitOfWork = unitOfWork;
         }
         
-        public Dictionary<string, Dictionary<string, M_UniqueIds>>? XmlToObjectsDictionary(string filePath)
+        public M_SeperatedScopes? XmlToObjectsDictionary(string filePath)
         {
             try
             {
@@ -46,12 +46,12 @@ namespace Entity
                     //if extracted the data successfully from the xml file to object
                     if (ktgemvar != null)
                     {
-                        Dictionary<string, Dictionary<string, M_UniqueIds>> dataForDB = new Dictionary<string, Dictionary<string, M_UniqueIds>>();
+                        M_SeperatedScopes dataForDB = new M_SeperatedScopes();
 
                         //maybe add threads
-                        dataForDB.Add("variables", _variableScanner.ScanCode(ktgemvar));
-                        dataForDB.Add("events", _eventScanner.ScanCode(ktgemvar));
-                        dataForDB.Add("alarms", _alarmScanner.ScanCode(ktgemvar));
+                        dataForDB.VariableDictionary = _variableScanner.ScanCode(ktgemvar);
+                        dataForDB.EventsDictionary = _eventScanner.ScanCode(ktgemvar);
+                        dataForDB.AlarmsDictionary = _alarmScanner.ScanCode(ktgemvar);
                         return dataForDB;
                     }
                 }
@@ -70,15 +70,11 @@ namespace Entity
             return (List<M_UniqueIds>) result;
         }
 
-        public Dictionary<string, Dictionary<string, M_UniqueIds>> SortUniqeIDsFromDbByScope(List<M_UniqueIds> ListFromDB)
+        public M_SeperatedScopes SortUniqeIDsFromDbByScope(List<M_UniqueIds> ListFromDB)
         {
             try
             {
-                Dictionary<string, Dictionary<string, M_UniqueIds>> DbInObjects = new Dictionary<string, Dictionary<string, M_UniqueIds>>();
-                Dictionary<string, M_UniqueIds> EventsDictionary = new Dictionary<string, M_UniqueIds>();
-                Dictionary<string, M_UniqueIds> AlarmsDictionary = new Dictionary<string, M_UniqueIds>();
-                Dictionary<string, M_UniqueIds> VariableDictionary = new Dictionary<string, M_UniqueIds>();
-
+                M_SeperatedScopes DbInObjects = new M_SeperatedScopes();
                 //HashSet<M_UniqueIds> EventsDictionary = new HashSet<M_UniqueIds>();
 
                 foreach (var obj in ListFromDB)
@@ -86,20 +82,16 @@ namespace Entity
                     switch (obj.Scope)
                     {
                         case "event":
-                            EventsDictionary.Add(obj.ID, obj);
+                            DbInObjects.EventsDictionary.Add(obj.ID, obj);
                             break;
                         case "alarm":
-                            AlarmsDictionary.Add(obj.ID, obj);
+                            DbInObjects.AlarmsDictionary.Add(obj.ID, obj);
                             break;
                         case "variable":
-                            VariableDictionary.Add(obj.ID, obj);
+                            DbInObjects.VariableDictionary.Add(obj.ID, obj);
                             break;
                     }
                 }
-                DbInObjects.Add("variables", VariableDictionary);
-                DbInObjects.Add("events", EventsDictionary);
-                DbInObjects.Add("alarms", AlarmsDictionary);
-
                 return DbInObjects;
             }
             catch (Exception)
@@ -108,6 +100,22 @@ namespace Entity
                 throw;
             }
 
+        }
+
+        public bool compareXmlFileWithDB(M_SeperatedScopes xmlAsDictionary, M_SeperatedScopes DbAsDictionary)
+        {
+
+            if (_alarmScanner.compareFileWithDB(xmlAsDictionary.AlarmsDictionary,DbAsDictionary.AlarmsDictionary))
+            {
+                if (_eventScanner.compareFileWithDB(xmlAsDictionary.EventsDictionary,DbAsDictionary.EventsDictionary))
+                {
+                    if (_variableScanner.compareFileWithDB(xmlAsDictionary.VariableDictionary,DbAsDictionary.VariableDictionary))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

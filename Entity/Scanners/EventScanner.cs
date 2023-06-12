@@ -21,5 +21,21 @@ namespace Entity.Scanners
             }
             return eventsDictionary;
         }
+
+
+        public bool compareFileWithDB(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        {
+            foreach (var eventDB in db)
+            {
+                foreach (var eventXML in xml)
+                {
+                    if (eventDB.Value.Name == eventXML.Value.Name || eventDB.Value.ID == eventXML.Value.ID)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 }
