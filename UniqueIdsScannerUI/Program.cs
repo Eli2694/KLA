@@ -1,4 +1,5 @@
 ﻿using DAL;
+using Entity;
 using Entity.EntityInterfaces;
 using Entity.Scanners;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,9 @@ static IHostBuilder CreateHostBuilder(string[] args)
             services.AddScoped<IUniqueIdsRepository, UniqueIdsRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddSingleton<IScanner, AlarmScanner>();
+            services.AddSingleton<IScanner, EventScanner>();
+            services.AddSingleton<IScanner, VariableScanner>();
+            services.AddSingleton<MainManager>();
         });
 }
 
