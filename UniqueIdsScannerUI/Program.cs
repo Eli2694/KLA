@@ -1,29 +1,43 @@
 ﻿using DAL;
-using Entity.EntityInterfaces;
-using Entity.Scanners;
+using Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Repository.Core;
-using Repository.Interfaces;
-using Utility_LOG;
+using Repository;
+using System;
+using System.IO;
 
 using IHost host = CreateHostBuilder(args).Build();
 using var scope = host.Services.CreateScope();
-var services = scope.ServiceProvider;
-var logManager = services.GetRequiredService<LogManager>();
 
+var services = scope.ServiceProvider;
 
 try
 {
-    var app = services.GetRequiredService<App>();
-    app.Run(args);
+    services.GetRequiredService<App>().Run(args);
+}
+catch (ArgumentException ex)
+{
+    //ask user for valid input path
+    //add to log
+}
+catch (IndexOutOfRangeException ex)
+{
+    //act 
+    //log
+}
+catch (InvalidOperationException ioe)
+{
+    Console.WriteLine("A required service could not be resolved:");
+    Console.WriteLine(ioe);
+    //add logs
 }
 catch (Exception ex)
 {
-    //logManager.LogError($"An unexpected error occurred: {ex.Message}", LogProviderType.File);
-    //logManager.LogError($"An unexpected error occurred: {ex.Message}", LogProviderType.Console);
+    Console.WriteLine("An unexpected error occurred:");
+    Console.WriteLine(ex);
+    //add logs
 }
 
 
@@ -43,12 +57,9 @@ static IHostBuilder CreateHostBuilder(string[] args)
         .ConfigureServices((_, services) =>
         {
             services.AddSingleton<App>();
-            services.AddDbContext<KlaContext>(opt => opt.UseSqlServer(connectionString));
-            services.AddSingleton<LogManager>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IUniqueIdsRepository, UniqueIdsRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddSingleton<IScanner, AlarmScanner>();
+            services.AddDbContext<DbAccess>(opt => opt.UseSqlServer(connectionString));
+            services.AddTransient<IRepositoryUsers, UserRepository>();
+            services.AddSingleton<MainManager>();
         });
 }
 

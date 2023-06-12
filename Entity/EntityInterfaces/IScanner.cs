@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Entity.EntityInterfaces
 {
-    public interface IScanner
+    internal interface IScanner
     {
-        Dictionary<string,M_UniqueIds> ScanCode();
+        Dictionary<string,M_UniqueIds> ScanCode(M_KlaXML ktgemvar);
 
         Dictionary<string, M_UniqueIds> RetriveFromDB();
     }

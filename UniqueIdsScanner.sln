@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniqueIdsScannerUI", "UniqueIdsScannerUI\UniqueIdsScannerUI.csproj", "{950ED3D9-EA01-47EC-BFDF-FE89A0986480}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2B8BA333-D01D-4724-B7D2-4CAB6F833BC3} = {2B8BA333-D01D-4724-B7D2-4CAB6F833BC3}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Model", "Model\Model.csproj", "{A90806B6-9AC5-4002-BB17-BFBB7FE9F536}"
 EndProject
@@ -12,8 +15,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{AE87E542-25A5-4E6D-9F7B-FB21987CBFE5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entity", "Entity\Entity.csproj", "{2B8BA333-D01D-4724-B7D2-4CAB6F833BC3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utility_LOG", "Utility_LOG\Utility_LOG.csproj", "{6692A618-2E29-433F-AE27-9A7C1DD74EF9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +42,6 @@ Global
 		{2B8BA333-D01D-4724-B7D2-4CAB6F833BC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B8BA333-D01D-4724-B7D2-4CAB6F833BC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B8BA333-D01D-4724-B7D2-4CAB6F833BC3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6692A618-2E29-433F-AE27-9A7C1DD74EF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6692A618-2E29-433F-AE27-9A7C1DD74EF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6692A618-2E29-433F-AE27-9A7C1DD74EF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6692A618-2E29-433F-AE27-9A7C1DD74EF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

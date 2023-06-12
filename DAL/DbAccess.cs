@@ -6,16 +6,12 @@ using Model;
 
 namespace DAL
 {
-    public class KlaContext : DbContext
+    public class DbAccess : DbContext
     {
-        public KlaContext(DbContextOptions<KlaContext> dbContextOption) : base(dbContextOption)
+        public DbAccess(DbContextOptions<DbAccess> dbContextOption) : base(dbContextOption)
         {
-
-
             try
             {
-                ChangeTracker.LazyLoadingEnabled = false;
-
                 var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
                 if (databaseCreator != null)
                 {

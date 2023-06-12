@@ -15,9 +15,17 @@ namespace Entity.Scanners
             throw new NotImplementedException();
         }
 
-        public Dictionary<string, M_UniqueIds> ScanCode()
+        public Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
         {
-            throw new NotImplementedException();
+            Dictionary<string, M_UniqueIds> dataVariablesDictionary = new Dictionary<string, M_UniqueIds>();
+
+            foreach (var datavar in ktgemvar.DataVariables)
+            {
+                string ID_KEY = datavar.Id.ToString();
+
+                dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "DataVariable", ID = ID_KEY, Name = datavar.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
+            }
+            return dataVariablesDictionary;
         }
     }
 }
