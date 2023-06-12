@@ -1,5 +1,6 @@
 ﻿using Entity.EntityInterfaces;
 using Model;
+using Repository.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,21 +11,20 @@ namespace Entity.Scanners
 {
     public class AlarmScanner : IScanner
     {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public AlarmScanner(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
         public Dictionary<string, M_UniqueIds> RetriveFromDB()
         {
             throw new NotImplementedException();
         }
 
-        public Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
+        public Dictionary<string, M_UniqueIds> ScanCode()
         {
-            Dictionary<string, M_UniqueIds> alaramsDictionary = new Dictionary<string, M_UniqueIds>();
-
-            foreach (var alarm in ktgemvar.Alarms)
-            {
-                string ID_KEY = alarm.Id.ToString();
-                alaramsDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "Alarm", ID = ID_KEY, Name = alarm.Name, Scope = "Alarms", Timestamp = DateTime.Now });
-            }
-            return alaramsDictionary;
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,43 +1,29 @@
 ﻿using DAL;
-using Entity;
+using Entity.EntityInterfaces;
+using Entity.Scanners;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Repository;
-using System;
-using System.IO;
+using Repository.Core;
+using Repository.Interfaces;
+using Utility_LOG;
 
 using IHost host = CreateHostBuilder(args).Build();
 using var scope = host.Services.CreateScope();
-
 var services = scope.ServiceProvider;
+var logManager = services.GetRequiredService<LogManager>();
+
 
 try
 {
-    services.GetRequiredService<App>().Run(args);
-}
-catch (ArgumentException ex)
-{
-    //ask user for valid input path
-    //add to log
-}
-catch (IndexOutOfRangeException ex)
-{
-    //act 
-    //log
-}
-catch (InvalidOperationException ioe)
-{
-    Console.WriteLine("A required service could not be resolved:");
-    Console.WriteLine(ioe);
-    //add logs
+    var app = services.GetRequiredService<App>();
+    app.Run(args);
 }
 catch (Exception ex)
 {
-    Console.WriteLine("An unexpected error occurred:");
-    Console.WriteLine(ex);
-    //add logs
+    //logManager.LogError($"An unexpected error occurred: {ex.Message}", LogProviderType.File);
+    //logManager.LogError($"An unexpected error occurred: {ex.Message}", LogProviderType.Console);
 }
 
 
@@ -57,9 +43,12 @@ static IHostBuilder CreateHostBuilder(string[] args)
         .ConfigureServices((_, services) =>
         {
             services.AddSingleton<App>();
-            services.AddDbContext<DbAccess>(opt => opt.UseSqlServer(connectionString));
-            services.AddTransient<IRepositoryUsers, UserRepository>();
-            services.AddSingleton<MainManager>();
+            services.AddDbContext<KlaContext>(opt => opt.UseSqlServer(connectionString));
+            services.AddSingleton<LogManager>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUniqueIdsRepository, UniqueIdsRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddSingleton<IScanner, AlarmScanner>();
         });
 }
 
