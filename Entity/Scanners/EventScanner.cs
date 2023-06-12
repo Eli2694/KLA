@@ -5,10 +5,10 @@ namespace Entity.Scanners
 {
     public class EventScanner : IScanner
     {
-        public Dictionary<string, M_UniqueIds> RetriveFromDB()
-        {
-            throw new NotImplementedException();
-        }
+        //public Dictionary<string, M_UniqueIds> RetriveFromDB(List<M_UniqueIds> ListFromDB)
+        //{
+           
+        //}
 
         public Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
         {

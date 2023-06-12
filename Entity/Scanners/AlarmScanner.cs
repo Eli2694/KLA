@@ -11,13 +11,6 @@ namespace Entity.Scanners
 {
     public class AlarmScanner : IScanner
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public AlarmScanner(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
 
         public Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
         {
@@ -31,9 +24,9 @@ namespace Entity.Scanners
             return alaramsDictionary;
         }
 
-        public Dictionary<string, M_UniqueIds> RetriveFromDB()
-        {
-            throw new NotImplementedException();
-        }
+        //public Dictionary<string, M_UniqueIds> RetriveFromDB(List<M_UniqueIds> ListFromDB)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

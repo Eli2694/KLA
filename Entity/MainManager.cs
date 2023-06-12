@@ -8,6 +8,7 @@ using System.Xml.Serialization;
 using System.Xml;
 using System.Security.Claims;
 using Entity.Scanners;
+using Repository.Interfaces;
 
 namespace Entity
 {
@@ -16,13 +17,16 @@ namespace Entity
         private readonly AlarmScanner _alarmScanner;
         private readonly EventScanner _eventScanner;
         private readonly VariableScanner _variableScanner;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public MainManager(AlarmScanner alarmScanner, EventScanner eventScanner, VariableScanner variableScanner) 
+        public MainManager(AlarmScanner alarmScanner, EventScanner eventScanner, VariableScanner variableScanner, IUnitOfWork unitOfWork) 
         {
             _alarmScanner = alarmScanner;
             _eventScanner = eventScanner;
             _variableScanner = variableScanner;
+            _unitOfWork = unitOfWork;
         }
+        
         public Dictionary<string, Dictionary<string, M_UniqueIds>>? XmlToObjectsDictionary(string filePath)
         {
             try
@@ -42,10 +46,10 @@ namespace Entity
                     //if extracted the data successfully from the xml file to object
                     if (ktgemvar != null)
                     {
-
                         Dictionary<string, Dictionary<string, M_UniqueIds>> dataForDB = new Dictionary<string, Dictionary<string, M_UniqueIds>>();
 
-                        dataForDB.Add("dataVariables", _variableScanner.ScanCode(ktgemvar));
+                        //maybe add threads
+                        dataForDB.Add("variables", _variableScanner.ScanCode(ktgemvar));
                         dataForDB.Add("events", _eventScanner.ScanCode(ktgemvar));
                         dataForDB.Add("alarms", _alarmScanner.ScanCode(ktgemvar));
                         return dataForDB;
@@ -58,6 +62,52 @@ namespace Entity
 
                 throw;
             }
+        }
+
+        public List<M_UniqueIds> RetriveUniqeIDsFromDB()
+        {
+            var result = _unitOfWork.UniqueIds.GetAll();     
+            return (List<M_UniqueIds>) result;
+        }
+
+        public Dictionary<string, Dictionary<string, M_UniqueIds>> SortUniqeIDsFromDbByScope(List<M_UniqueIds> ListFromDB)
+        {
+            try
+            {
+                Dictionary<string, Dictionary<string, M_UniqueIds>> DbInObjects = new Dictionary<string, Dictionary<string, M_UniqueIds>>();
+                Dictionary<string, M_UniqueIds> EventsDictionary = new Dictionary<string, M_UniqueIds>();
+                Dictionary<string, M_UniqueIds> AlarmsDictionary = new Dictionary<string, M_UniqueIds>();
+                Dictionary<string, M_UniqueIds> VariableDictionary = new Dictionary<string, M_UniqueIds>();
+
+                //HashSet<M_UniqueIds> EventsDictionary = new HashSet<M_UniqueIds>();
+
+                foreach (var obj in ListFromDB)
+                {
+                    switch (obj.Scope)
+                    {
+                        case "event":
+                            EventsDictionary.Add(obj.ID, obj);
+                            break;
+                        case "alarm":
+                            AlarmsDictionary.Add(obj.ID, obj);
+                            break;
+                        case "variable":
+                            VariableDictionary.Add(obj.ID, obj);
+                            break;
+                    }
+                }
+                DbInObjects.Add("variables", VariableDictionary);
+                DbInObjects.Add("events", EventsDictionary);
+                DbInObjects.Add("alarms", AlarmsDictionary);
+
+                return DbInObjects;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
     }
 }

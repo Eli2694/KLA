@@ -1,5 +1,6 @@
 ﻿using Entity.EntityInterfaces;
 using Model;
+using Repository.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,11 @@ namespace Entity.Scanners
 {
     public class VariableScanner : IScanner
     {
-        public Dictionary<string, M_UniqueIds> RetriveFromDB()
-        {
-            throw new NotImplementedException();
-        }
+
+        //public Dictionary<string, M_UniqueIds> RetriveFromDB(List<M_UniqueIds> ListFromDB)
+        //{
+
+        //}
 
         public Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
         {
@@ -22,8 +24,24 @@ namespace Entity.Scanners
             foreach (var datavar in ktgemvar.DataVariables)
             {
                 string ID_KEY = datavar.Id.ToString();
-
                 dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "DataVariable", ID = ID_KEY, Name = datavar.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
+            }
+            foreach (var Equipment in ktgemvar.EquipmentConstants)
+            {
+                string ID_KEY = Equipment.Id.ToString();
+                dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "EquipmentConstant", ID = ID_KEY, Name = Equipment.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
+            }
+
+            foreach (var Dynamic in ktgemvar.DynamicVariables)
+            {
+                string ID_KEY = Dynamic.Id.ToString();
+                dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "DynamicVariable", ID = ID_KEY, Name = Dynamic.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
+            }
+
+            foreach (var Status in ktgemvar.StatusVariables)
+            {
+                string ID_KEY = Status.Id.ToString();
+                dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "StatusVariable", ID = ID_KEY, Name = Status.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
             }
             return dataVariablesDictionary;
         }

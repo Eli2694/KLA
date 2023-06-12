@@ -28,6 +28,7 @@ public class App
         args[0] = "--update"; args[1] = "-f"; args[2] = @"E:/CodingPlayground/XMLSerializerExmaple/XmlSerizalizeExample/XmlSerizalizeExample/bin/Debug/net6.0/ATLAS.reassign.xml"; // Uniqe.exe --update -f/-c/-a path = verify&update else = verify
         //args[0] = "-f"; args[1] = "path";
 
+        //if user acces without args params then start user interface
         if (args.Length == 0)
         {
             _log.LogEvent("This is a test event message.", LogProviderType.Console);
@@ -57,15 +58,16 @@ public class App
                    {
                        cliOptions = Options;
                        Dictionary<string, Dictionary<string, M_UniqueIds>>? xmlAsDictionary = _mainManager.XmlToObjectsDictionary(cliOptions.filePath);
-
+                       Dictionary<string, Dictionary<string, M_UniqueIds>>? DbAsDictionary = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+                       
                        Console.WriteLine("verifying: " + cliOptions.filePath.Trim());
-
+                       //verifying
                        if (xmlAsDictionary != null)
                        {
                            // go through all the dictionaries and compare their values with db
-                           foreach (var item in xmlAsDictionary)
+                           foreach (var scope in xmlAsDictionary)
                            {
-                               string result = item.Value.Aggregate("",
+                               string result = scope.Value.Aggregate("",
                                            (current, pair) => current + $"{pair.Key}: {pair.Value.Name}, {pair.Value.EntityType}\n");
 
                                Console.WriteLine(result);
