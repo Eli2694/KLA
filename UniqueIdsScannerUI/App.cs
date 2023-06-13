@@ -52,7 +52,7 @@ public class App
                    if (string.IsNullOrWhiteSpace(Options.filePath))
                    {
                        Console.WriteLine("Invalid command line arguments");
-                       throw new ArgumentException("filePath is null or empty or white-space");
+                       throw new ArgumentException("filePath is null or empty or white-space");                    
                    }
                    else
                    {
@@ -65,7 +65,7 @@ public class App
                        if (xmlScopes != null)
                        {
                            // go through all the dictionaries and compare their values with db
-                           if (_mainManager.compareXmlFileWithDB(xmlScopes, DbScopes))
+                           if (_mainManager.compareXmlScopesWithDBScopes(xmlScopes, DbScopes))
                            {
                                Console.WriteLine("no conflictions");
 

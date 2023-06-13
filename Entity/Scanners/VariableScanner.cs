@@ -19,6 +19,8 @@ namespace Entity.Scanners
 
         public Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
         {
+            try
+            {                
             Dictionary<string, M_UniqueIds> dataVariablesDictionary = new Dictionary<string, M_UniqueIds>();
 
             foreach (var datavar in ktgemvar.DataVariables)
@@ -44,21 +46,22 @@ namespace Entity.Scanners
                 dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "StatusVariable", ID = ID_KEY, Name = Status.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
             }
             return dataVariablesDictionary;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        public bool compareFileWithDB(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        public bool compareXmlScopeWithDBScope(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
         {
-            foreach (var variableDB in db)
-            {
-                foreach (var variableXML in xml)
-                {
-                    if (variableDB.Value.Name == variableXML.Value.Name || variableDB.Value.ID == variableXML.Value.ID)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return !db.Values.Any(variableDB => XmlContainsVariable(xml, variableDB));
+
+        }
+        private bool XmlContainsVariable(Dictionary<string, M_UniqueIds> xml, M_UniqueIds variableDB)
+        {
+            return xml.Values.Any(variableXML => variableDB.Name == variableXML.Name || variableDB.ID == variableXML.ID);
         }
     }
 }

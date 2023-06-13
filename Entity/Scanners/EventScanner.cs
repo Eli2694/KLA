@@ -23,19 +23,14 @@ namespace Entity.Scanners
         }
 
 
-        public bool compareFileWithDB(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        public bool compareXmlScopeWithDBScope(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
         {
-            foreach (var eventDB in db)
-            {
-                foreach (var eventXML in xml)
-                {
-                    if (eventDB.Value.Name == eventXML.Value.Name || eventDB.Value.ID == eventXML.Value.ID)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return !db.Values.Any(variableDB => XmlContainsVariable(xml, variableDB));
+
+        }
+        private bool XmlContainsVariable(Dictionary<string, M_UniqueIds> xml, M_UniqueIds variableDB)
+        {
+            return xml.Values.Any(variableXML => variableDB.Name == variableXML.Name || variableDB.ID == variableXML.ID);
         }
     }
 }

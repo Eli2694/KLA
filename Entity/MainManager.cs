@@ -34,7 +34,6 @@ namespace Entity
                 //string path = @"E:/CodingPlayground/XMLSerializerExmaple/XmlSerizalizeExample/XmlSerizalizeExample/bin/Debug/net6.0/ATLAS.reassign.xml";
                 if (File.Exists(filePath))
                 {
-
                     XmlSerializer ser = new XmlSerializer(typeof(M_KlaXML));
                     M_KlaXML? ktgemvar;
 
@@ -102,14 +101,14 @@ namespace Entity
 
         }
 
-        public bool compareXmlFileWithDB(M_SeperatedScopes xmlAsDictionary, M_SeperatedScopes DbAsDictionary)
+        public bool compareXmlScopesWithDBScopes(M_SeperatedScopes xmlAsDictionary, M_SeperatedScopes DbAsDictionary)
         {
 
-            if (_alarmScanner.compareFileWithDB(xmlAsDictionary.AlarmsDictionary,DbAsDictionary.AlarmsDictionary))
+            if (_alarmScanner.compareXmlScopeWithDBScope(xmlAsDictionary.AlarmsDictionary,DbAsDictionary.AlarmsDictionary))
             {
-                if (_eventScanner.compareFileWithDB(xmlAsDictionary.EventsDictionary,DbAsDictionary.EventsDictionary))
+                if (_eventScanner.compareXmlScopeWithDBScope(xmlAsDictionary.EventsDictionary,DbAsDictionary.EventsDictionary))
                 {
-                    if (_variableScanner.compareFileWithDB(xmlAsDictionary.VariableDictionary,DbAsDictionary.VariableDictionary))
+                    if (_variableScanner.compareXmlScopeWithDBScope(xmlAsDictionary.VariableDictionary,DbAsDictionary.VariableDictionary))
                     {
                         return true;
                     }
