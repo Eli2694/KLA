@@ -10,13 +10,13 @@ namespace Model
     {
         public M_SeperatedScopes() 
         {
-            EventsDictionary = new Dictionary<string, M_UniqueIds>();
-            AlarmsDictionary = new Dictionary<string, M_UniqueIds>();
-            VariableDictionary = new Dictionary<string, M_UniqueIds>();
+            EventsList = new List<M_UniqueIds>();
+            AlarmsList = new List<M_UniqueIds>();
+            VariablesList = new List<M_UniqueIds>();
         }
-        public Dictionary<string, M_UniqueIds> EventsDictionary;
-        public Dictionary<string, M_UniqueIds> AlarmsDictionary;
-        public Dictionary<string, M_UniqueIds> VariableDictionary; 
+        public List<M_UniqueIds> EventsList;
+        public List<M_UniqueIds> AlarmsList;
+        public List<M_UniqueIds> VariablesList; 
    
     }
 }

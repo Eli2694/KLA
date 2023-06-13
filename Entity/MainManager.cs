@@ -27,7 +27,7 @@ namespace Entity
             _unitOfWork = unitOfWork;
         }
         
-        public M_SeperatedScopes? XmlToObjectsDictionary(string filePath)
+        public M_SeperatedScopes? XmlToSeperatedScopes(string filePath)
         {
             try
             {
@@ -48,9 +48,9 @@ namespace Entity
                         M_SeperatedScopes dataForDB = new M_SeperatedScopes();
 
                         //maybe add threads
-                        dataForDB.VariableDictionary = _variableScanner.ScanCode(ktgemvar);
-                        dataForDB.EventsDictionary = _eventScanner.ScanCode(ktgemvar);
-                        dataForDB.AlarmsDictionary = _alarmScanner.ScanCode(ktgemvar);
+                        dataForDB.VariablesList = _variableScanner.ScanCode(ktgemvar);
+                        dataForDB.EventsList = _eventScanner.ScanCode(ktgemvar);
+                        dataForDB.AlarmsList = _alarmScanner.ScanCode(ktgemvar);
                         return dataForDB;
                     }
                 }
@@ -74,20 +74,19 @@ namespace Entity
             try
             {
                 M_SeperatedScopes DbInObjects = new M_SeperatedScopes();
-                //HashSet<M_UniqueIds> EventsDictionary = new HashSet<M_UniqueIds>();
 
                 foreach (var obj in ListFromDB)
                 {
                     switch (obj.Scope)
                     {
                         case "event":
-                            DbInObjects.EventsDictionary.Add(obj.ID, obj);
+                            DbInObjects.EventsList.Add( obj);
                             break;
                         case "alarm":
-                            DbInObjects.AlarmsDictionary.Add(obj.ID, obj);
+                            DbInObjects.AlarmsList.Add(obj);
                             break;
                         case "variable":
-                            DbInObjects.VariableDictionary.Add(obj.ID, obj);
+                            DbInObjects.VariablesList.Add(obj);
                             break;
                     }
                 }
@@ -101,14 +100,14 @@ namespace Entity
 
         }
 
-        public bool compareXmlScopesWithDBScopes(M_SeperatedScopes xmlAsDictionary, M_SeperatedScopes DbAsDictionary)
+        public bool compareXmlScopesWithDBScopes(M_SeperatedScopes xmlSeperatedScopes, M_SeperatedScopes DbSeperatedScopes)
         {
 
-            if (_alarmScanner.compareXmlScopeWithDBScope(xmlAsDictionary.AlarmsDictionary,DbAsDictionary.AlarmsDictionary))
+            if (_alarmScanner.compareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList))
             {
-                if (_eventScanner.compareXmlScopeWithDBScope(xmlAsDictionary.EventsDictionary,DbAsDictionary.EventsDictionary))
+                if (_eventScanner.compareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList))
                 {
-                    if (_variableScanner.compareXmlScopeWithDBScope(xmlAsDictionary.VariableDictionary,DbAsDictionary.VariableDictionary))
+                    if (_variableScanner.compareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList))
                     {
                         return true;
                     }

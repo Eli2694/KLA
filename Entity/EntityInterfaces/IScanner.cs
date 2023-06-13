@@ -9,11 +9,11 @@ namespace Entity.EntityInterfaces
 {
     public interface IScanner
     {
-        Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar);
+        List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar);
 
         // Dictionary<string, M_UniqueIds> RetriveFromDB(List< M_UniqueIds> ListFromDB);
 
-        bool compareXmlScopeWithDBScope(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db);
+        bool compareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db);
 
     }
 }

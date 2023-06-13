@@ -17,35 +17,31 @@ namespace Entity.Scanners
 
         //}
 
-        public Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
+        public List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
         {
             try
-            {                
-            Dictionary<string, M_UniqueIds> dataVariablesDictionary = new Dictionary<string, M_UniqueIds>();
+            {             
+            List<M_UniqueIds> dataVariablesList = new List<M_UniqueIds>();
 
             foreach (var datavar in ktgemvar.DataVariables)
             {
-                string ID_KEY = datavar.Id.ToString();
-                dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "DataVariable", ID = ID_KEY, Name = datavar.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
+                dataVariablesList.Add( new M_UniqueIds { EntityType = "DataVariable", ID = datavar.Id.ToString() , Name = datavar.ExternalName, Scope = "variable", Timestamp = DateTime.Now });
             }
             foreach (var Equipment in ktgemvar.EquipmentConstants)
             {
-                string ID_KEY = Equipment.Id.ToString();
-                dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "EquipmentConstant", ID = ID_KEY, Name = Equipment.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
+                dataVariablesList.Add( new M_UniqueIds { EntityType = "EquipmentConstant", ID = Equipment.Id.ToString() ,  Name = Equipment.ExternalName, Scope = "variable", Timestamp = DateTime.Now });
             }
 
             foreach (var Dynamic in ktgemvar.DynamicVariables)
             {
-                string ID_KEY = Dynamic.Id.ToString();
-                dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "DynamicVariable", ID = ID_KEY, Name = Dynamic.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
+                dataVariablesList.Add( new M_UniqueIds { EntityType = "DynamicVariable", ID = Dynamic.Id.ToString() ,  Name = Dynamic.ExternalName, Scope = "variable", Timestamp = DateTime.Now });
             }
 
             foreach (var Status in ktgemvar.StatusVariables)
             {
-                string ID_KEY = Status.Id.ToString();
-                dataVariablesDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "StatusVariable", ID = ID_KEY, Name = Status.ExternalName, Scope = "Variables", Timestamp = DateTime.Now });
+                dataVariablesList.Add( new M_UniqueIds { EntityType = "StatusVariable", ID = Status.Id.ToString() ,  Name = Status.ExternalName, Scope = "variable", Timestamp = DateTime.Now });
             }
-            return dataVariablesDictionary;
+            return dataVariablesList;
             }
             catch (Exception)
             {
@@ -54,14 +50,13 @@ namespace Entity.Scanners
             }
         }
 
-        public bool compareXmlScopeWithDBScope(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        public bool compareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db)
         {
-            return !db.Values.Any(variableDB => XmlContainsVariable(xml, variableDB));
-
+            return !db.Any(variableDB => XmlContainsVariable(xml, variableDB));
         }
-        private bool XmlContainsVariable(Dictionary<string, M_UniqueIds> xml, M_UniqueIds variableDB)
+        private bool XmlContainsVariable(List<M_UniqueIds> xml, M_UniqueIds variableDB)
         {
-            return xml.Values.Any(variableXML => variableDB.Name == variableXML.Name || variableDB.ID == variableXML.ID);
+            return xml.Any(variableXML => variableDB.Name == variableXML.Name || variableDB.ID == variableXML.ID);
         }
     }
 }
