@@ -33,7 +33,9 @@ static IHostBuilder CreateHostBuilder(string[] args)
 
     var config = new ConfigurationBuilder()
         .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json")
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("UniqeIdsScanner_ENVIRONMENT") ?? "Production"}.json", optional: true)
+        .AddEnvironmentVariables()
         .Build();
 
     // var connectionString = GetConnectionString(); 
