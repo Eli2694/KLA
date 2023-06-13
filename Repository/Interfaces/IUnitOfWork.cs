@@ -10,6 +10,6 @@ namespace Repository.Interfaces
     {
         IUniqueIdsRepository UniqueIds { get; }
         IUserRepository Users { get; }
-        int Complete();
+        void Complete();
     }
 }
