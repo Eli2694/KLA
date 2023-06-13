@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Repository.Core;
 using Repository.Interfaces;
 using Utility_LOG;
@@ -40,19 +41,28 @@ static IHostBuilder CreateHostBuilder(string[] args)
 
 
     return Host.CreateDefaultBuilder(args)
-        .ConfigureServices((_, services) =>
-        {
-            services.AddSingleton<App>();
-            services.AddDbContext<KlaContext>(opt => opt.UseSqlServer(connectionString));
-            services.AddSingleton<LogManager>();
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddTransient<IUniqueIdsRepository, UniqueIdsRepository>();
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<AlarmScanner>();
-            services.AddTransient<EventScanner>();
-            services.AddTransient<VariableScanner>();
-            services.AddSingleton<MainManager>();
-        });
+     .ConfigureServices((hostContext, services) =>
+     {
+         services.AddSingleton<App>();
+         services.AddDbContext<KlaContext>(options =>
+             options.UseSqlServer(connectionString)
+             .UseLoggerFactory(LoggerFactory.Create(builder =>
+             {
+                 builder.AddFilter((category, level) =>
+                     !category.Equals("Microsoft.EntityFrameworkCore.Database.Command") || level == LogLevel.Error);
+             }))
+         );
+         services.AddSingleton<LogManager>();
+         services.AddTransient<IUnitOfWork, UnitOfWork>();
+         services.AddTransient<IUniqueIdsRepository, UniqueIdsRepository>();
+         services.AddTransient<IUserRepository, UserRepository>();
+         services.AddTransient<AlarmScanner>();
+         services.AddTransient<EventScanner>();
+         services.AddTransient<VariableScanner>();
+         services.AddSingleton<MainManager>();
+     });
+
+
 }
 
 //static string GetConnectionString()
