@@ -10,27 +10,25 @@ namespace Entity.Scanners
            
         //}
 
-        public Dictionary<string, M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
+        public List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
         {
-            Dictionary<string, M_UniqueIds> eventsDictionary = new Dictionary<string, M_UniqueIds>();
+            List<M_UniqueIds> eventsDictionary = new List<M_UniqueIds>();
 
             foreach (var evnt in ktgemvar.Events)
             {
-                string ID_KEY = evnt.Id.ToString();
-                eventsDictionary.Add(ID_KEY, new M_UniqueIds { EntityType = "Event", ID = ID_KEY, Name = evnt.Name, Scope = "Events", Timestamp = DateTime.Now });
+                eventsDictionary.Add( new M_UniqueIds { EntityType = "Event", ID = evnt.Id.ToString(), Name = evnt.Name, Scope = "event", Timestamp = DateTime.Now });
             }
             return eventsDictionary;
         }
 
 
-        public bool compareXmlScopeWithDBScope(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        public bool compareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db)
         {
-            return !db.Values.Any(variableDB => XmlContainsVariable(xml, variableDB));
-
+            return !db.Any(variableDB => XmlContainsVariable(xml, variableDB));
         }
-        private bool XmlContainsVariable(Dictionary<string, M_UniqueIds> xml, M_UniqueIds variableDB)
+        private bool XmlContainsVariable(List<M_UniqueIds> xml, M_UniqueIds variableDB)
         {
-            return xml.Values.Any(variableXML => variableDB.Name == variableXML.Name || variableDB.ID == variableXML.ID);
+            return xml.Any(variableXML => variableDB.Name == variableXML.Name || variableDB.ID == variableXML.ID);
         }
     }
 }

@@ -57,7 +57,7 @@ public class App
                    else
                    {
                        cliOptions = Options;
-                       M_SeperatedScopes? xmlScopes = _mainManager.XmlToObjectsDictionary(cliOptions.filePath);
+                       M_SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(cliOptions.filePath);
                        M_SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
                        
                        Console.WriteLine("verifying: " + cliOptions.filePath.Trim());
