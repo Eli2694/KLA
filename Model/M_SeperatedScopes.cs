@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Model
 {
-    public record M_SeperatedScopes
+    public class M_SeperatedScopes
     {
         public M_SeperatedScopes() 
         {

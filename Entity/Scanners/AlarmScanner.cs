@@ -23,19 +23,13 @@ namespace Entity.Scanners
             }
             return alaramsDictionary;
         }
-        public bool compareFileWithDB(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        public bool compareXmlScopeWithDBScope(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
         {
-            foreach (var alarmDB in db)
-            {
-                foreach (var alarmXML in xml)
-                {
-                    if (alarmDB.Value.Name == alarmXML.Value.Name || alarmDB.Value.ID == alarmXML.Value.ID )
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return !db.Values.Any(variableDB => XmlContainsVariable(xml, variableDB));
+        }
+        private bool XmlContainsVariable(Dictionary<string, M_UniqueIds> xml, M_UniqueIds variableDB)
+        {
+            return xml.Values.Any(variableXML => variableDB.Name == variableXML.Name || variableDB.ID == variableXML.ID);
         }
 
         //public Dictionary<string, M_UniqueIds> RetriveFromDB(List<M_UniqueIds> ListFromDB)

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Repository.Core;
 using Repository.Interfaces;
 using Utility_LOG;
@@ -23,8 +24,7 @@ try
 }
 catch (Exception ex)
 {
-    //logManager.LogError($"An unexpected error occurred: {ex.Message}", LogProviderType.File);
-    //logManager.LogError($"An unexpected error occurred: {ex.Message}", LogProviderType.Console);
+  Console.WriteLine(ex.ToString());
 }
 
 
@@ -33,7 +33,9 @@ static IHostBuilder CreateHostBuilder(string[] args)
 
     var config = new ConfigurationBuilder()
         .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json")
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("UniqeIdsScanner_ENVIRONMENT") ?? "Production"}.json", optional: true)
+        .AddEnvironmentVariables()
         .Build();
 
     // var connectionString = GetConnectionString(); 
@@ -41,19 +43,28 @@ static IHostBuilder CreateHostBuilder(string[] args)
 
 
     return Host.CreateDefaultBuilder(args)
-        .ConfigureServices((_, services) =>
-        {
-            services.AddSingleton<App>();
-            services.AddDbContext<KlaContext>(opt => opt.UseSqlServer(connectionString));
-            services.AddSingleton<LogManager>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IUniqueIdsRepository, UniqueIdsRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddSingleton<IScanner, AlarmScanner>();
-            services.AddSingleton<IScanner, EventScanner>();
-            services.AddSingleton<IScanner, VariableScanner>();
-            services.AddSingleton<MainManager>();
-        });
+     .ConfigureServices((hostContext, services) =>
+     {
+         services.AddSingleton<App>();
+         services.AddDbContext<KlaContext>(options =>
+             options.UseSqlServer(connectionString)
+             .UseLoggerFactory(LoggerFactory.Create(builder =>
+             {
+                 builder.AddFilter((category, level) =>
+                     !category.Equals("Microsoft.EntityFrameworkCore.Database.Command") || level == LogLevel.Error);
+             }))
+         );
+         services.AddSingleton<LogManager>();
+         services.AddTransient<IUnitOfWork, UnitOfWork>();
+         services.AddTransient<IUniqueIdsRepository, UniqueIdsRepository>();
+         services.AddTransient<IUserRepository, UserRepository>();
+         services.AddTransient<AlarmScanner>();
+         services.AddTransient<EventScanner>();
+         services.AddTransient<VariableScanner>();
+         services.AddSingleton<MainManager>();
+     });
+
+
 }
 
 //static string GetConnectionString()

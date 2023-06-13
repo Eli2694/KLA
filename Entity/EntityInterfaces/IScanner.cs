@@ -13,6 +13,7 @@ namespace Entity.EntityInterfaces
 
         // Dictionary<string, M_UniqueIds> RetriveFromDB(List< M_UniqueIds> ListFromDB);
 
-        bool compareFileWithDB(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db);
+        bool compareXmlScopeWithDBScope(Dictionary<string, M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db);
+
     }
 }
