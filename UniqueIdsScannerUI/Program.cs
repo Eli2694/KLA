@@ -55,7 +55,7 @@ static IHostBuilder CreateHostBuilder(string[] args)
              }))
          );
          services.AddSingleton<LogManager>();
-         services.AddScoped<IUnitOfWork, UnitOfWork>();
+         services.AddTransient<IUnitOfWork, UnitOfWork>();
          services.AddTransient<IUniqueIdsRepository, UniqueIdsRepository>();
          services.AddTransient<IUserRepository, UserRepository>();
          services.AddTransient<AlarmScanner>();
