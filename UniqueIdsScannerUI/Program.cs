@@ -23,8 +23,7 @@ try
 }
 catch (Exception ex)
 {
-    //logManager.LogError($"An unexpected error occurred: {ex.Message}", LogProviderType.File);
-    //logManager.LogError($"An unexpected error occurred: {ex.Message}", LogProviderType.Console);
+  Console.WriteLine(ex.ToString());
 }
 
 
@@ -46,12 +45,12 @@ static IHostBuilder CreateHostBuilder(string[] args)
             services.AddSingleton<App>();
             services.AddDbContext<KlaContext>(opt => opt.UseSqlServer(connectionString));
             services.AddSingleton<LogManager>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IUniqueIdsRepository, UniqueIdsRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddSingleton<IScanner, AlarmScanner>();
-            services.AddSingleton<IScanner, EventScanner>();
-            services.AddSingleton<IScanner, VariableScanner>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IUniqueIdsRepository, UniqueIdsRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<AlarmScanner>();
+            services.AddTransient<EventScanner>();
+            services.AddTransient<VariableScanner>();
             services.AddSingleton<MainManager>();
         });
 }
