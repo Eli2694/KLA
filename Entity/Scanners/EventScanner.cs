@@ -14,14 +14,18 @@ namespace Entity.Scanners
 
         public List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
         {
-            List<M_UniqueIds> eventScopeList = new List<M_UniqueIds>();
-
-            foreach (var evnt in ktgemvar.Events)
+            return ktgemvar.Events.Select(evnt => new M_UniqueIds
             {
-                eventScopeList.Add(new M_UniqueIds { EntityType = "Event", ID = evnt.Id.ToString(), Name = evnt.Name, Scope = "event", Timestamp = DateTime.Now });
-            }
-            return eventScopeList;
+                EntityType = "Event",
+                ID = evnt.Id.ToString(),
+                Name = evnt.Name,
+                Scope = "event",
+                Timestamp = DateTime.Now
+            })
+            .ToList();
         } 
+
+
     }
 
 }

@@ -8,13 +8,14 @@ using Utility_LOG;
 
 namespace Entity.Scanners
 {
-    public  class BaseScanner
+    public abstract class BaseScanner
     {
         protected readonly LogManager _log;
-        private List<M_UniqueIds> newUniqueIdsFromXml = new List<M_UniqueIds>();
+        public List<M_UniqueIds> newUniqueIdsFromXml;
 
         public BaseScanner(LogManager log)
         {
+            newUniqueIdsFromXml = new List<M_UniqueIds>();
             _log = log;
         }
         public bool CompareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db)
@@ -46,13 +47,13 @@ namespace Entity.Scanners
 
             if (isCompareSuccessful)
             {
-                NewXmlUniqueIds(xml, dbDictionary);
+                AddUniqueIdsFromXmlToList(xml, dbDictionary);
             }
 
             return isCompareSuccessful;
         }
 
-        public void NewXmlUniqueIds(List<M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        public void AddUniqueIdsFromXmlToList(List<M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
         {
             newUniqueIdsFromXml = xml.Where(variableXML => !db.ContainsKey(variableXML.ID)).ToList();
             ReportNewUniqueIds();
