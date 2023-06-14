@@ -7,7 +7,6 @@ namespace Entity.Scanners
     public class EventScanner : BaseScanner, IScanner
     {
         
-
         public EventScanner(LogManager log) : base(log)
         {
         }
@@ -24,8 +23,5 @@ namespace Entity.Scanners
             })
             .ToList();
         } 
-
-
     }
-
 }

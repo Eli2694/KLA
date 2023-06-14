@@ -71,8 +71,6 @@ namespace Entity.Scanners
                 throw;
             }
         }
-
-
     }
 
 }

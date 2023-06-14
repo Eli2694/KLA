@@ -21,12 +21,12 @@ namespace Entity.Scanners
         public bool CompareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db)
         {
             bool isCompareSuccessful = true;
-            var dbDictionary = db.ToDictionary(k => k.ID, v => v);
+            var dbByIdDictionary = db.ToDictionary(k => k.ID, v => v);
             var dbByNameDictionary = db.ToDictionary(k => k.Name, v => v);
 
             foreach (var xmlElement in xml)
             {
-                if (dbDictionary.TryGetValue(xmlElement.ID, out var dbElementByID))
+                if (dbByIdDictionary.TryGetValue(xmlElement.ID, out var dbElementByID))
                 {
                     if (dbElementByID.Name != xmlElement.Name)
                     {
@@ -47,25 +47,25 @@ namespace Entity.Scanners
 
             if (isCompareSuccessful)
             {
-                AddUniqueIdsFromXmlToList(xml, dbDictionary);
+                AddUniqueIdsFromXmlToList(xml, dbByIdDictionary);
             }
 
             return isCompareSuccessful;
         }
 
-        public void AddUniqueIdsFromXmlToList(List<M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        private void AddUniqueIdsFromXmlToList(List<M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
         {
             newUniqueIdsFromXml = xml.Where(variableXML => !db.ContainsKey(variableXML.ID)).ToList();
             ReportNewUniqueIds();
 
         }
 
-        public void ReportNewUniqueIds()
+        private void ReportNewUniqueIds()
         {
             Console.WriteLine("Unique IDs present in XML but not in DB:");
             foreach (var uniqueId in newUniqueIdsFromXml)
             {
-                Console.WriteLine($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}, Scope: {uniqueId.Scope}, Timestamp: {uniqueId.Timestamp}");
+                _log.LogEvent($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}, Scope: {uniqueId.Scope}, Timestamp: {uniqueId.Timestamp}",LogProviderType.Console);
             }
         }
     }

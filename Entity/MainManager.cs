@@ -18,7 +18,7 @@ namespace Entity
         private readonly AlarmScanner _alarmScanner;
         private readonly EventScanner _eventScanner;
         private readonly VariableScanner _variableScanner;
-        private readonly IUnitOfWork _unitOfWork;
+        public readonly IUnitOfWork _unitOfWork;
         private readonly LogManager _log;
 
         public MainManager(AlarmScanner alarmScanner, EventScanner eventScanner, VariableScanner variableScanner, IUnitOfWork unitOfWork, LogManager log) 
@@ -145,6 +145,24 @@ namespace Entity
             return false;
         }
 
+        public void UpdateDatabaseWithNewUniqueIds()
+        {
+            if (_alarmScanner.newUniqueIdsFromXml != null && _alarmScanner.newUniqueIdsFromXml.Any())
+            {
+                _unitOfWork.UniqueIds.AddRange(_alarmScanner.newUniqueIdsFromXml);
+            }
 
+            if (_eventScanner.newUniqueIdsFromXml != null && _eventScanner.newUniqueIdsFromXml.Any())
+            {
+                _unitOfWork.UniqueIds.AddRange(_eventScanner.newUniqueIdsFromXml);
+            }
+
+            if (_variableScanner.newUniqueIdsFromXml != null && _variableScanner.newUniqueIdsFromXml.Any())
+            {
+                _unitOfWork.UniqueIds.AddRange(_variableScanner.newUniqueIdsFromXml);
+            }
+
+            _unitOfWork.Complete();
+        }
     }
 }

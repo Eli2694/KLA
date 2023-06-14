@@ -10,9 +10,6 @@ namespace Entity.EntityInterfaces
     public interface IScanner
     {
         List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar);
-
-        // Dictionary<string, M_UniqueIds> RetriveFromDB(List< M_UniqueIds> ListFromDB);
-
         bool CompareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db);
 
     }

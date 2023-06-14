@@ -28,8 +28,5 @@ namespace Entity.Scanners
                 Timestamp = DateTime.Now
             }).ToList();
         }
-
-        
     }
-
 }
