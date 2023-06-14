@@ -62,7 +62,7 @@ public class App
                        if (xmlScopes != null)
                        {
                            // go through all the dictionaries and compare their values with db
-                           if (_mainManager.compareXmlScopesWithDBScopes(xmlScopes, DbScopes))
+                           if (_mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes))
                            {
                                Console.WriteLine("no conflictions");
 
