@@ -18,46 +18,63 @@ namespace Entity.Scanners
             newUniqueIdsFromXml = new List<M_UniqueIds>();
             _log = log;
         }
+
         public bool CompareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db)
         {
-            bool isCompareSuccessful = true;
             var dbByIdDictionary = db.ToDictionary(k => k.ID, v => v);
             var dbByNameDictionary = db.ToDictionary(k => k.Name, v => v);
+            var errorMessages = new List<string>();
 
+            ValidateElements(xml, dbByIdDictionary, dbByNameDictionary, errorMessages);
+
+            if (errorMessages.Count > 0)
+            {
+                foreach (var errorMessage in errorMessages)
+                {
+                    _log.LogError(errorMessage, LogProviderType.Console);
+                }
+                return false;
+            }
+
+            AddUniqueIdsFromXmlToList(xml, dbByIdDictionary);
+            return true;
+        }
+
+        private void ValidateElements(List<M_UniqueIds> xml, Dictionary<string, M_UniqueIds> dbByIdDictionary, Dictionary<string, M_UniqueIds> dbByNameDictionary, List<string> errorMessages)
+        {
             foreach (var xmlElement in xml)
             {
-                if (dbByIdDictionary.TryGetValue(xmlElement.ID, out var dbElementByID))
-                {
-                    if (dbElementByID.Name != xmlElement.Name)
-                    {
-                        _log.LogError($"ID '{xmlElement.ID}' has a different name in the XML and DB.", LogProviderType.Console);
-                        isCompareSuccessful = false;
-                    }
-                }
-
-                if (dbByNameDictionary.TryGetValue(xmlElement.Name, out var dbElementByName))
-                {
-                    if (dbElementByName.ID != xmlElement.ID)
-                    {
-                        _log.LogError($"Name '{xmlElement.Name}' has a different ID in the XML and DB.", LogProviderType.Console);
-                        isCompareSuccessful = false;
-                    }
-                }
+                ValidateNames(xmlElement, dbByIdDictionary, errorMessages);
+                ValidateIds(xmlElement, dbByNameDictionary, errorMessages);
             }
+        }
 
-            if (isCompareSuccessful)
+        private void ValidateNames(M_UniqueIds xmlElement, Dictionary<string, M_UniqueIds> dbByIdDictionary, List<string> errorMessages)
+        {
+            if (dbByIdDictionary.TryGetValue(xmlElement.ID, out var dbElementByID))
             {
-                AddUniqueIdsFromXmlToList(xml, dbByIdDictionary);
+                if (dbElementByID.Name != xmlElement.Name)
+                {
+                    errorMessages.Add($"ID '{xmlElement.ID}' has a different name in the XML and DB.");
+                }
             }
+        }
 
-            return isCompareSuccessful;
+        private void ValidateIds(M_UniqueIds xmlElement, Dictionary<string, M_UniqueIds> dbByNameDictionary, List<string> errorMessages)
+        {
+            if (dbByNameDictionary.TryGetValue(xmlElement.Name, out var dbElementByName))
+            {
+                if (dbElementByName.ID != xmlElement.ID)
+                {
+                    errorMessages.Add($"Name '{xmlElement.Name}' has a different ID in the XML and DB.");
+                }
+            }
         }
 
         private void AddUniqueIdsFromXmlToList(List<M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
         {
             newUniqueIdsFromXml = xml.Where(variableXML => !db.ContainsKey(variableXML.ID)).ToList();
             ReportNewUniqueIds();
-
         }
 
         private void ReportNewUniqueIds()
@@ -65,8 +82,9 @@ namespace Entity.Scanners
             Console.WriteLine("Unique IDs present in XML but not in DB:");
             foreach (var uniqueId in newUniqueIdsFromXml)
             {
-                _log.LogEvent($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}, Scope: {uniqueId.Scope}, Timestamp: {uniqueId.Timestamp}",LogProviderType.Console);
+                _log.LogEvent($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}, Scope: {uniqueId.Scope}, Timestamp: {uniqueId.Timestamp}", LogProviderType.Console);
             }
         }
     }
+
 }

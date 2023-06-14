@@ -78,8 +78,7 @@ public class App
                        }
                        else
                        {
-                           //cant be null to continue
-                           //log
+                           _log.LogError("Can't read from xml file", LogProviderType.Console);
                            throw new Exception();
                        }                      
                    }
