@@ -24,19 +24,16 @@ public class App
     internal void Run(string[] args)
     {
 
-        args = new string[3];
-        args[0] = "--update"; args[1] = "-f"; args[2] = @"E:/CodingPlayground/XMLSerializerExmaple/XmlSerizalizeExample/XmlSerizalizeExample/bin/Debug/net6.0/ATLAS.reassign.xml"; // Uniqe.exe --update -f/-c/-a path = verify&update else = verify
+        //args = new string[3];
+        //args[0] = "--update"; args[1] = "-f"; args[2] = @"E:/CodingPlayground/XMLSerializerExmaple/XmlSerizalizeExample/XmlSerizalizeExample/bin/Debug/net6.0/ATLAS.reassign.xml"; // Uniqe.exe --update -f/-c/-a path = verify&update else = verify
         //args[0] = "-f"; args[1] = "path";
 
-        //if user acces without args params then start user interface
         if (args.Length == 0)
         {
-            _log.LogEvent("This is a test event message.", LogProviderType.Console);
-            _log.LogEvent("This is a test event message.", LogProviderType.File);
 
-
-            Console.WriteLine("Hello please enter path");
+            Console.WriteLine("Hello please enter a valid option: ");
             var result = Parser.Default.ParseArguments<CliOptions>(args);
+            var parser = new Parser(config => config.HelpWriter = Console.Out);
         }
         else
         {

@@ -24,16 +24,46 @@ namespace Entity.Scanners
         }
         public bool compareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db)
         {
-            return !db.Any(variableDB => XmlContainsVariable(xml, variableDB));
-        }
-        private bool XmlContainsVariable(List<M_UniqueIds> xml, M_UniqueIds variableDB)
-        {
-            return xml.Any(variableXML => variableDB.Name == variableXML.Name || variableDB.ID == variableXML.ID);
+            M_ComparedLists comparedLists = new M_ComparedLists();
+
+            foreach (var dbVariable in db)
+            {
+                compareXmlScopeWithDBScope(xml, dbVariable, comparedLists);
+            }
+            if (comparedLists.matchingIdAndDifferentName.Count == 0 && comparedLists.differentIdAndMatchingName.Count ==0) { return true; }
+            return false;
         }
 
-        //public Dictionary<string, M_UniqueIds> RetriveFromDB(List<M_UniqueIds> ListFromDB)
-        //{
-        //    throw new NotImplementedException();
-        //}
+
+        private void compareXmlScopeWithDBScope(List<M_UniqueIds> xml, M_UniqueIds dbVariable, M_ComparedLists comparedLists)
+        {
+
+            foreach (var xmlVariable in xml)
+            {
+                if (dbVariable.ID == xmlVariable.ID)
+                {
+                    if (dbVariable.Name == xmlVariable.Name)
+                    {
+                        comparedLists.matchingIdAndName.Add(xmlVariable);
+                    }
+                    else
+                    {
+                        comparedLists.matchingIdAndDifferentName.Add(xmlVariable);
+                    }
+                }
+                else
+                {
+                    if (dbVariable.Name == xmlVariable.Name)
+                    {
+                        comparedLists.differentIdAndMatchingName.Add(xmlVariable);
+                    }
+                    else
+                    {
+                        comparedLists.differentIdAndDifferentName.Add(xmlVariable);
+                    }
+                }
+            }
+        }
+
     }
 }
