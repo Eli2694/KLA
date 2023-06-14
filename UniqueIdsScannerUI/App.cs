@@ -48,7 +48,7 @@ public class App
             {
                 //add logs
                 var result = Parser.Default.ParseArguments<CliOptions>(args)
-               .WithParsed<CliOptions>(Options => {
+               .WithParsed(Options => {
                    if (string.IsNullOrWhiteSpace(Options.filePath))
                    {
                        Console.WriteLine("Invalid command line arguments");
@@ -72,7 +72,7 @@ public class App
                                //if user selected the --update cliCommand option
                                if (cliOptions.isUpdate)
                                {
-                                   
+                                   _mainManager.UpdateDatabaseWithNewUniqueIds();
                                }
                            } 
                        }

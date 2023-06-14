@@ -130,39 +130,28 @@ namespace Entity
 
         public bool CompareXmlScopesWithDBScopes(M_SeperatedScopes xmlSeperatedScopes, M_SeperatedScopes DbSeperatedScopes)
         {
-
-            if (_alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList))
-            {
-                if (_eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList))
-                {
-                    if (_variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList) &&
+                    _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList) &&
+                    _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList);
         }
 
         public void UpdateDatabaseWithNewUniqueIds()
         {
-            if (_alarmScanner.newUniqueIdsFromXml != null && _alarmScanner.newUniqueIdsFromXml.Any())
-            {
-                _unitOfWork.UniqueIds.AddRange(_alarmScanner.newUniqueIdsFromXml);
-            }
-
-            if (_eventScanner.newUniqueIdsFromXml != null && _eventScanner.newUniqueIdsFromXml.Any())
-            {
-                _unitOfWork.UniqueIds.AddRange(_eventScanner.newUniqueIdsFromXml);
-            }
-
-            if (_variableScanner.newUniqueIdsFromXml != null && _variableScanner.newUniqueIdsFromXml.Any())
-            {
-                _unitOfWork.UniqueIds.AddRange(_variableScanner.newUniqueIdsFromXml);
-            }
+            UpdateDatabaseWithScanner(_alarmScanner);
+            UpdateDatabaseWithScanner(_eventScanner);
+            UpdateDatabaseWithScanner(_variableScanner);
 
             _unitOfWork.Complete();
+        }
+
+        private void UpdateDatabaseWithScanner(BaseScanner scanner)
+        {
+            var newIds = scanner.newUniqueIdsFromXml;
+
+            if (newIds != null && newIds.Any())
+            {
+                _unitOfWork.UniqueIds.AddRange(newIds);
+            }
         }
     }
 }
