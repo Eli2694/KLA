@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using Model;
 
@@ -10,8 +9,6 @@ namespace DAL
     {
         public KlaContext(DbContextOptions<KlaContext> dbContextOption) : base(dbContextOption)
         {
-
-
             try
             {
                 ChangeTracker.LazyLoadingEnabled = false;
