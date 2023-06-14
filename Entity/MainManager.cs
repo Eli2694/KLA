@@ -128,22 +128,23 @@ namespace Entity
 
         }
 
-        public bool CompareXmlScopesWithDBScopes(M_SeperatedScopes xmlSeperatedScopes, M_SeperatedScopes DbSeperatedScopes)
+        public async Task<bool> CompareXmlScopesWithDBScopesAsync(M_SeperatedScopes xmlSeperatedScopes, M_SeperatedScopes DbSeperatedScopes)
         {
-
-            if (_alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList))
+            try
             {
-                if (_eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList))
-                {
-                    if (_variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList))
-                    {
-                        return true;
-                    }
-                }
+                var taskAlarm = Task.Run(() => _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList));
+                var taskEvent = Task.Run(() => _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList));
+                var taskVariable = Task.Run(() => _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList));
+
+                var results = await Task.WhenAll(taskAlarm, taskEvent, taskVariable);
+   
+                return results.All(r => r == true);
             }
-            return false;
+            catch (Exception)
+            {
+
+                throw;
+            }  
         }
-
-
     }
 }

@@ -24,8 +24,8 @@ public class App
     internal void Run(string[] args)
     {
 
-        //args = new string[3];
-        //args[0] = "--update"; args[1] = "-f"; args[2] = @"E:/CodingPlayground/XMLSerializerExmaple/XmlSerizalizeExample/XmlSerizalizeExample/bin/Debug/net6.0/ATLAS.reassign.xml"; // Uniqe.exe --update -f/-c/-a path = verify&update else = verify
+        args = new string[3];
+        args[0] = "--update"; args[1] = "-f"; args[2] = @"E:/CodingPlayground/XMLSerializerExmaple/XmlSerizalizeExample/XmlSerizalizeExample/bin/Debug/net6.0/ATLAS.reassign.xml"; // Uniqe.exe --update -f/-c/-a path = verify&update else = verify
         //args[0] = "-f"; args[1] = "path";
 
         if (args.Length == 0)
@@ -45,7 +45,7 @@ public class App
             {
                 //add logs
                 var result = Parser.Default.ParseArguments<CliOptions>(args)
-               .WithParsed<CliOptions>(Options => {
+               .WithParsed<CliOptions>(async Options => {
                    if (string.IsNullOrWhiteSpace(Options.filePath))
                    {
                        Console.WriteLine("Invalid command line arguments");
@@ -62,7 +62,7 @@ public class App
                        if (xmlScopes != null)
                        {
                            // go through all the dictionaries and compare their values with db
-                           if (_mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes))
+                           if (await _mainManager.CompareXmlScopesWithDBScopesAsync(xmlScopes, DbScopes))
                            {
                                Console.WriteLine("no conflictions");
 

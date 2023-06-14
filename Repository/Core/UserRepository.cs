@@ -16,7 +16,7 @@ namespace Repository.Core
         {
         }
 
-        public M_User GetValidatedUser(string userId)
+        public M_User? GetValidatedUser(string userId)
         {
             return _context.Allowd_User.SingleOrDefault(n => n.UserID == userId);
         } 

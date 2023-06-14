@@ -51,6 +51,7 @@ static IHostBuilder CreateHostBuilder(string[] args)
              .UseLoggerFactory(LoggerFactory.Create(builder =>
              {
                  builder.AddFilter((category, level) =>
+                     category != null &&
                      !category.Equals("Microsoft.EntityFrameworkCore.Database.Command") || level == LogLevel.Error);
              }))
          );

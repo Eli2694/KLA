@@ -36,7 +36,7 @@ namespace Repository.Core
             return _entities.AsNoTracking().Where(predicate).ToList();
         }
 
-        public TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
+        public TEntity? SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
         {
             return _entities.SingleOrDefault(predicate);
         }
