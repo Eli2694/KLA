@@ -30,17 +30,14 @@ namespace Entity
             _log = log;
         }
 
-        public bool ValidateXmlFilePaths(List<string> filePaths)
+        public bool ValidateXmlFilePath(string filePath)
         {
             bool isValid = true;
 
-            foreach (var filePath in filePaths)
+            if (!File.Exists(filePath))
             {
-                if (!File.Exists(filePath))
-                {
-                    _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
-                    isValid = false; 
-                }
+                _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
+                isValid = false;
             }
 
             return isValid;

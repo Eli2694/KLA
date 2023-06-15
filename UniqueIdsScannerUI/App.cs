@@ -14,143 +14,127 @@ using Microsoft.Extensions.Configuration;
 
 public class App
 {
-	private readonly LogManager _log;
+    private readonly LogManager _log;
     private readonly MainManager _mainManager;
     private readonly IConfiguration _settings;
 
     public App(LogManager log, MainManager mainManager, IConfiguration settings)
     {
-		_log = log;
+        _log = log;
         _mainManager = mainManager;
         _settings = settings;
     }
+
     internal void Run(string[] args)
     {
-
-        //args = new string[3];
-        //args[0] = "--update"; 
-        //args[1] = "-f";
-        //args[2] = @"C:\ZionNet\DevOps\KLA\DataDictionaryValidation-ExampleApp\InputFiles\ATLAS.reassign.xml"; 
-
-        args = new string[1];
-        args[0] = "--update"; 
-
-        //if user acces without args params then start user interface
         if (args.Length == 0)
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Instructions:");
-            Console.WriteLine("Xml Paths Reside in Configuration file:");
-            Console.WriteLine("For Verifying The Content Of Xml Files Use: UniqueIdsScanner.exe --verify");
-            Console.WriteLine("For Updating The Database Use : UniqueIdsScanner.exe --update");
-            Console.WriteLine("Input Xml Path:");
-            Console.ResetColor();
-            
+            DisplayInstructions();
         }
         else
         {
-
-            var listOfXmlFileFromAppSettings = _settings.GetSection("XmlFilesPath").Get<List<string>>();
-
-            using (var parser = new CommandLine.Parser((settings) =>
-            {
-                settings.CaseSensitive = true;
-            }))
-            {
-                //add logs
-                var result = Parser.Default.ParseArguments<CliOptions>(args)
-               .WithParsed(Options => {
-                   if (string.IsNullOrWhiteSpace(Options.filePath))
-                   {
-                       Console.WriteLine("Invalid command line arguments");
-                       throw new ArgumentException("filePath is null or empty or white-space");
-                   }
-                   else
-                   {
-
-                       RunVerifyAndUpdate(Options.filePath, Options.isUpdate);
-                   }
-               })
-               //if user enterd wrong arguments
-               .WithNotParsed((errs) => throw new ArgumentException($"Failed to parse command line arguments: {errs}"));
-            }
+            ParseArgumentsAndRunOptions(args);
         }
     }
 
-
-    public void RunVerifyAndUpdate(string filepath, bool isUpdate)
+    private void DisplayInstructions()
     {
-        M_SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
-        M_SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("Instructions:");
+        Console.WriteLine("Xml Paths Reside in Configuration file:");
+        Console.WriteLine("For Verifying The Content Of Xml Files Use: UniqueIdsScanner.exe --verify");
+        Console.WriteLine("For Updating The Database Use : UniqueIdsScanner.exe --update");
+        Console.WriteLine("Input Xml Path:");
+        Console.ResetColor();
+    }
 
-        Console.WriteLine("verifying: " + filepath.Trim());
-        //verifying
-        if (xmlScopes != null)
+    private void ParseArgumentsAndRunOptions(string[] args)
+    {
+        using (var parser = new CommandLine.Parser((settings) => { settings.CaseSensitive = true; }))
         {
-            // go through all the dictionaries and compare their values with db
-            if (_mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes))
-            {
-                Console.WriteLine("no conflicts");
+            Parser.Default.ParseArguments<CliOptions>(args)
+                .WithParsed<CliOptions>(options => RunOptions(options))
+                .WithNotParsed(HandleParseError);
+        }
+    }
 
-                //if user selected the --update cliCommand option
-                if (isUpdate)
-                {
-                    _mainManager.UpdateDatabaseWithNewUniqueIds();
-                }
+    private void HandleParseError(IEnumerable<Error> errors)
+    {
+        // Provide meaningful error message to user and/or log it.
+        // ...
+    }
+
+    private void RunOptions(CliOptions options)
+    {
+        List<string> xmlFilePaths = GetFilePaths(options);
+        List<string> validXmlFilePaths = new List<string>();
+
+        foreach (var xmlFile in xmlFilePaths)
+        {
+            if (_mainManager.ValidateXmlFilePath(xmlFile))
+            {
+                validXmlFilePaths.Add(xmlFile);
             }
+            else
+            {
+                _log.LogError($"Invalid File Path: {xmlFile}", LogProviderType.Console);
+            }
+        }
+
+        if (validXmlFilePaths.Count == 0)
+        {
+            throw new ArgumentException("No valid file paths found");
+        }
+
+        foreach (var validXmlFile in validXmlFilePaths)
+        {
+            ProcessXmlFile(validXmlFile, options);
+        }
+    }
+
+    private void ProcessXmlFile(string filePath, CliOptions options)
+    {
+        bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath) : false;
+
+        if (options.isUpdate)
+        {
+            RunUpdate(CanBeUpdated);
+        }
+    }
+
+    private List<string> GetFilePaths(CliOptions options)
+    {
+        if (options.filePath != null)
+        {
+            return new List<string> { options.filePath };
         }
         else
         {
-            _log.LogError("Can't seperate xml file to scopes", LogProviderType.Console);
+            return _settings.GetSection("XmlFilesPath").Get<List<string>>();
+        }
+    }
+
+    private bool RunVerify(string filepath)
+    {
+        M_SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
+
+        if (xmlScopes == null)
+        {
+            _log.LogError("Can't separate xml file to scopes", LogProviderType.Console);
+            return false;
+        }
+
+        M_SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+        return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes);
+    }
+
+    private void RunUpdate(bool isUpdate)
+    {
+        if (isUpdate)
+        {
+            _mainManager.UpdateDatabaseWithNewUniqueIds();
         }
     }
 }
 
 
-//if (_mainManager.ValidateXmlFilePaths(listOfXmlFileFromAppSettings))
-//{
-//    using (var parser = new CommandLine.Parser((settings) =>
-//    {
-//        settings.CaseSensitive = true;
-//    }))
-//    {
-//        //add logs
-//        var result = Parser.Default.ParseArguments<CliOptions>(args)
-//       .WithParsed(Options => {
-//           if (string.IsNullOrWhiteSpace(Options.filePath))
-//           {
-//               Console.WriteLine("Invalid command line arguments");
-//               throw new ArgumentException("filePath is null or empty or white-space");
-//           }
-//           else
-//           {
-//               M_SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(Options.filePath);
-//               M_SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
-
-//               Console.WriteLine("verifying: " + Options.filePath.Trim());
-//               //verifying
-//               if (xmlScopes != null)
-//               {
-//                   // go through all the dictionaries and compare their values with db
-//                   if (_mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes))
-//                   {
-//                       Console.WriteLine("no conflicts");
-
-//                       //if user selected the --update cliCommand option
-//                       if (Options.isUpdate)
-//                       {
-//                           _mainManager.UpdateDatabaseWithNewUniqueIds();
-//                       }
-//                   }
-//               }
-//               else
-//               {
-//                   _log.LogError("Can't read from xml file", LogProviderType.Console);
-//                   throw new Exception();
-//               }
-//           }
-//       })
-//       //if user enterd wrong arguments
-//       .WithNotParsed((errs) => throw new ArgumentException($"Failed to parse command line arguments: {errs}"));
-//    }
-//}
