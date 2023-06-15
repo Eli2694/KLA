@@ -12,8 +12,7 @@ namespace Entity.Scanners
 {
     public class AlarmScanner : BaseScanner, IScanner 
     {
-        
-        public AlarmScanner(LogManager log) : base(log)
+		public AlarmScanner(LogManager log ) : base(log)
         {
         }
 
