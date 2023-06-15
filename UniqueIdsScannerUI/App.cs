@@ -28,8 +28,12 @@ public class App
     {
 
         //args = new string[3];
-        //args[0] = "--update"; args[1] = "-f"; args[2] = @"C:\ZionNet\DevOps\KLA\DataDictionaryValidation-ExampleApp\InputFiles\ATLAS.reassign.xml"; // Uniqe.exe --update -f/-c/-a path = verify&update else = verify
-        ////args[0] = "-f"; args[1] = "path";
+        //args[0] = "--update"; 
+        //args[1] = "-f";
+        //args[2] = @"C:\ZionNet\DevOps\KLA\DataDictionaryValidation-ExampleApp\InputFiles\ATLAS.reassign.xml"; 
+
+        args = new string[1];
+        args[0] = "--update"; 
 
         //if user acces without args params then start user interface
         if (args.Length == 0)
