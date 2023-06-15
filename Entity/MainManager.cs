@@ -52,25 +52,36 @@ namespace Entity
             {
                 if (File.Exists(filePath))
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(M_KlaXML));
-                    M_KlaXML? klaXml;
-
-                    using (XmlReader reader = XmlReader.Create(filePath))
+                    if (Path.GetExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
                     {
-                        klaXml = (M_KlaXML?)serializer.Deserialize(reader);
-                    }
+                        XmlSerializer serializer = new XmlSerializer(typeof(M_KlaXML));
+                        M_KlaXML? klaXml;
 
-                    if (klaXml != null)
+                        using (XmlReader reader = XmlReader.Create(filePath))
+                        {
+                            klaXml = (M_KlaXML?)serializer.Deserialize(reader);
+                        }
+
+                        if (klaXml != null)
+                        {
+                            M_SeperatedScopes dataForDB = new M_SeperatedScopes();
+
+                            dataForDB.VariablesList = _variableScanner.ScanCode(klaXml);
+                            dataForDB.EventsList = _eventScanner.ScanCode(klaXml);
+                            dataForDB.AlarmsList = _alarmScanner.ScanCode(klaXml);
+                            CheckAllScopesForDuplicates(dataForDB);
+
+                            return dataForDB;
+                        }                   
+                    }
+                    else
                     {
-                        M_SeperatedScopes dataForDB = new M_SeperatedScopes();
-
-                        dataForDB.VariablesList = _variableScanner.ScanCode(klaXml);
-                        dataForDB.EventsList = _eventScanner.ScanCode(klaXml);
-                        dataForDB.AlarmsList = _alarmScanner.ScanCode(klaXml);
-                        CheckAllScopesForDuplicates(dataForDB);
-
-                        return dataForDB;
+                        _log.LogError($"{filePath} - File exist but is not an xml", LogProviderType.Console);
                     }
+                }
+                else
+                {
+                    _log.LogError($"{filePath} - Doesnt exist", LogProviderType.Console);
                 }
 
                 return null;

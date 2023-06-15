@@ -35,8 +35,8 @@ public class App
         //args[2] = @"C:\ZionNet\DevOps\KLA\DataDictionaryValidation-ExampleApp\InputFiles\ATLAS.reassign.xml";
 
         // Uncomment the following lines for testing purposes
-        args = new string[2];
-        args[0] = "update"; args[1] = "-f";
+       // args = new string[2];
+       // args[0] = "update"; args[1] = "-f";
 
         if (args.Length == 0)
         {
@@ -105,26 +105,27 @@ public class App
 
     public void VerifyXmlFile(string filepath, bool isUpdate)
     {
-        M_SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
-        M_SeperatedScopes? dbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
-
-        Console.WriteLine($"Verifying: {filepath.Trim()}");
-
-        if (xmlScopes == null)
+        try
         {
-            _log.LogError("Can't separate xml file to scopes", LogProviderType.Console);
-            return;
-        }
+            M_SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
+            M_SeperatedScopes? dbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
 
-        if (_mainManager.CompareXmlScopesWithDBScopes(xmlScopes, dbScopes))
-        {
-            Console.WriteLine("No conflicts");
+            Console.WriteLine($"Verifying: {filepath.Trim()}");
 
-            if (isUpdate)
+            if (xmlScopes != null && _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, dbScopes))
             {
-                _mainManager.UpdateDatabaseWithNewUniqueIds();
+                Console.WriteLine("No conflicts");
+
+                if (isUpdate)
+                {
+                    _mainManager.UpdateDatabaseWithNewUniqueIds();
+                }
             }
         }
+        catch (Exception)
+        {
+            _log.LogError("Can't separate xml file to scopes", LogProviderType.Console);
+        }    
     }
 }
 
