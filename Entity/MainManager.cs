@@ -30,6 +30,22 @@ namespace Entity
             _log = log;
         }
 
+        public bool ValidateXmlFilePaths(List<string> filePaths)
+        {
+            bool isValid = true;
+
+            foreach (var filePath in filePaths)
+            {
+                if (!File.Exists(filePath))
+                {
+                    _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
+                    isValid = false; 
+                }
+            }
+
+            return isValid;
+        }
+
         public M_SeperatedScopes? XmlToSeperatedScopes(string filePath)
         {
             try

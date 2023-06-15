@@ -79,7 +79,6 @@ namespace Entity.Scanners
 
         private void ReportNewUniqueIds()
         {
-            Console.WriteLine("Unique IDs present in XML but not in DB:");
             foreach (var uniqueId in newUniqueIdsFromXml)
             {
                 _log.LogEvent($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}, Scope: {uniqueId.Scope}, Timestamp: {uniqueId.Timestamp}", LogProviderType.Console);
