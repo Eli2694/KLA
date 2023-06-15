@@ -18,7 +18,7 @@ namespace Entity
         private readonly AlarmScanner _alarmScanner;
         private readonly EventScanner _eventScanner;
         private readonly VariableScanner _variableScanner;
-        public readonly IUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly LogManager _log;
 
         public MainManager(AlarmScanner alarmScanner, EventScanner eventScanner, VariableScanner variableScanner, IUnitOfWork unitOfWork, LogManager log) 
@@ -189,6 +189,7 @@ namespace Entity
             if (newIds != null && newIds.Any())
             {
                 _unitOfWork.UniqueIds.AddRange(newIds);
+                scanner.newUniqueIdsFromXml.Clear();
             }
         }
     }

@@ -12,7 +12,6 @@ namespace Entity.Scanners
     {
         protected readonly LogManager _log;
         public List<M_UniqueIds> newUniqueIdsFromXml;
-
         public BaseScanner(LogManager log)
         {
             newUniqueIdsFromXml = new List<M_UniqueIds>();
@@ -81,7 +80,7 @@ namespace Entity.Scanners
         {
             foreach (var uniqueId in newUniqueIdsFromXml)
             {
-                _log.LogEvent($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}, Scope: {uniqueId.Scope}, Timestamp: {uniqueId.Timestamp}", LogProviderType.Console);
+                _log.LogEvent($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}", LogProviderType.Console);
             }
         }
     }
