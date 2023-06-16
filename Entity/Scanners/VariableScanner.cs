@@ -17,12 +17,12 @@ namespace Entity.Scanners
         {
         }
 
-        public List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
+        public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
             try
             {
                 var dataVariablesList = ktgemvar.DataVariables.Select(datavar =>
-                    new M_UniqueIds
+                    new UniqueIds
                     {
                         EntityType = "DataVariable",
                         ID = datavar.Id.ToString(),
@@ -32,7 +32,7 @@ namespace Entity.Scanners
                     });
 
                 var equipmentConstantsList = ktgemvar.EquipmentConstants.Select(equipment =>
-                    new M_UniqueIds
+                    new UniqueIds
                     {
                         EntityType = "EquipmentConstant",
                         ID = equipment.Id.ToString(),
@@ -42,7 +42,7 @@ namespace Entity.Scanners
                     });
 
                 var dynamicVariablesList = ktgemvar.DynamicVariables.Select(dynamic =>
-                    new M_UniqueIds
+                    new UniqueIds
                     {
                         EntityType = "DynamicVariable",
                         ID = dynamic.Id.ToString(),
@@ -52,7 +52,7 @@ namespace Entity.Scanners
                     });
 
                 var statusVariablesList = ktgemvar.StatusVariables.Select(status =>
-                    new M_UniqueIds
+                    new UniqueIds
                     {
                         EntityType = "StatusVariable",
                         ID = status.Id.ToString(),

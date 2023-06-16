@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace Repository.Core
 {
-    public class UserRepository : Repository<M_User>, IUserRepository
+    public class UserRepository : Repository<User>, IUserRepository
     {
         public UserRepository(KlaContext context) : base(context)
         {
         }
 
-        public M_User GetValidatedUser(string userId)
+        public User GetValidatedUser(string userId)
         {
             return _context.Allowd_User.SingleOrDefault(n => n.UserID == userId);
         } 

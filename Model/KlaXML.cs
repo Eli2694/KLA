@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 namespace Model
 {
     [XmlRoot("ktgem")]
-    public class M_KlaXML
+    public class KlaXML
     {
             [XmlElement("header")]
             public Header Header { get; set; }

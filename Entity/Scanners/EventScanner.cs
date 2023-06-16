@@ -11,9 +11,9 @@ namespace Entity.Scanners
         {
         }
 
-        public List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
+        public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
-            return ktgemvar.Events.Select(evnt => new M_UniqueIds
+            return ktgemvar.Events.Select(evnt => new UniqueIds
             {
                 EntityType = "Event",
                 ID = evnt.Id.ToString(),

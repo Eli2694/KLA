@@ -17,9 +17,9 @@ namespace Entity.Scanners
         {
         }
 
-        public List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
+        public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
-            return ktgemvar.Alarms.Select(alarm => new M_UniqueIds
+            return ktgemvar.Alarms.Select(alarm => new UniqueIds
             {
                 EntityType = "Alarm",
                 ID = alarm.Id.ToString(),

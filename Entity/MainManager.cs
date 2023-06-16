@@ -46,7 +46,7 @@ namespace Entity
             return isValid;
         }
 
-        public M_SeperatedScopes? XmlToSeperatedScopes(string filePath)
+        public SeperatedScopes? XmlToSeperatedScopes(string filePath)
         {
             try
             {
@@ -54,17 +54,17 @@ namespace Entity
                 {
                     if (Path.GetExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
                     {
-                        XmlSerializer serializer = new XmlSerializer(typeof(M_KlaXML));
-                        M_KlaXML? klaXml;
+                        XmlSerializer serializer = new XmlSerializer(typeof(KlaXML));
+                        KlaXML? klaXml;
 
                         using (XmlReader reader = XmlReader.Create(filePath))
                         {
-                            klaXml = (M_KlaXML?)serializer.Deserialize(reader);
+                            klaXml = (KlaXML?)serializer.Deserialize(reader);
                         }
 
                         if (klaXml != null)
                         {
-                            M_SeperatedScopes dataForDB = new M_SeperatedScopes();
+                            SeperatedScopes dataForDB = new SeperatedScopes();
 
                             dataForDB.VariablesList = _variableScanner.ScanCode(klaXml);
                             dataForDB.EventsList = _eventScanner.ScanCode(klaXml);
@@ -92,14 +92,14 @@ namespace Entity
             }
         }
 
-        public void CheckAllScopesForDuplicates(M_SeperatedScopes dataForDb)
+        public void CheckAllScopesForDuplicates(SeperatedScopes dataForDb)
         {
             CheckForDuplicates(dataForDb.EventsList, "EventsList");
             CheckForDuplicates(dataForDb.AlarmsList, "AlarmsList");
             CheckForDuplicates(dataForDb.VariablesList, "VariablesList");
         }
 
-        private void CheckForDuplicates(List<M_UniqueIds> list, string listName)
+        private void CheckForDuplicates(List<UniqueIds> list, string listName)
         {
             var duplicateNames = list.GroupBy(v => v.Name).Where(g => g.Count() > 1).Select(g => g.Key);
             var duplicateIDs = list.GroupBy(v => v.ID).Where(g => g.Count() > 1).Select(g => g.Key);
@@ -118,17 +118,17 @@ namespace Entity
             }
         }
 
-        public List<M_UniqueIds> RetriveUniqeIDsFromDB()
+        public List<UniqueIds> RetriveUniqeIDsFromDB()
         {
             var result = _unitOfWork.UniqueIds.GetAll();     
-            return (List<M_UniqueIds>) result;
+            return (List<UniqueIds>) result;
         }
 
-        public M_SeperatedScopes SortUniqeIDsFromDbByScope(List<M_UniqueIds> ListFromDB)
+        public SeperatedScopes SortUniqeIDsFromDbByScope(List<UniqueIds> ListFromDB)
         {
             try
             {
-                M_SeperatedScopes DbInObjects = new M_SeperatedScopes();
+                SeperatedScopes DbInObjects = new SeperatedScopes();
 
                 foreach (var obj in ListFromDB)
                 {
@@ -155,7 +155,7 @@ namespace Entity
 
         }
 
-        public bool CompareXmlScopesWithDBScopes(M_SeperatedScopes xmlSeperatedScopes, M_SeperatedScopes DbSeperatedScopes)
+        public bool CompareXmlScopesWithDBScopes(SeperatedScopes xmlSeperatedScopes, SeperatedScopes DbSeperatedScopes)
         {
             return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList) &&
                     _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList) &&
