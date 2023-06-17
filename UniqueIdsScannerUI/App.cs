@@ -22,9 +22,6 @@ public class App
     internal void Run(string[] args)
     {
 
-        args = new string[1];
-        args[0] = "--verify";
-
         try
         {
             if (args.Length == 0)
