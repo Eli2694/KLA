@@ -6,16 +6,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utility_LOG;
 
 namespace Repository.Core
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly KlaContext _context;
+        private readonly LogManager _log;
 
-        public UnitOfWork(KlaContext context)
+        public UnitOfWork(KlaContext context, LogManager log)
         {
             _context = context;
+            _log = log;
             UniqueIds = new UniqueIdsRepository(_context);
             Users = new UserRepository(_context);
         }
@@ -32,24 +35,17 @@ namespace Repository.Core
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                // Handle the concurrency exception.
-                // You could log the error message and/or display a user-friendly message to the end user.
-                Console.WriteLine($"Concurrency error in Save: {ex.Message}");
-
-                // If necessary, you can rethrow the exception to propagate the error upwards.
+                _log.LogError($"Concurrency error in Save: {ex.Message}",LogProviderType.File);
                 throw;
             }
             catch (DbUpdateException ex)
             {
-                // This is another type of exception that can be thrown by SaveChanges.
-                // It can be due to SQL Server errors, connectivity issues, etc.
-                Console.WriteLine($"Database update error in Save: {ex.Message}");
+                _log.LogError($"Database update error in Save: {ex.Message}", LogProviderType.File);
                 throw;
             }
             catch (Exception ex)
             {
-                // This will catch any other types of exceptions.
-                Console.WriteLine($"An error occurred in Save: {ex.Message}");
+                _log.LogError($"An error occurred in Save: {ex.Message}", LogProviderType.File);
                 throw;
             }
 
@@ -58,7 +54,14 @@ namespace Repository.Core
         public void Dispose()
         {
 
-            _context.Dispose();
+            try
+            {
+                _context.Dispose();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred while disposing the database context: {ex.Message}", LogProviderType.File);
+            }
         }
     }
 }

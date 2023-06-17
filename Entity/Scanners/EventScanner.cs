@@ -13,15 +13,23 @@ namespace Entity.Scanners
 
         public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
-            return ktgemvar.Events.Select(evnt => new UniqueIds
+            try
             {
-                EntityType = "Event",
-                ID = evnt.Id.ToString(),
-                Name = evnt.Name,
-                Scope = "event",
-                Timestamp = DateTime.Now
-            })
-            .ToList();
+                return ktgemvar.Events.Select(evnt => new UniqueIds
+                {
+                    EntityType = "Event",
+                    ID = evnt.Id.ToString(),
+                    Name = evnt.Name,
+                    Scope = "event",
+                    Timestamp = DateTime.Now
+                })
+                            .ToList();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }     
         } 
     }
 }

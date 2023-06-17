@@ -32,15 +32,24 @@ namespace Entity
 
         public bool ValidateXmlFilePath(string filePath)
         {
-            bool isValid = true;
-
-            if (!File.Exists(filePath))
+            try
             {
-                _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
-                isValid = false;
-            }
+                bool isValid = true;
 
-            return isValid;
+                if (!File.Exists(filePath))
+                {
+                    _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.Console);
+                _log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.File);
+                return false;
+            }
         }
 
         public SeperatedScopes? XmlToSeperatedScopes(string filePath)
@@ -109,16 +118,22 @@ namespace Entity
 
         private bool CheckForDuplicates(List<UniqueIds> list, string listName)
         {
-            var duplicateNames = list.GroupBy(v => v.Name).Where(g => g.Count() > 1).Select(g => g.Key);
-            var duplicateIDs = list.GroupBy(v => v.ID).Where(g => g.Count() > 1).Select(g => g.Key);
+            try
+            {
+                var duplicateNames = list.GroupBy(v => v.Name).Where(g => g.Count() > 1).Select(g => g.Key);
+                var duplicateIDs = list.GroupBy(v => v.ID).Where(g => g.Count() > 1).Select(g => g.Key);
 
-            bool duplicatesFound = false;
-            // If either of the calls to LogDuplicates returns true, 
-            // duplicatesFound will be set to true due to the OR assignment operator (|=).
-            duplicatesFound |= LogDuplicates(listName, "names", duplicateNames);
-            duplicatesFound |= LogDuplicates(listName, "IDs", duplicateIDs);
+                bool duplicatesFound = false;
+                duplicatesFound |= LogDuplicates(listName, "names", duplicateNames);
+                duplicatesFound |= LogDuplicates(listName, "IDs", duplicateIDs);
 
-            return duplicatesFound;
+                return duplicatesFound;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in CheckForDuplicates: {ex.Message}", LogProviderType.File);
+                return false;
+            }
         }
 
 
@@ -143,8 +158,16 @@ namespace Entity
 
         public List<UniqueIds> RetriveUniqeIDsFromDB()
         {
-            var result = _unitOfWork.UniqueIds.GetAll();     
-            return (List<UniqueIds>) result;
+            try
+            {
+                var result = _unitOfWork.UniqueIds.GetAll();
+                return (List<UniqueIds>)result;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in RetriveUniqeIDsFromDB: {ex.Message}", LogProviderType.File);
+                return null;
+            }
         }
 
         public SeperatedScopes SortUniqeIDsFromDbByScope(List<UniqueIds> ListFromDB)
@@ -180,9 +203,17 @@ namespace Entity
 
         public bool CompareXmlScopesWithDBScopes(SeperatedScopes xmlSeperatedScopes, SeperatedScopes DbSeperatedScopes)
         {
-            return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList) &&
-                    _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList) &&
-                    _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList);
+            try
+            {
+                return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList) &&
+                        _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList) &&
+                        _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList);
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in CompareXmlScopesWithDBScopes: {ex.Message}", LogProviderType.File);
+                return false;
+            }
         }
 
         //public async Task<bool> CompareXmlScopesWithDBScopes(M_SeperatedScopes xmlSeperatedScopes, M_SeperatedScopes DbSeperatedScopes)
@@ -198,11 +229,19 @@ namespace Entity
 
         public void UpdateDatabaseWithNewUniqueIds()
         {
-            UpdateDatabaseWithScanner(_alarmScanner);
-            UpdateDatabaseWithScanner(_eventScanner);
-            UpdateDatabaseWithScanner(_variableScanner);
+            try
+            {
+                UpdateDatabaseWithScanner(_alarmScanner);
+                UpdateDatabaseWithScanner(_eventScanner);
+                UpdateDatabaseWithScanner(_variableScanner);
 
-            _unitOfWork.Complete();
+                _unitOfWork.Complete();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.Console);
+                _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.File);
+            }
         }
 
         private void UpdateDatabaseWithScanner(BaseScanner scanner)

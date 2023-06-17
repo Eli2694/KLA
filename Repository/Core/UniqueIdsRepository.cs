@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utility_LOG;
 
 namespace Repository.Core
 {
@@ -18,9 +19,18 @@ namespace Repository.Core
 
         public IEnumerable<UniqueIds> GetSpecificScope(string scope)
         {
-            return _context.Unique_Ids
-                .Where(x => x.Scope == scope)
-                .ToList();
+            try
+            {
+                return _context.Unique_Ids
+                                .Where(x => x.Scope == scope)
+                                .ToList();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
 
     }

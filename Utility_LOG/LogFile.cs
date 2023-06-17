@@ -44,7 +44,7 @@ namespace Utility_LOG
             {
                 using (StreamWriter sw = new StreamWriter(FileName, true))
                 {
-                    sw.WriteLine(msg + DateTime.Now);
+                    sw.WriteLine("[EVENT][" + DateTime.Now + "] " + msg);
                 }
                 
             }
@@ -59,7 +59,7 @@ namespace Utility_LOG
             {
                 using (StreamWriter sw = new StreamWriter(FileName, true))
                 {
-                    sw.WriteLine(msg + DateTime.Now);
+                    sw.WriteLine("[ERROR][" + DateTime.Now + "] " + msg);
                 }
 
             }
@@ -74,8 +74,9 @@ namespace Utility_LOG
             {
                 using (StreamWriter sw = new StreamWriter(FileName, true))
                 {
-                    sw.WriteLine(msg + DateTime.Now);
-                    sw.WriteLine(exce.ToString() + DateTime.Now);
+                    sw.WriteLine("[EXCEPTION][" + DateTime.Now + "] " + msg + ", " + exce.Message);
+                    sw.WriteLine("Stack Trace: " + exce.StackTrace);
+
                 }
 
             }

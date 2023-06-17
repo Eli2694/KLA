@@ -18,14 +18,23 @@ namespace Entity.Scanners
 
         public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
-            return ktgemvar.Alarms.Select(alarm => new UniqueIds
+            try
             {
-                EntityType = "Alarm",
-                ID = alarm.Id.ToString(),
-                Name = alarm.Name,
-                Scope = "alarm",
-                Timestamp = DateTime.Now
-            }).ToList();
+                return ktgemvar.Alarms.Select(alarm => new UniqueIds
+                {
+                    EntityType = "Alarm",
+                    ID = alarm.Id.ToString(),
+                    Name = alarm.Name,
+                    Scope = "alarm",
+                    Timestamp = DateTime.Now
+                }).ToList();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
     }
 }

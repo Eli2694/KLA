@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entity", "Entity\Entity.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utility_LOG", "Utility_LOG\Utility_LOG.csproj", "{6692A618-2E29-433F-AE27-9A7C1DD74EF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entity.UnitTest", "Entity.UnitTest\Entity.UnitTest.csproj", "{00CBD45A-F4DC-4697-A579-3417B780988F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entity.UnitTest", "Entity.UnitTest\Entity.UnitTest.csproj", "{00CBD45A-F4DC-4697-A579-3417B780988F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

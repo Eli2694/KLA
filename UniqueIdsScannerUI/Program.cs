@@ -24,7 +24,7 @@ try
 }
 catch (Exception ex)
 {
-  Console.WriteLine(ex.ToString());
+    logManager.LogException(ex.Message, ex, LogProviderType.File);
 }
 
 

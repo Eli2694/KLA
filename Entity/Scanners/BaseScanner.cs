@@ -22,23 +22,32 @@ namespace Entity.Scanners
 
         public bool CompareXmlScopeWithDBScope(List<UniqueIds> xml, List<UniqueIds> db)
         {
-            var dbByIdDictionary = db.ToDictionary(k => k.ID, v => v);
-            var dbByNameDictionary = db.ToDictionary(k => k.Name, v => v);
-            var errorMessages = new List<string>();
-
-            ValidateElements(xml, dbByIdDictionary, dbByNameDictionary, errorMessages);
-
-            if (errorMessages.Count > 0)
+            try
             {
-                foreach (var errorMessage in errorMessages)
+                var dbByIdDictionary = db.ToDictionary(k => k.ID, v => v);
+                var dbByNameDictionary = db.ToDictionary(k => k.Name, v => v);
+                var errorMessages = new List<string>();
+
+                ValidateElements(xml, dbByIdDictionary, dbByNameDictionary, errorMessages);
+
+                if (errorMessages.Count > 0)
                 {
-                    _log.LogError(errorMessage, LogProviderType.Console);
+                    foreach (var errorMessage in errorMessages)
+                    {
+                        _log.LogError(errorMessage, LogProviderType.Console);
+                        _log.LogError(errorMessage, LogProviderType.File);
+                    }
+                    return false;
                 }
+
+                AddUniqueIdsFromXmlToList(xml, dbByIdDictionary);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in CompareXmlScopeWithDBScope: {ex.Message}", LogProviderType.File);
                 return false;
             }
-
-            AddUniqueIdsFromXmlToList(xml, dbByIdDictionary);
-            return true;
         }
 
         private void ValidateElements(List<UniqueIds> xml, Dictionary<string, UniqueIds> dbByIdDictionary, Dictionary<string, UniqueIds> dbByNameDictionary, List<string> errorMessages)

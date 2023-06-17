@@ -2,13 +2,19 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Model;
+using Utility_LOG;
 
 namespace DAL
 {
     public class KlaContext : DbContext
     {
-        public KlaContext(DbContextOptions<KlaContext> dbContextOption) : base(dbContextOption)
+        private readonly LogManager _log;
+
+        public KlaContext(DbContextOptions<KlaContext> dbContextOption, LogManager log ) : base(dbContextOption)
         {
+
+            _log = log;
+
             try
             {
                 ChangeTracker.LazyLoadingEnabled = false;
@@ -23,10 +29,9 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                // Write to log
-                throw new Exception(ex.ToString());
-            }
-
+                _log.LogException(ex.Message, ex, LogProviderType.File);
+                throw;
+            }    
         }
 
         

@@ -21,14 +21,22 @@ public class App
 
     internal void Run(string[] args)
     {
-        if (args.Length == 0)
+        try
         {
-
-            DisplayInstructions();
+            if (args.Length == 0)
+            {
+                DisplayInstructions();
+            }
+            else
+            {
+                ParseArgumentsAndRunOptions(args);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            ParseArgumentsAndRunOptions(args);
+            _log.LogException("Exception in Run method", ex, LogProviderType.Console);
+            _log.LogException("Exception in Run method", ex, LogProviderType.File);
+            throw;
         }
     }
 
@@ -38,23 +46,37 @@ public class App
         Console.WriteLine("Welcome to Unique IDs Scanner!");
         Console.WriteLine("================================");
         Console.WriteLine("Instructions:");
-        Console.WriteLine("1. Configure XML paths in the configuration file.");
-        Console.WriteLine("2. To verify the content of XML files, use: UniqueIdsScanner.exe --verify");
-        Console.WriteLine("3. To update the database, use: UniqueIdsScanner.exe --update");
+        Console.WriteLine("1. Configure XML paths in the appsettings.json configuration file.");
+        Console.WriteLine("2. If you want to only verify the content of XML files, use:");
+        Console.WriteLine("   UniqueIdsScanner.exe --verify");
+        Console.WriteLine("   or specify a specific file with:");
+        Console.WriteLine("   UniqueIdsScanner.exe --verify -f 'Path To XML File'");
+        Console.WriteLine("3. If you want to verify and update the database, use:");
+        Console.WriteLine("   UniqueIdsScanner.exe --update");
+        Console.WriteLine("   or specify a specific file with:");
+        Console.WriteLine("   UniqueIdsScanner.exe --update -f 'Path To XML File'");
         Console.WriteLine();
         Console.WriteLine("Example Usages:");
         Console.WriteLine("---------------");
-        Console.WriteLine("1. Verifying XML content:");
-        Console.WriteLine("   UniqueIdsScanner.exe --verify -f 'Path To XML File'");
+        Console.WriteLine("1. Verifying XML content using paths from the appsettings.json:");
+        Console.WriteLine("   UniqueIdsScanner.exe --verify");
         Console.WriteLine();
-        Console.WriteLine("2. Updating the database:");
-        Console.WriteLine("   UniqueIdsScanner.exe --update -f 'Path To XML File'");
+        Console.WriteLine("2. Verifying specific XML file:");
+        Console.WriteLine("   UniqueIdsScanner.exe --verify -f 'C:\\folder\\file.xml'");
+        Console.WriteLine();
+        Console.WriteLine("3. Updating the database using paths from the appsettings.json:");
+        Console.WriteLine("   UniqueIdsScanner.exe --update");
+        Console.WriteLine();
+        Console.WriteLine("4. Updating the database with a specific XML file:");
+        Console.WriteLine("   UniqueIdsScanner.exe --update -f 'C:\\folder\\file.xml'");
         Console.WriteLine();
         Console.WriteLine("** Please follow the instructions carefully. **");
         Console.WriteLine("==============================================");
         Console.WriteLine("Press any key to quit.");
         Console.ResetColor();
+        Console.ReadKey();
     }
+
 
     private void ParseArgumentsAndRunOptions(string[] args)
     {
@@ -93,7 +115,7 @@ public class App
 
         if (inValidXmlFilePaths.Any())
         {
-            throw new ArgumentException("invalid file path was found");
+            throw new ArgumentException();
         }
 
         foreach (var validXmlFile in validXmlFilePaths)
@@ -104,11 +126,19 @@ public class App
 
     private void ProcessXmlFile(string filePath, CliOptions options)
     {
-        bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath) : false;
-
-        if (options.isUpdate)
+        try
         {
-            RunUpdate(CanBeUpdated);
+            bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath) : false;
+
+            if (options.isUpdate)
+            {
+                RunUpdate(CanBeUpdated);
+            }
+        }
+        catch (Exception ex)
+        {
+            _log.LogException($"Exception in ProcessXmlFile method for file {filePath}", ex, LogProviderType.File);
+            throw;
         }
     }
 
@@ -126,17 +156,25 @@ public class App
 
     private bool RunVerify(string filepath)
     {
-        SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
-
-        if (xmlScopes == null)
+        try
         {
-            _log.LogError($"Can't separate xml file to scopes: {filepath}", LogProviderType.Console);
-            _log.LogError($"Can't separate xml file to scopes: {filepath}", LogProviderType.File);
-            return false;
-        }
+            SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
 
-        SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
-        return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes);
+            if (xmlScopes == null)
+            {
+                _log.LogError($"Can't separate xml file to scopes: {filepath}", LogProviderType.Console);
+                _log.LogError($"Can't separate xml file to scopes: {filepath}", LogProviderType.File);
+                return false;
+            }
+
+            SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+            return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes);
+        }
+        catch (Exception ex)
+        {
+            _log.LogException($"Exception in RunVerify method for file {filepath}", ex, LogProviderType.File);
+            throw;
+        }
     }
 
     private void RunUpdate(bool isUpdate)
