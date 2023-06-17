@@ -1,110 +1,155 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+using System.Text.RegularExpressions;
+using Utility_LOG;
 
-namespace Utility_LOG
+public class LogFile : ILogger
 {
-    public class LogFile: ILogger
+    private string _fileName;
+    private int count = 0;
+    //private const int MaxFileSize = 50 * 1024 * 1024; //50MB
+    private const int MaxFileSize = 50 * 1024; //50MB
+    private int logWritesSinceHouseKeeping = 0;
+    private const int WritesBeforeHouseKeeping = 10;
+    private StreamWriter logStreamWriter;
+
+    public LogFile()
     {
-        private string _fileName;
-        public string FileName
+        Init();
+    }
+
+    public string FileName
+    {
+        get { return _fileName; }
+        private set { _fileName = value; }
+    }
+
+    public void Init()
+    {
+        FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
+
+        if (logStreamWriter != null)
         {
-            get { return _fileName; }
-            set { _fileName = value; }
+            logStreamWriter.Dispose();
+            logStreamWriter = null;
         }
 
-        private static int count = 0;
-        private static int MaxFileSize = 45 * 1024 * 1024; //45MB
-
-        public void Init() 
+        try
         {
-			FileName = $"{DateTime.Now.ToString("dd-MM-yyyy")}_Log{count}.txt";
-            LogCheckHouseKeeping();
-			FileInfo CheckFile = new FileInfo(FileName);
-			if (!CheckFile.Exists)
-            {
-                try
-                {				
-					using (File.Create(FileName)) { }
-				}
-                catch (Exception ex)
-                {
-					Console.WriteLine($"Error creating file: {ex.Message}");
-                }
-			}
-           
+            logStreamWriter = new StreamWriter(FileName, true);
         }
-        public void LogEvent(string msg)
+        catch (IOException ex)
         {
-            try
-            {
-                using (StreamWriter sw = new StreamWriter(FileName, true))
-                {
-                    sw.WriteLine("[EVENT][" + DateTime.Now + "] " + msg);
-                }
-                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(" LogEvent Func: " + ex.Message);
-            }
-        }
-        public void LogError(string msg)
-        {
-            try
-            {
-                using (StreamWriter sw = new StreamWriter(FileName, true))
-                {
-                    sw.WriteLine("[ERROR][" + DateTime.Now + "] " + msg);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(" LogError Func: " + ex.Message);
-            }
-        }
-        public void LogException(string msg, Exception exce)
-        {
-            try
-            {
-                using (StreamWriter sw = new StreamWriter(FileName, true))
-                {
-                    sw.WriteLine("[EXCEPTION][" + DateTime.Now + "] " + msg + ", " + exce.Message);
-                    sw.WriteLine("Stack Trace: " + exce.StackTrace);
-
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(" LogException Func: " + ex.Message);
-            }
-        }
-        public void LogCheckHouseKeeping()
-        {
-            FileInfo file = new FileInfo(FileName);
-            try
-            {
-                if (file.Exists && file.Length > MaxFileSize) // check size in bytes
-                {
-                    count++;
-                    Init();
-                }
-            }
-            catch (Exception e)
-            {
-                
-                Console.WriteLine($"there was a problem with 'LogCheckHouseKeeping' function: {e.Message}");
-                throw;
-            }
-
+            Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
+            throw; // Or handle the error as appropriate
         }
     }
-}
 
+
+    public void LogEvent(string msg)
+    {
+        WriteLog($"[EVENT][{DateTime.Now}] {msg}");
+    }
+
+    public void LogError(string msg)
+    {
+        WriteLog($"[ERROR][{DateTime.Now}] {msg}");
+    }
+
+    public void LogException(string msg, Exception exce)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"[EXCEPTION][{DateTime.Now}] {msg}, {exce.Message}");
+        sb.AppendLine("Stack Trace: " + exce.StackTrace);
+        WriteLog(sb.ToString());
+    }
+
+    private void WriteLog(string msg)
+    {
+        try
+        {
+            logStreamWriter.WriteLine(msg);
+            logStreamWriter.Flush();
+            logWritesSinceHouseKeeping++;
+
+            if (logWritesSinceHouseKeeping >= WritesBeforeHouseKeeping)
+            {
+                LogCheckHouseKeeping();
+                logWritesSinceHouseKeeping = 0;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error - WriteLog Func: {ex.Message}");
+        }
+    }
+
+    public void LogCheckHouseKeeping()
+    {
+        var logFileInfo = new FileInfo(FileName);
+        logFileInfo.Refresh();
+        if (logFileInfo.Length <= MaxFileSize) // check size in bytes
+            return;
+
+        // Close the current log file
+        logStreamWriter.Close();
+        logStreamWriter.Dispose();
+
+        // Compress and rename the current log file
+        var archivePath = Path.Combine(logFileInfo.DirectoryName, "archive");
+        Directory.CreateDirectory(archivePath);
+
+        // Determine the archive file based on the month and year
+        var archiveFileName = $"{DateTime.Now:yyyy-MM}.zip";
+        var archiveFilePath = Path.Combine(archivePath, archiveFileName);
+
+        // Move the log file to the archive directory temporarily
+        var tempFilePath = Path.Combine(archivePath, logFileInfo.Name);
+        File.Move(logFileInfo.FullName, tempFilePath);
+
+        try
+        {
+            // Add the log file to the archive
+            using (FileStream zipToOpen = new FileStream(archiveFilePath, FileMode.OpenOrCreate))
+            using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
+            {
+                var entryName = Path.GetFileName(tempFilePath);
+                var entry = archive.GetEntry(entryName);
+                var entryVersion = 0;
+                while (entry != null)
+                {
+                    // File with the same name already exists in the ZIP, append a version number
+                    entryName = Path.GetFileNameWithoutExtension(tempFilePath) + $"_{++entryVersion}" + Path.GetExtension(tempFilePath);
+                    entry = archive.GetEntry(entryName);
+                }
+                // Add the file to the existing ZIP
+                archive.CreateEntryFromFile(tempFilePath, entryName);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"There was a problem with 'LogCheckHouseKeeping' function: {e.Message}");
+            throw;
+        }
+        finally
+        {
+            // Delete the original log file from the archive directory
+            File.Delete(tempFilePath);
+
+            // Create a new log file and reset the counter
+            count++;
+            Init();
+        }
+    }
+
+
+    public void Dispose()
+    {
+        logStreamWriter?.Dispose();
+        logStreamWriter = null;
+    }
+}
 

@@ -31,6 +31,7 @@ namespace Repository.Core
         {
             try
             {
+                _log.LogEvent("Save changes to database", LogProviderType.File);
                 _context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException ex)
