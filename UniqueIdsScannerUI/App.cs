@@ -25,12 +25,6 @@ public class App
         {
             if (args.Length == 0)
             {
-                for (int i = 0; i < 100000; i++)
-                {
-                    _log.LogError($"test {i} ", LogProviderType.File);
-                }
-                
-                
 
                 DisplayInstructions();
             }

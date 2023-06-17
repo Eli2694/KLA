@@ -10,10 +10,10 @@ public class LogFile : ILogger
 {
     private string _fileName;
     private int count = 0;
-    //private const int MaxFileSize = 50 * 1024 * 1024; //50MB
-    private const int MaxFileSize = 50 * 1024; //50MB
+    private const int MaxFileSize = 50 * 1024 * 1024; //50MB
     private int logWritesSinceHouseKeeping = 0;
-    private const int WritesBeforeHouseKeeping = 10;
+    private const int WritesBeforeHouseKeeping = 50;
+
     private StreamWriter logStreamWriter;
 
     public LogFile()
