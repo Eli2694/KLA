@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Model\Model.csproj" />
+    <ProjectReference Include="..\Utility_LOG\Utility_LOG.csproj" />
   </ItemGroup>
 
 </Project>
