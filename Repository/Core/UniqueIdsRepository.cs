@@ -13,7 +13,7 @@ namespace Repository.Core
 {
     public class UniqueIdsRepository : Repository<UniqueIds>, IUniqueIdsRepository
     {
-        public UniqueIdsRepository(KlaContext context) : base(context)
+        public UniqueIdsRepository(KlaContext context, LogManager log) : base(context, log)
         {
         }
 
@@ -32,6 +32,5 @@ namespace Repository.Core
             }
             
         }
-
     }
 }

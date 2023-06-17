@@ -7,12 +7,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utility_LOG;
 
 namespace Repository.Core
 {
     public class UserRepository : Repository<User>, IUserRepository
     {
-        public UserRepository(KlaContext context) : base(context)
+        public UserRepository(KlaContext context, LogManager log) : base(context, log)
         {
         }
 

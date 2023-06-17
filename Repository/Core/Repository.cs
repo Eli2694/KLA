@@ -24,11 +24,6 @@ namespace Repository.Core
             _entities = _context.Set<TEntity>();
         }
 
-        public Repository(KlaContext context)
-        {
-            _context = context;
-        }
-
         public IEnumerable<TEntity> GetAll()
         {
             try

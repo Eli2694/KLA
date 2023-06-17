@@ -19,8 +19,8 @@ namespace Repository.Core
         {
             _context = context;
             _log = log;
-            UniqueIds = new UniqueIdsRepository(_context);
-            Users = new UserRepository(_context);
+            UniqueIds = new UniqueIdsRepository(_context, log);
+            Users = new UserRepository(_context, log);
         }
 
 
