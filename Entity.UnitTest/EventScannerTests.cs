@@ -31,14 +31,14 @@ namespace Entity.UnitTest
 			var ktgemvar = CreateKtgemvarWithEvents(events);
 
 			// Act
-			List<M_UniqueIds> result = _target.ScanCode(ktgemvar);
+			List<UniqueIds> result = _target.ScanCode(ktgemvar);
 
 			// Assert
 			Assert.Multiple(() =>
 			{
 				foreach (var evnt in events)
 				{
-					M_UniqueIds uniqueId = result.Find(u => u.ID == evnt.Id.ToString());
+					UniqueIds uniqueId = result.Find(u => u.ID == evnt.Id.ToString());
 
 					Assert.IsNotNull(uniqueId, $"Mapped M_UniqueIds object for Event {evnt.Id} should not be null");
 					Assert.AreEqual("Event", uniqueId.EntityType, $"EntityType for Event {evnt.Id} should be set to 'Event'");
@@ -61,10 +61,10 @@ namespace Entity.UnitTest
 			var ktgemvar = CreateKtgemvarWithEvents(events);
 
 			// Act
-			List<M_UniqueIds> result = _target.ScanCode(ktgemvar);
+			List<UniqueIds> result = _target.ScanCode(ktgemvar);
 
 			// Assert
-			Assert.IsInstanceOf<List<M_UniqueIds>>(result, "The result should be a List<M_UniqueIds>");
+			Assert.IsInstanceOf<List<UniqueIds>>(result, "The result should be a List<M_UniqueIds>");
 		}
 
 		[Test]
@@ -74,15 +74,15 @@ namespace Entity.UnitTest
 			var ktgemvar = CreateKtgemvarWithEvents(new List<Event>());
 
 			// Act
-			List<M_UniqueIds> result = _target.ScanCode(ktgemvar);
+			List<UniqueIds> result = _target.ScanCode(ktgemvar);
 
 			// Assert
 			Assert.IsEmpty(result, "The result should be an empty list");
 		}
 
-		private M_KlaXML CreateKtgemvarWithEvents(List<Event> events)
+		private KlaXML CreateKtgemvarWithEvents(List<Event> events)
 		{
-			return new M_KlaXML { Events = events };
+			return new KlaXML { Events = events };
 		}
 	}
 }

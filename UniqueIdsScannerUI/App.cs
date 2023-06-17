@@ -126,7 +126,7 @@ public class App
 
     private bool RunVerify(string filepath)
     {
-        M_SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
+        SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
 
         if (xmlScopes == null)
         {
@@ -135,7 +135,7 @@ public class App
             return false;
         }
 
-        M_SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+        SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
         return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes);
     }
 

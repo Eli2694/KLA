@@ -61,7 +61,7 @@ namespace Entity
 
                         if (klaXml != null)
                         {
-                            M_SeperatedScopes dataForDB = new M_SeperatedScopes();
+                            SeperatedScopes dataForDB = new SeperatedScopes();
 
                             dataForDB.VariablesList = _variableScanner.ScanCode(klaXml);
                             dataForDB.EventsList = _eventScanner.ScanCode(klaXml);
@@ -97,7 +97,7 @@ namespace Entity
         }
 
 
-        public bool CheckAllScopesForDuplicates(M_SeperatedScopes dataForDb)
+        public bool CheckAllScopesForDuplicates(SeperatedScopes dataForDb)
         {
             bool duplicatesFound = false;
             duplicatesFound |= CheckForDuplicates(dataForDb.EventsList, "EventsList");
@@ -107,7 +107,7 @@ namespace Entity
         }
 
 
-        private bool CheckForDuplicates(List<M_UniqueIds> list, string listName)
+        private bool CheckForDuplicates(List<UniqueIds> list, string listName)
         {
             var duplicateNames = list.GroupBy(v => v.Name).Where(g => g.Count() > 1).Select(g => g.Key);
             var duplicateIDs = list.GroupBy(v => v.ID).Where(g => g.Count() > 1).Select(g => g.Key);

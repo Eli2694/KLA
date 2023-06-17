@@ -23,7 +23,7 @@ namespace Entity.UnitTest
 			_target = new VariableScanner(_mockLogManager.Object);
 		}
 
-		private void AssertMappedUniqueId(M_UniqueIds uniqueId, string id, string entityType, string name, string scope)
+		private void AssertMappedUniqueId(UniqueIds uniqueId, string id, string entityType, string name, string scope)
 		{
 			Assert.IsNotNull(uniqueId, $"Mapped M_UniqueIds object for {entityType} {id} should not be null");
 			Assert.AreEqual(entityType, uniqueId.EntityType, $"EntityType for {entityType} {id} should be set to '{entityType}'");
@@ -63,7 +63,7 @@ namespace Entity.UnitTest
 			var ktgemvar = CreateKtgemvarWithVariables(dataVariables, equipmentConstants, dynamicVariables, statusVariables);
 
 			// Act
-			List<M_UniqueIds> result = _target.ScanCode(ktgemvar);
+			List<UniqueIds> result = _target.ScanCode(ktgemvar);
 
 			// Assert
 			Assert.Multiple(() =>
@@ -71,28 +71,28 @@ namespace Entity.UnitTest
 				// DataVariables
 				foreach (var dataVar in dataVariables)
 				{
-					M_UniqueIds uniqueId = result.FirstOrDefault(u => u.ID == dataVar.Id.ToString());
+					UniqueIds uniqueId = result.FirstOrDefault(u => u.ID == dataVar.Id.ToString());
 					AssertMappedUniqueId(uniqueId, dataVar.Id.ToString(), "DataVariable", dataVar.ExternalName, "variable");
 				}
 
 				// EquipmentConstants
 				foreach (var equipment in equipmentConstants)
 				{
-					M_UniqueIds uniqueId = result.FirstOrDefault(u => u.ID == equipment.Id.ToString());
+					UniqueIds uniqueId = result.FirstOrDefault(u => u.ID == equipment.Id.ToString());
 					AssertMappedUniqueId(uniqueId, equipment.Id.ToString(), "EquipmentConstant", equipment.ExternalName, "variable");
 				}
 
 				// DynamicVariables
 				foreach (var dynamicVar in dynamicVariables)
 				{
-					M_UniqueIds uniqueId = result.FirstOrDefault(u => u.ID == dynamicVar.Id.ToString());
+					UniqueIds uniqueId = result.FirstOrDefault(u => u.ID == dynamicVar.Id.ToString());
 					AssertMappedUniqueId(uniqueId, dynamicVar.Id.ToString(), "DynamicVariable", dynamicVar.ExternalName, "variable");
 				}
 
 				// StatusVariables
 				foreach (var statusVar in statusVariables)
 				{
-					M_UniqueIds uniqueId = result.FirstOrDefault(u => u.ID == statusVar.Id.ToString());
+					UniqueIds uniqueId = result.FirstOrDefault(u => u.ID == statusVar.Id.ToString());
 					AssertMappedUniqueId(uniqueId, statusVar.Id.ToString(), "StatusVariable", statusVar.ExternalName, "variable");
 				}
 			});
@@ -110,10 +110,10 @@ namespace Entity.UnitTest
 			);
 
 			// Act
-			List<M_UniqueIds> result = _target.ScanCode(ktgemvar);
+			List<UniqueIds> result = _target.ScanCode(ktgemvar);
 
 			// Assert
-			Assert.IsInstanceOf<List<M_UniqueIds>>(result, "The result should be a List<M_UniqueIds>");
+			Assert.IsInstanceOf<List<UniqueIds>>(result, "The result should be a List<M_UniqueIds>");
 		}
 
 		[Test]
@@ -128,16 +128,16 @@ namespace Entity.UnitTest
 			);
 
 			// Act
-			List<M_UniqueIds> result = _target.ScanCode(ktgemvar);
+			List<UniqueIds> result = _target.ScanCode(ktgemvar);
 
 			// Assert
 			Assert.IsEmpty(result, "The result should be an empty list");
 		}
 
 
-		private M_KlaXML CreateKtgemvarWithVariables(List<DataVariable> dataVariables, List<EquipmentConstant> equipmentConstants, List<DynamicVariable> dynamicVariables, List<StatusVariable> statusVariables)
+		private KlaXML CreateKtgemvarWithVariables(List<DataVariable> dataVariables, List<EquipmentConstant> equipmentConstants, List<DynamicVariable> dynamicVariables, List<StatusVariable> statusVariables)
 		{
-			return new M_KlaXML
+			return new KlaXML
 			{
 				DataVariables = dataVariables,
 				EquipmentConstants = equipmentConstants,

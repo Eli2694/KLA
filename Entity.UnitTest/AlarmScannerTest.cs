@@ -32,14 +32,14 @@ namespace Entity.UnitTest
 			var ktgemvar = CreateKtgemvarWithAlarms(alarms);
 
 			// Act
-			List<M_UniqueIds> result = _target.ScanCode(ktgemvar);
+			List<UniqueIds> result = _target.ScanCode(ktgemvar);
 
 			// Assert
 			Assert.Multiple(() =>
 			{
 				Assert.AreEqual(1, result.Count, "There should be one mapped M_UniqueIds object");
 
-				M_UniqueIds uniqueId = result.FirstOrDefault();
+				UniqueIds uniqueId = result.FirstOrDefault();
 				Assert.IsNotNull(uniqueId, "Mapped M_UniqueIds object should not be null");
 				Assert.AreEqual("Alarm", uniqueId.EntityType, "EntityType should be set to 'Alarm'");
 				Assert.AreEqual(alarmName, uniqueId.Name, "Name should be mapped correctly");
@@ -60,12 +60,12 @@ namespace Entity.UnitTest
 			var ktgemvar = CreateKtgemvarWithAlarms(alarms);
 
 			// Act
-			List<M_UniqueIds> result = _target.ScanCode(ktgemvar);
+			List<UniqueIds> result = _target.ScanCode(ktgemvar);
 
 			// Assert
 			Assert.Multiple(() =>
 			{
-				Assert.IsInstanceOf<List<M_UniqueIds>>(result, "The result should be a List<M_UniqueIds>");
+				Assert.IsInstanceOf<List<UniqueIds>>(result, "The result should be a List<M_UniqueIds>");
 				Assert.AreEqual(alarms.Count, result.Count, "The number of generated M_UniqueIds objects should be equal to the number of alarms");
 			});
 		}
@@ -77,15 +77,15 @@ namespace Entity.UnitTest
 			var ktgemvar = CreateKtgemvarWithAlarms(new List<Alarm>());
 
 			// Act
-			List<M_UniqueIds> result = _target.ScanCode(ktgemvar);
+			List<UniqueIds> result = _target.ScanCode(ktgemvar);
 
 			// Assert
 			Assert.IsEmpty(result, "The result should be an empty list");
 		}
 
-		private M_KlaXML CreateKtgemvarWithAlarms(List<Alarm> alarms)
+		private KlaXML CreateKtgemvarWithAlarms(List<Alarm> alarms)
 		{
-			return new M_KlaXML { Alarms = alarms };
+			return new KlaXML { Alarms = alarms };
 		}
 	}
 }
