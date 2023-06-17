@@ -11,14 +11,16 @@ namespace Entity.Scanners
     public abstract class BaseScanner
     {
         protected readonly LogManager _log;
-        public List<M_UniqueIds> newUniqueIdsFromXml;
+
+        public List<UniqueIds> newUniqueIdsFromXml;
+
         public BaseScanner(LogManager log)
         {
-            newUniqueIdsFromXml = new List<M_UniqueIds>();
+            newUniqueIdsFromXml = new List<UniqueIds>();
             _log = log;
         }
 
-        public bool CompareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db)
+        public bool CompareXmlScopeWithDBScope(List<UniqueIds> xml, List<UniqueIds> db)
         {
             var dbByIdDictionary = db.ToDictionary(k => k.ID, v => v);
             var dbByNameDictionary = db.ToDictionary(k => k.Name, v => v);
@@ -39,7 +41,7 @@ namespace Entity.Scanners
             return true;
         }
 
-        private void ValidateElements(List<M_UniqueIds> xml, Dictionary<string, M_UniqueIds> dbByIdDictionary, Dictionary<string, M_UniqueIds> dbByNameDictionary, List<string> errorMessages)
+        private void ValidateElements(List<UniqueIds> xml, Dictionary<string, UniqueIds> dbByIdDictionary, Dictionary<string, UniqueIds> dbByNameDictionary, List<string> errorMessages)
         {
             foreach (var xmlElement in xml)
             {
@@ -48,7 +50,7 @@ namespace Entity.Scanners
             }
         }
 
-        private void ValidateNames(M_UniqueIds xmlElement, Dictionary<string, M_UniqueIds> dbByIdDictionary, List<string> errorMessages)
+        private void ValidateNames(UniqueIds xmlElement, Dictionary<string, UniqueIds> dbByIdDictionary, List<string> errorMessages)
         {
             if (dbByIdDictionary.TryGetValue(xmlElement.ID, out var dbElementByID))
             {
@@ -59,7 +61,7 @@ namespace Entity.Scanners
             }
         }
 
-        private void ValidateIds(M_UniqueIds xmlElement, Dictionary<string, M_UniqueIds> dbByNameDictionary, List<string> errorMessages)
+        private void ValidateIds(UniqueIds xmlElement, Dictionary<string, UniqueIds> dbByNameDictionary, List<string> errorMessages)
         {
             if (dbByNameDictionary.TryGetValue(xmlElement.Name, out var dbElementByName))
             {
@@ -70,7 +72,7 @@ namespace Entity.Scanners
             }
         }
 
-        private void AddUniqueIdsFromXmlToList(List<M_UniqueIds> xml, Dictionary<string, M_UniqueIds> db)
+        private void AddUniqueIdsFromXmlToList(List<UniqueIds> xml, Dictionary<string, UniqueIds> db)
         {
             newUniqueIdsFromXml = xml.Where(variableXML => !db.ContainsKey(variableXML.ID)).ToList();
             ReportNewUniqueIds();

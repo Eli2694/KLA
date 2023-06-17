@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Model
 {
-    public class M_UniqueIds
+    public class UniqueIds
     {
         [Key]
         [Column(Order = 0)]

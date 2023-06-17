@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Repository.Interfaces
 {
-    public interface IUserRepository : IRepository<M_User>
+    public interface IUserRepository : IRepository<User>
     {
-        M_User GetValidatedUser(string userId);
+        User GetValidatedUser(string userId);
     }
 }

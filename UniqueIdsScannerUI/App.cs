@@ -98,14 +98,14 @@ public class App
     {
         try
         {
-            M_SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
-            M_SeperatedScopes? dbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+            SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
+            SeperatedScopes? dbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
 
-            Console.WriteLine($"Now Verifying: {filepath.Trim()}");
+            _log.LogEvent($"Verifying: {filepath.Trim()}", LogProviderType.Console);
 
             if (xmlScopes != null && _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, dbScopes))
             {
-                _log.LogEvent($"There is No conflicts in {filepath.Trim()}",LogProviderType.Console);
+                _log.LogEvent("No errors were found in the comparison between XML and DB ", LogProviderType.Console);
 
                 if (isUpdate)
                 {
