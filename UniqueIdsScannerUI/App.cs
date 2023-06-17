@@ -1,12 +1,5 @@
-﻿using CommandLine.Text;
-using CommandLine;
-using Microsoft.Identity.Client;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
+﻿using CommandLine;
 using Utility_LOG;
-using static Utility_LOG.LogManager;
 using UniqueIdsScannerUI;
 using Model;
 using Entity;
@@ -40,11 +33,24 @@ public class App
     private void DisplayInstructions()
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("Welcome to Unique IDs Scanner!");
+        Console.WriteLine("================================");
         Console.WriteLine("Instructions:");
-        Console.WriteLine("Xml Paths Reside in Configuration file:");
-        Console.WriteLine("For Verifying The Content Of Xml Files Use: UniqueIdsScanner.exe --verify");
-        Console.WriteLine("For Updating The Database Use : UniqueIdsScanner.exe --update");
-        Console.WriteLine("Input Xml Path:");
+        Console.WriteLine("1. Configure XML paths in the configuration file.");
+        Console.WriteLine("2. To verify the content of XML files, use: UniqueIdsScanner.exe --verify");
+        Console.WriteLine("3. To update the database, use: UniqueIdsScanner.exe --update");
+        Console.WriteLine();
+        Console.WriteLine("Example Usages:");
+        Console.WriteLine("---------------");
+        Console.WriteLine("1. Verifying XML content:");
+        Console.WriteLine("   UniqueIdsScanner.exe --verify -f 'Path To XML File'");
+        Console.WriteLine();
+        Console.WriteLine("2. Updating the database:");
+        Console.WriteLine("   UniqueIdsScanner.exe --update -f 'Path To XML File'");
+        Console.WriteLine();
+        Console.WriteLine("** Please follow the instructions carefully. **");
+        Console.WriteLine("==============================================");
+        Console.WriteLine("Press any key to quit.");
         Console.ResetColor();
     }
 
@@ -60,8 +66,7 @@ public class App
 
     private void HandleParseError(IEnumerable<Error> errors)
     {
-        // Provide meaningful error message to user and/or log it.
-        // ...
+        throw new ArgumentException($"Failed to parse command line arguments: {string.Join(", ", errors)}");
     }
 
     private void RunOptions(CliOptions options)
