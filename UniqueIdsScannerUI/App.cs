@@ -73,6 +73,7 @@ public class App
     {
         List<string> xmlFilePaths = GetFilePaths(options);
         List<string> validXmlFilePaths = new List<string>();
+        List<string> inValidXmlFilePaths = new List<string>();
 
         foreach (var xmlFile in xmlFilePaths)
         {
@@ -83,12 +84,14 @@ public class App
             else
             {
                 _log.LogError($"Invalid File Path: {xmlFile}", LogProviderType.Console);
+                _log.LogError($"Invalid File Path: {xmlFile}", LogProviderType.File);
+                inValidXmlFilePaths.Add(xmlFile);
             }
         }
 
-        if (validXmlFilePaths.Count == 0)
+        if (inValidXmlFilePaths.Any())
         {
-            throw new ArgumentException("No valid file paths found");
+            throw new ArgumentException("invalid file path was found");
         }
 
         foreach (var validXmlFile in validXmlFilePaths)
