@@ -30,17 +30,14 @@ namespace Entity
             _log = log;
         }
 
-        public bool ValidateXmlFilePaths(List<string> filePaths)
+        public bool ValidateXmlFilePath(string filePath)
         {
             bool isValid = true;
 
-            foreach (var filePath in filePaths)
+            if (!File.Exists(filePath))
             {
-                if (!File.Exists(filePath))
-                {
-                    _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
-                    isValid = false; 
-                }
+                _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
+                isValid = false;
             }
 
             return isValid;
@@ -64,58 +61,84 @@ namespace Entity
 
                         if (klaXml != null)
                         {
-                            SeperatedScopes dataForDB = new SeperatedScopes();
+                            M_SeperatedScopes dataForDB = new M_SeperatedScopes();
 
                             dataForDB.VariablesList = _variableScanner.ScanCode(klaXml);
                             dataForDB.EventsList = _eventScanner.ScanCode(klaXml);
                             dataForDB.AlarmsList = _alarmScanner.ScanCode(klaXml);
-                            CheckAllScopesForDuplicates(dataForDB);
+                            
+                            if (CheckAllScopesForDuplicates(dataForDB))
+                            {
+                                 return null;
+                            }
 
                             return dataForDB;
                         }                   
                     }
                     else
                     {
-                        _log.LogError($"{filePath} - File exist but is not an xml", LogProviderType.Console);
+                        _log.LogError($"{filePath} - Not Valid", LogProviderType.Console);
                     }
+       
                 }
                 else
                 {
-                    _log.LogError($"{filePath} - Doesnt exist", LogProviderType.Console);
+                    _log.LogError($"{filePath} - Not Found", LogProviderType.Console);
                 }
 
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _log.LogException("Exception In XmlToSeperatedScopes Function", ex, LogProviderType.Console);
+                _log.LogException("Exception In XmlToSeperatedScopes Function", ex, LogProviderType.File);
                 throw;
             }
         }
 
-        public void CheckAllScopesForDuplicates(SeperatedScopes dataForDb)
+
+        public bool CheckAllScopesForDuplicates(M_SeperatedScopes dataForDb)
         {
-            CheckForDuplicates(dataForDb.EventsList, "EventsList");
-            CheckForDuplicates(dataForDb.AlarmsList, "AlarmsList");
-            CheckForDuplicates(dataForDb.VariablesList, "VariablesList");
+            bool duplicatesFound = false;
+            duplicatesFound |= CheckForDuplicates(dataForDb.EventsList, "EventsList");
+            duplicatesFound |= CheckForDuplicates(dataForDb.AlarmsList, "AlarmsList");
+            duplicatesFound |= CheckForDuplicates(dataForDb.VariablesList, "VariablesList");
+            return duplicatesFound;
         }
 
-        private void CheckForDuplicates(List<UniqueIds> list, string listName)
+
+        private bool CheckForDuplicates(List<M_UniqueIds> list, string listName)
         {
             var duplicateNames = list.GroupBy(v => v.Name).Where(g => g.Count() > 1).Select(g => g.Key);
             var duplicateIDs = list.GroupBy(v => v.ID).Where(g => g.Count() > 1).Select(g => g.Key);
 
-            LogDuplicates(listName, "names", duplicateNames);
-            LogDuplicates(listName, "IDs", duplicateIDs);
+            bool duplicatesFound = false;
+            // If either of the calls to LogDuplicates returns true, 
+            // duplicatesFound will be set to true due to the OR assignment operator (|=).
+            duplicatesFound |= LogDuplicates(listName, "names", duplicateNames);
+            duplicatesFound |= LogDuplicates(listName, "IDs", duplicateIDs);
+
+            return duplicatesFound;
         }
 
-        private void LogDuplicates(string listName, string propertyName, IEnumerable<string> duplicates)
+
+        private bool LogDuplicates(string listName, string propertyName, IEnumerable<string> duplicates)
         {
+            int duplicatesCount = 0;
             if (duplicates.Any())
             {
                 string errorMessage = $"Duplicate {propertyName} found in {listName}: {string.Join(", ", duplicates)}";
                 _log.LogError(errorMessage, LogProviderType.Console);
                 _log.LogError(errorMessage, LogProviderType.File);
+                duplicatesCount++;
             }
+
+            if(duplicatesCount > 0)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public List<UniqueIds> RetriveUniqeIDsFromDB()
