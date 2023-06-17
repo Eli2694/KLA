@@ -33,7 +33,8 @@ namespace Repository.Core
         {
             try
             {
-                // .AsNoTracking()
+                _log.LogEvent("fetching all entities", LogProviderType.File);
+               
                 return _entities.AsNoTracking().ToList();
             }
             catch (Exception ex)
@@ -47,6 +48,7 @@ namespace Repository.Core
         {
             try
             {
+                _log.LogEvent("fetching entities based on the predicate", LogProviderType.File);
                 return _entities.AsNoTracking().Where(predicate).ToList();
             }
             catch (Exception ex)
@@ -60,6 +62,7 @@ namespace Repository.Core
         {
             try
             {
+                _log.LogEvent("fetching single or default entity based on the predicate", LogProviderType.File);
                 return _entities.SingleOrDefault(predicate);
             }
             catch (Exception ex)
@@ -73,6 +76,7 @@ namespace Repository.Core
         {
             try
             {
+                _log.LogEvent("adding entity", LogProviderType.File);
                 _entities.Add(entity);
             }
             catch (Exception ex)
@@ -86,6 +90,7 @@ namespace Repository.Core
         {
             try
             {
+                _log.LogEvent("adding a range of entities", LogProviderType.File);
                 _entities.AddRange(entities);
             }
             catch (Exception ex)
