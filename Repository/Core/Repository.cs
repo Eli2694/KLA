@@ -53,7 +53,7 @@ namespace Repository.Core
             }
         }
 
-        public TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
+        public TEntity? SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
         {
             try
             {
