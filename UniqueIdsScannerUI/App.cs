@@ -106,14 +106,16 @@ public class App
             }
             else
             {
-                _log.LogError($"Invalid File Path: {xmlFile}", LogProviderType.Console);
-                _log.LogError($"Invalid File Path: {xmlFile}", LogProviderType.File);
+                string errorMessage = $"Invalid File Path: {xmlFile}";
+                _log.LogError(errorMessage, LogProviderType.Console);
+                _log.LogError(errorMessage, LogProviderType.File);
                 inValidXmlFilePaths.Add(xmlFile);
             }
         }
 
         if (inValidXmlFilePaths.Any())
         {
+            
             throw new ArgumentException();
         }
 
@@ -122,6 +124,7 @@ public class App
             ProcessXmlFile(validXmlFile, options);
         }
     }
+
 
     private void ProcessXmlFile(string filePath, CliOptions options)
     {
