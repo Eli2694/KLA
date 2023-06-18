@@ -10,9 +10,11 @@ public class LogFile : ILogger
 {
     private string _fileName;
     private int count = 0;
-    private const int MaxFileSize = 50 * 1024 * 1024; //50MB
+    //private const int MaxFileSize = 50 * 1024 * 1024; //50MB
+    private const int MaxFileSize = 50 * 1024; //50MB
     private int logWritesSinceHouseKeeping = 0;
     private const int WritesBeforeHouseKeeping = 50;
+
 
     private StreamWriter logStreamWriter;
 
@@ -27,6 +29,27 @@ public class LogFile : ILogger
         private set { _fileName = value; }
     }
 
+    //public void Init()
+    //{
+    //    FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
+
+    //    if (logStreamWriter != null)
+    //    {
+    //        logStreamWriter.Dispose();
+    //        logStreamWriter = null;
+    //    }
+
+    //    try
+    //    {
+    //        logStreamWriter = new StreamWriter(FileName, true);
+    //    }
+    //    catch (IOException ex)
+    //    {
+    //        Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
+    //        throw; // Or handle the error as appropriate
+    //    }
+    //}
+
     public void Init()
     {
         FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
@@ -37,16 +60,32 @@ public class LogFile : ILogger
             logStreamWriter = null;
         }
 
-        try
+        const int maxRetries = 5;
+        int retryCount = 0;
+        bool fileOpened = false;
+
+        while (!fileOpened && retryCount < maxRetries)
         {
-            logStreamWriter = new StreamWriter(FileName, true);
+            try
+            {
+                logStreamWriter = new StreamWriter(FileName, true);
+                fileOpened = true;
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
+                retryCount++;
+                Thread.Sleep(1000); // Wait for 1 second before retrying
+            }
         }
-        catch (IOException ex)
+
+        if (!fileOpened)
         {
-            Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
-            //throw; // Or handle the error as appropriate
+            Console.WriteLine($"Unable to open the file '{FileName}' after {maxRetries} attempts. Aborting.");
+            throw new IOException("Failed to open file after multiple attempts.");
         }
     }
+
 
 
     public void LogEvent(string msg)

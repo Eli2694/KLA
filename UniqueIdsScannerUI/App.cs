@@ -26,7 +26,6 @@ public class App
         {
             if (args.Length == 0)
             {
-
                 DisplayInstructions();
             }
             else
@@ -36,9 +35,7 @@ public class App
         }
         catch (Exception ex)
         {
-            _log.LogException("Exception in Run method", ex, LogProviderType.Console);
             _log.LogException("Exception in Run method", ex, LogProviderType.File);
-            throw;
         }
     }
 
