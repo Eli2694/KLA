@@ -18,6 +18,9 @@ namespace UniqueIdsScannerUI
 
         [Option(longName: "verify", HelpText = @"If you want to verify then: UniqueIdsScanner.exe --verify")]
         public bool isVerify { get; set; }
+        
+        [Option(longName: "rename", HelpText = @"If you want to create a new Alias then: UniqueIdsScanner.exe --update -r")]
+        public bool isRenamed { get; set; }
     }
 
 }
