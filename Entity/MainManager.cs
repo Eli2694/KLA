@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Entity.Scanners;
 using Repository.Interfaces;
 using Utility_LOG;
+using Repository.Core;
 
 namespace Entity
 {
