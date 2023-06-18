@@ -22,7 +22,7 @@ namespace Entity.UnitTest
 			_mockLogManager = new Mock<LogManager>();
 			_baseScanner = new TestScanner(_mockLogManager.Object);
 		}
-
+		
 		[Test]
 		public void CompareXmlScopeWithDBScope_WhenXmlAndDbAreEqual_ReturnsTrue()
 		{

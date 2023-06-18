@@ -35,7 +35,7 @@ namespace Entity.Scanners
                     foreach (var errorMessage in errorMessages)
                     {
                         _log.LogError(errorMessage, LogProviderType.Console);
-                        //_log.LogError(errorMessage, LogProviderType.File);
+                        _log.LogError(errorMessage, LogProviderType.File);
                     }
                     return false;
                 }
@@ -45,7 +45,7 @@ namespace Entity.Scanners
             }
             catch (Exception ex)
             {
-                //_log.LogError($"An error occurred in CompareXmlScopeWithDBScope: {ex.Message}", LogProviderType.File);
+                _log.LogError($"An error occurred in CompareXmlScopeWithDBScope: {ex.Message}", LogProviderType.File);
                 return false;
             }
         }
