@@ -24,5 +24,8 @@ namespace Model
         public string OriginalName { get; set; }
 
         public DateTime? AliasCreated { get; set; }
+
+        [ForeignKey("ID")]
+        public UniqueIds UniqueId { get; set; }
     }
 }

@@ -32,5 +32,19 @@ namespace Repository.Core
             }
             
         }
+
+        public IEnumerable<UniqueIds> GetUniqueIdsWithAliases()
+        {
+            try
+            {
+                return _context.Unique_Ids.Include(u => u.Aliases).ToList();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 }

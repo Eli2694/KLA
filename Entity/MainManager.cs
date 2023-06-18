@@ -11,7 +11,7 @@ using Entity.Scanners;
 using Repository.Interfaces;
 using Utility_LOG;
 using Repository.Core;
-
+using System.Text.Json;
 
 namespace Entity
 {
@@ -266,6 +266,17 @@ namespace Entity
                 return user.Password == NameAndPass[1];
             }
             return false;
+        }
+
+        public void GenerateReport()
+        {
+            var uniqueIdWithAliases = _unitOfWork.UniqueIds.GetUniqueIdsWithAliases();
+
+            var json = JsonSerializer.Serialize(uniqueIdWithAliases, new JsonSerializerOptions { WriteIndented = true });
+
+
+            string filePath = "";
+            File.WriteAllText(filePath, json);
         }
     }
 }

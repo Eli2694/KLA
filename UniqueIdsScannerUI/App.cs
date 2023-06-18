@@ -22,7 +22,7 @@ public class App
     internal void Run(string[] args)
     {
         args = new string[1];
-        args[0] = "--verify";
+        args[0] = "--generate-report";
         try
         {
             if (args.Length == 0)
@@ -31,7 +31,7 @@ public class App
             }
             else
             {
-                if(isAuthenticatedUser())
+                if (isAuthenticatedUser())
                 {
                     ParseArgumentsAndRunOptions(args);
                 }
@@ -119,7 +119,7 @@ public class App
 
         if (inValidXmlFilePaths.Any())
         {
-            
+
             throw new ArgumentException();
         }
 
@@ -196,13 +196,17 @@ public class App
         List<string>? NameAndPass = _settings.GetSection("UsernameAndPassword").Get<List<string>>();
         if (NameAndPass != null)
         {
-             if(_mainManager.isAuthenticatedUser(NameAndPass))
+            if (_mainManager.isAuthenticatedUser(NameAndPass))
             {
                 return true;
             }
-            _log.LogError("Invalid Username Or Password",LogProviderType.Console);
+            _log.LogError("Invalid Username Or Password", LogProviderType.Console);
         }
         return false;
+    }
+    public void GenerateReport()
+    {
+
     }
 }
 
