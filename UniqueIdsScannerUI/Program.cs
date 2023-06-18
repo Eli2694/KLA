@@ -46,7 +46,8 @@ static IHostBuilder CreateHostBuilder(string[] args)
 	return Host.CreateDefaultBuilder(args)
 	 .ConfigureServices((hostContext, services) =>
 	 {
-		 services.AddSingleton<App>();
+
+         services.AddSingleton<App>();
 		 services.AddDbContext<KlaContext>(options =>
 			 options.UseSqlServer(connectionString)
 			 .UseLoggerFactory(LoggerFactory.Create(builder =>

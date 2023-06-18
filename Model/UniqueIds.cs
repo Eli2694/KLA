@@ -31,6 +31,5 @@ namespace Model
         public string EntityType { get; set; }
 
         public virtual ICollection<Aliases> Aliases { get; set; }
-
     }
 }

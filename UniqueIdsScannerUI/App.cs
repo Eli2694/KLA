@@ -5,6 +5,7 @@ using Model;
 using Entity;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using System.Text.Json;
 
 public class App
 {
@@ -23,6 +24,7 @@ public class App
     {
         args = new string[1];
         args[0] = "--generate-report";
+
         try
         {
             if (args.Length == 0)
@@ -58,6 +60,8 @@ public class App
         Console.WriteLine("   UniqueIdsScannerUI.exe --update");
         Console.WriteLine("   or specify a specific file with:");
         Console.WriteLine("   UniqueIdsScannerUI.exe --update -f 'Path To XML File'");
+        Console.WriteLine("4. If you want to generate a report, use:");
+        Console.WriteLine("   UniqueIdsScannerUI.exe --generate-report");
         Console.WriteLine();
         Console.WriteLine("Example Usages:");
         Console.WriteLine("---------------");
@@ -73,12 +77,16 @@ public class App
         Console.WriteLine("4. Updating the database with a specific XML file:");
         Console.WriteLine("   UniqueIdsScannerUI.exe --update -f 'C:\\folder\\file.xml'");
         Console.WriteLine();
+        Console.WriteLine("5. Generating a report:");
+        Console.WriteLine("   UniqueIdsScannerUI.exe --generate-report");
+        Console.WriteLine();
         Console.WriteLine("** Please follow the instructions carefully. **");
         Console.WriteLine("==============================================");
         Console.WriteLine("Press any key to quit.");
         Console.ResetColor();
         Console.ReadKey();
     }
+
 
 
     private void ParseArgumentsAndRunOptions(string[] args)
@@ -98,6 +106,13 @@ public class App
 
     private void RunOptions(CliOptions options)
     {
+
+        if (options.isGenerateReport)
+        {
+            GenerateReport();
+            return;
+        }
+
         List<string> xmlFilePaths = GetFilePaths(options);
         List<string> validXmlFilePaths = new List<string>();
         List<string> inValidXmlFilePaths = new List<string>();
@@ -206,7 +221,27 @@ public class App
     }
     public void GenerateReport()
     {
+        try
+        {
+            string reportFilePath = _settings.GetValue<string>("GenerateReport");
 
+            if (!string.IsNullOrEmpty(reportFilePath))
+            {
+                string FileName = $"{DateTime.Now:dd-MM-yyyy}_Report.txt";
+                reportFilePath = Path.Combine(reportFilePath, FileName);
+                _mainManager.GenerateReport(reportFilePath);
+            }
+            else
+            {
+                _log.LogError("File path for generate report was not found",LogProviderType.Console);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            _log.LogException(ex.Message, ex, LogProviderType.File);
+            throw;
+        }
     }
 }
 

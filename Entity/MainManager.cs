@@ -12,6 +12,7 @@ using Repository.Interfaces;
 using Utility_LOG;
 using Repository.Core;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Entity
 {
@@ -268,15 +269,27 @@ namespace Entity
             return false;
         }
 
-        public void GenerateReport()
+        public void GenerateReport(string filePath)
         {
-            var uniqueIdWithAliases = _unitOfWork.UniqueIds.GetUniqueIdsWithAliases();
+            try
+            {
+                var uniqueIdWithAliases =  _unitOfWork.UniqueIds.GetUniqueIdsWithAliases();
 
-            var json = JsonSerializer.Serialize(uniqueIdWithAliases, new JsonSerializerOptions { WriteIndented = true });
+                // not using ReferenceHandler.Preserve can cause an infinite loop 
+                var options = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                    WriteIndented = true
+                };
 
+                var json = JsonSerializer.Serialize(uniqueIdWithAliases, options);
 
-            string filePath = "";
-            File.WriteAllText(filePath, json);
+                File.WriteAllText(filePath, json);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
