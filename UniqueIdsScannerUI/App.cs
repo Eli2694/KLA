@@ -22,8 +22,9 @@ public class App
 
     internal void Run(string[] args)
     {
-        args = new string[1];
-        args[0] = "--generate-report";
+        args = new string[2];
+        args[0] = "--update";
+        args[1] = "-r";
 
         try
         {
@@ -62,6 +63,8 @@ public class App
         Console.WriteLine("   UniqueIdsScannerUI.exe --update -f 'Path To XML File'");
         Console.WriteLine("4. If you want to generate a report, use:");
         Console.WriteLine("   UniqueIdsScannerUI.exe --generate-report");
+        Console.WriteLine("5. If you want to create a new Alias, use:");
+        Console.WriteLine("   UniqueIdsScannerUI.exe --update -r");
         Console.WriteLine();
         Console.WriteLine("Example Usages:");
         Console.WriteLine("---------------");
@@ -79,6 +82,9 @@ public class App
         Console.WriteLine();
         Console.WriteLine("5. Generating a report:");
         Console.WriteLine("   UniqueIdsScannerUI.exe --generate-report");
+        Console.WriteLine();
+        Console.WriteLine("6. Creating a new Alias:");
+        Console.WriteLine("   UniqueIdsScannerUI.exe --update -r");
         Console.WriteLine();
         Console.WriteLine("** Please follow the instructions carefully. **");
         Console.WriteLine("==============================================");
@@ -153,7 +159,7 @@ public class App
 
             if (options.isUpdate)
             {
-                RunUpdate(CanBeUpdated);
+                RunUpdate(CanBeUpdated, options);
             }
         }
         catch (Exception ex)
@@ -198,26 +204,49 @@ public class App
         }
     }
 
-    private void RunUpdate(bool isUpdate)
+    private void RunUpdate(bool isUpdate, CliOptions options)
     {
-        if (isUpdate)
+        try
         {
-            _mainManager.UpdateDatabaseWithNewUniqueIds();
+            if (isUpdate)
+            {
+                _mainManager.UpdateDatabaseWithNewUniqueIds();
+
+                if (options.isRenamed)
+                {
+                    SetUpRename();
+                }
+            }
         }
+        catch (Exception)
+        {
+
+            throw;
+        }
+       
     }
 
     private bool isAuthenticatedUser()
     {
-        List<string>? NameAndPass = _settings.GetSection("UsernameAndPassword").Get<List<string>>();
-        if (NameAndPass != null)
+        try
         {
-            if (_mainManager.isAuthenticatedUser(NameAndPass))
+            List<string>? NameAndPass = _settings.GetSection("UsernameAndPassword").Get<List<string>>();
+            if (NameAndPass != null)
             {
-                return true;
+                if (_mainManager.isAuthenticatedUser(NameAndPass))
+                {
+                    return true;
+                }
+                _log.LogError("Invalid Username Or Password", LogProviderType.Console);
             }
-            _log.LogError("Invalid Username Or Password", LogProviderType.Console);
+            return false;
         }
-        return false;
+        catch (Exception)
+        {
+
+            throw;
+        }
+        
     }
     public void GenerateReport()
     {
@@ -245,6 +274,7 @@ public class App
             else
             {
                 _log.LogError("File path for generate report was not found", LogProviderType.Console);
+                
             }
 
         }
@@ -253,6 +283,29 @@ public class App
             _log.LogException(ex.Message, ex, LogProviderType.File);
             throw;
         }
+    }
+
+    public void SetUpRename()
+    {
+        try
+        {
+            var renameDict = _settings.GetSection("Renamed").Get<Dictionary<string, string>>();
+            if (renameDict != null)
+            {
+                _mainManager.ValidateAndPrepareAliases(renameDict);
+            }
+            else
+            {
+                _log.LogError("Can't get 'rename' information", LogProviderType.Console);
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+        
     }
 
 }

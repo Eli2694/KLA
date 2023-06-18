@@ -13,6 +13,8 @@ using Utility_LOG;
 using Repository.Core;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Entity
 {
@@ -214,7 +216,7 @@ namespace Entity
             }
             catch (Exception ex)
             {
-                //_log.LogError($"An error occurred in CompareXmlScopesWithDBScopes: {ex.Message}", LogProviderType.File);
+                _log.LogError($"An error occurred in CompareXmlScopesWithDBScopes: {ex.Message}", LogProviderType.File);
                 return false;
             }
         }
@@ -291,5 +293,79 @@ namespace Entity
                 throw;
             }
         }
+
+        public void ValidateAndPrepareAliases(Dictionary<string, string> renameInfo)
+        {
+            List<Aliases> newAliases = new List<Aliases>();
+
+            var uniqueIdNames = _unitOfWork.UniqueIds.GetAll().Select(a => a.Name).ToList();
+
+            var missingKeys = renameInfo.Keys.Except(uniqueIdNames).ToList();
+
+            if (missingKeys.Any())
+            {
+                var keys = string.Join(", ", missingKeys);
+                _log.LogError($"Keys '{keys}' not found in the database", LogProviderType.Console);
+
+                throw new KeyNotFoundException($"Keys '{keys}' not found in the database");
+            }
+
+            // Fetching all existing aliases from the database and storing them in a HashSet for faster lookup
+            var existingAliases = new HashSet<string>(_unitOfWork.Aliases.GetAll().Select(a => a.AliasName));
+
+            var flattenedKeyUniqueIdPairs = renameInfo.Keys
+                .SelectMany(key => _unitOfWork.UniqueIds.Find(a => a.Name == key)
+                .Select(uniqueId => new { Key = key, UniqueId = uniqueId }));
+
+            foreach (var pair in flattenedKeyUniqueIdPairs)
+            {
+                var newAlias = PrepareAliasIfNotExisting(pair.UniqueId, renameInfo[pair.Key], existingAliases);
+
+                if (newAlias != null)
+                {
+                    newAliases.Add(newAlias);
+                }
+            }
+
+            if(newAliases.Any())
+            {
+                UpdateDbWithNewAliases(newAliases);
+            }
+            
+        }
+
+        public Aliases PrepareAliasIfNotExisting(UniqueIds uniqueId, string aliasName, HashSet<string> existingAliases)
+        {
+            // Checking if alias already exists in the database
+            if (!existingAliases.Contains(aliasName))
+            {
+                // If not, preparing new alias
+                return new Aliases
+                {
+                    ID = uniqueId.ID,
+                    OriginalName = uniqueId.Name,
+                    AliasName = aliasName,
+                    UniqueIdScope = uniqueId.Scope,
+                    AliasCreated = DateTime.Now,
+
+                };
+            }
+            else
+            {
+                // If alias already exists, logging a message
+                _log.LogError($"Alias '{aliasName}' already exists in the database", LogProviderType.Console);
+            }
+
+            // If alias already exists, returning null
+            return null;
+        }
+
+        public void UpdateDbWithNewAliases(List<Aliases> newAliases)
+        {
+            _unitOfWork.Aliases.AddRange(newAliases);
+            _unitOfWork.Complete();
+
+        }
+
     }
 }

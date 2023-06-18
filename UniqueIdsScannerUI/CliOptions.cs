@@ -21,6 +21,9 @@ namespace UniqueIdsScannerUI
 
         [Option(longName: "generate-report", HelpText = @"If you want to generate-report then: UniqueIdsScanner.exe --generate-report")]
         public bool isGenerateReport { get; set; }
+
+        [Option('r', "rename", HelpText = @"If you want to create a new Alias then: UniqueIdsScanner.exe --update -r")]
+        public bool isRenamed { get; set; }
     }
 
 }
