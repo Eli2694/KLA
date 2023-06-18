@@ -5,18 +5,19 @@ using Utility_LOG;
 
 namespace Entity.UnitTest
 {
-	[TestFixture]
+    [NonParallelizable]
+    [TestFixture]
 	public class EventScannerTests
 	{
-		private Mock<LogManager> _mockLogManager;
-		private EventScanner _target;
+		private Mock<LogManager> _mockLogManager = new Mock<LogManager>();
+		private EventScanner _target = new EventScanner();
 
-		[SetUp]
-		public void Setup()
-		{
-			_mockLogManager = new Mock<LogManager>();
-			_target = new EventScanner(_mockLogManager.Object);
-		}
+		//[SetUp]
+		//public void Setup()
+		//{
+		//	_mockLogManager = new Mock<LogManager>();
+		//	_target = new EventScanner(_mockLogManager.Object);
+		//}
 
 		[Test]
 		public void ScanCode_MapsEventDataCorrectly_WhenEventsExist()

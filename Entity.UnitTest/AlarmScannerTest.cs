@@ -5,18 +5,18 @@ using Utility_LOG;
 
 namespace Entity.UnitTest
 {
-	[TestFixture]
+    [NonParallelizable]
+    [TestFixture]
 	public class AlarmScannerTest
 	{
-		private Mock<LogManager> _mockLogManager;
-		private AlarmScanner _target;
+		private Mock<LogManager> _mockLogManager  = new Mock<LogManager>();
+		private AlarmScanner _target = new AlarmScanner();
 
-		[SetUp]
-		public void Setup()
-		{
-			_mockLogManager = new Mock<LogManager>();
-			_target = new AlarmScanner(_mockLogManager.Object);
-		}
+		//[SetUp]
+		//public void Setup()
+		//{	
+		//	//_target = new AlarmScanner();
+		//}
 
 
 		[Test]

@@ -10,18 +10,19 @@ using Utility_LOG;
 
 namespace Entity.UnitTest
 {
-	[TestFixture]
+    [NonParallelizable]
+    [TestFixture]
 	public class VariableScannerTests
 	{
-		private Mock<LogManager> _mockLogManager;
-		private VariableScanner _target;
+		private Mock<LogManager> _mockLogManager = new Mock<LogManager>();
+		private VariableScanner _target  = new VariableScanner();
 
-		[SetUp]
-		public void Setup()
-		{
-			_mockLogManager = new Mock<LogManager>();
-			_target = new VariableScanner(_mockLogManager.Object);
-		}
+		//[SetUp]
+		//public void Setup()
+		//{
+		//	_mockLogManager = new Mock<LogManager>();
+		//	_target = new VariableScanner(_mockLogManager.Object);
+		//}
 
 		private void AssertMappedUniqueId(UniqueIds uniqueId, string id, string entityType, string name, string scope)
 		{

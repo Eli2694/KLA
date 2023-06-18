@@ -1,21 +1,15 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
+﻿using System.IO.Compression;
 using System.Text;
-using System.Text.RegularExpressions;
 using Utility_LOG;
 
 public class LogFile : ILogger
 {
     private string _fileName;
     private int count = 0;
-    //private const int MaxFileSize = 50 * 1024 * 1024; //50MB
-    private const int MaxFileSize = 50 * 1024; //50MB
+    private const int MaxFileSize = 50 * 1024 * 1024; //50MB
     private int logWritesSinceHouseKeeping = 0;
     private const int WritesBeforeHouseKeeping = 50;
-
-
+    private readonly object lockObject = new object();
     private StreamWriter logStreamWriter;
 
     public LogFile()
@@ -29,64 +23,29 @@ public class LogFile : ILogger
         private set { _fileName = value; }
     }
 
-    //public void Init()
-    //{
-    //    FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
-
-    //    if (logStreamWriter != null)
-    //    {
-    //        logStreamWriter.Dispose();
-    //        logStreamWriter = null;
-    //    }
-
-    //    try
-    //    {
-    //        logStreamWriter = new StreamWriter(FileName, true);
-    //    }
-    //    catch (IOException ex)
-    //    {
-    //        Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
-    //        throw; // Or handle the error as appropriate
-    //    }
-    //}
-
     public void Init()
     {
-        FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
-
-        if (logStreamWriter != null)
+        lock (lockObject)
         {
-            logStreamWriter.Dispose();
-            logStreamWriter = null;
-        }
+            FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
 
-        const int maxRetries = 5;
-        int retryCount = 0;
-        bool fileOpened = false;
+            if (logStreamWriter != null)
+            {
+                logStreamWriter.Dispose();
+                logStreamWriter = null;
+            }
 
-        while (!fileOpened && retryCount < maxRetries)
-        {
             try
             {
                 logStreamWriter = new StreamWriter(FileName, true);
-                fileOpened = true;
             }
             catch (IOException ex)
             {
                 Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
-                retryCount++;
-                Thread.Sleep(1000); // Wait for 1 second before retrying
+                throw;
             }
         }
-
-        if (!fileOpened)
-        {
-            Console.WriteLine($"Unable to open the file '{FileName}' after {maxRetries} attempts. Aborting.");
-            throw new IOException("Failed to open file after multiple attempts.");
-        }
     }
-
-
 
     public void LogEvent(string msg)
     {
@@ -108,21 +67,24 @@ public class LogFile : ILogger
 
     private void WriteLog(string msg)
     {
-        try
+        lock (lockObject)
         {
-            logStreamWriter.WriteLine(msg);
-            logStreamWriter.Flush();
-            logWritesSinceHouseKeeping++;
-
-            if (logWritesSinceHouseKeeping >= WritesBeforeHouseKeeping)
+            try
             {
-                LogCheckHouseKeeping();
-                logWritesSinceHouseKeeping = 0;
+                logStreamWriter.WriteLine(msg);
+                logStreamWriter.Flush();
+                logWritesSinceHouseKeeping++;
+
+                if (logWritesSinceHouseKeeping >= WritesBeforeHouseKeeping)
+                {
+                    LogCheckHouseKeeping();
+                    logWritesSinceHouseKeeping = 0;
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error - WriteLog Func: {ex.Message}");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error - WriteLog Func: {ex.Message}");
+            }
         }
     }
 
@@ -184,11 +146,18 @@ public class LogFile : ILogger
         }
     }
 
-
     public void Dispose()
     {
-        logStreamWriter?.Dispose();
-        logStreamWriter = null;
+        lock (lockObject)
+        {
+            if (logStreamWriter != null)
+            {
+                logStreamWriter.Flush();
+                logStreamWriter.Dispose();
+                logStreamWriter = null;
+            }
+        }
     }
 }
+
 
