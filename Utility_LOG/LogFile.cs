@@ -44,7 +44,7 @@ public class LogFile : ILogger
         catch (IOException ex)
         {
             Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
-            throw; // Or handle the error as appropriate
+            //throw; // Or handle the error as appropriate
         }
     }
 
