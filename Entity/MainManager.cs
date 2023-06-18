@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Entity.Scanners;
 using Repository.Interfaces;
 using Utility_LOG;
+using System.Runtime;
 
 namespace Entity
 {
@@ -253,6 +254,17 @@ namespace Entity
                 _unitOfWork.UniqueIds.AddRange(newIds);
                 scanner.newUniqueIdsFromXml.Clear();
             }
+        }
+
+
+        public bool isAuthenticatedUser(List<string> NameAndPass)
+        {
+           User user = _unitOfWork.Users.GetValidatedUser(NameAndPass[0]);
+            if (user != null)
+            {
+                return user.Password == NameAndPass[1];
+            }
+            return false;
         }
     }
 }
