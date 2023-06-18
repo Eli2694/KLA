@@ -267,5 +267,10 @@ namespace Entity
             }
             return false;
         }
+
+        public void AddAliases()
+        {
+
+        }
     }
 }

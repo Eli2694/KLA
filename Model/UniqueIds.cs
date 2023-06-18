@@ -30,5 +30,8 @@ namespace Model
         [StringLength(50)]
         public string EntityType { get; set; }
 
+        // Navigation property
+        public virtual ICollection<Aliases> Aliases { get; set; }
+
     }
 }
