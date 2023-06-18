@@ -30,78 +30,151 @@ namespace Entity
             _log = log;
         }
 
-        public M_SeperatedScopes? XmlToSeperatedScopes(string filePath)
+        public bool ValidateXmlFilePath(string filePath)
+        {
+            try
+            {
+                bool isValid = true;
+
+                if (!File.Exists(filePath))
+                {
+                    _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.Console);
+                //_log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.File);
+                return false;
+            }
+        }
+
+        public SeperatedScopes? XmlToSeperatedScopes(string filePath)
         {
             try
             {
                 if (File.Exists(filePath))
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(M_KlaXML));
-                    M_KlaXML? klaXml;
-
-                    using (XmlReader reader = XmlReader.Create(filePath))
+                    if (Path.GetExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
                     {
-                        klaXml = (M_KlaXML?)serializer.Deserialize(reader);
-                    }
+                        XmlSerializer serializer = new XmlSerializer(typeof(KlaXML));
+                        KlaXML? klaXml;
 
-                    if (klaXml != null)
+                        using (XmlReader reader = XmlReader.Create(filePath))
+                        {
+                            klaXml = (KlaXML?)serializer.Deserialize(reader);
+                        }
+
+                        if (klaXml != null)
+                        {
+                            SeperatedScopes dataForDB = new SeperatedScopes();
+
+                            dataForDB.VariablesList = _variableScanner.ScanCode(klaXml);
+                            dataForDB.EventsList = _eventScanner.ScanCode(klaXml);
+                            dataForDB.AlarmsList = _alarmScanner.ScanCode(klaXml);
+                            
+                            if (CheckAllScopesForDuplicates(dataForDB))
+                            {
+                                 return null;
+                            }
+
+                            return dataForDB;
+                        }                   
+                    }
+                    else
                     {
-                        M_SeperatedScopes dataForDB = new M_SeperatedScopes();
-
-                        dataForDB.VariablesList = _variableScanner.ScanCode(klaXml);
-                        dataForDB.EventsList = _eventScanner.ScanCode(klaXml);
-                        dataForDB.AlarmsList = _alarmScanner.ScanCode(klaXml);
-                        CheckAllScopesForDuplicates(dataForDB);
-
-                        return dataForDB;
+                        _log.LogError($"{filePath} - Not Valid", LogProviderType.Console);
                     }
+       
+                }
+                else
+                {
+                    _log.LogError($"{filePath} - Not Found", LogProviderType.Console);
                 }
 
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _log.LogException("Exception In XmlToSeperatedScopes Function", ex, LogProviderType.Console);
+                //_log.LogException("Exception In XmlToSeperatedScopes Function", ex, LogProviderType.File);
                 throw;
             }
         }
 
-        public void CheckAllScopesForDuplicates(M_SeperatedScopes dataForDb)
+
+        public bool CheckAllScopesForDuplicates(SeperatedScopes dataForDb)
         {
-            CheckForDuplicates(dataForDb.EventsList, "EventsList");
-            CheckForDuplicates(dataForDb.AlarmsList, "AlarmsList");
-            CheckForDuplicates(dataForDb.VariablesList, "VariablesList");
+            bool duplicatesFound = false;
+            duplicatesFound |= CheckForDuplicates(dataForDb.EventsList, "EventsList");
+            duplicatesFound |= CheckForDuplicates(dataForDb.AlarmsList, "AlarmsList");
+            duplicatesFound |= CheckForDuplicates(dataForDb.VariablesList, "VariablesList");
+            return duplicatesFound;
         }
 
-        private void CheckForDuplicates(List<M_UniqueIds> list, string listName)
-        {
-            var duplicateNames = list.GroupBy(v => v.Name).Where(g => g.Count() > 1).Select(g => g.Key);
-            var duplicateIDs = list.GroupBy(v => v.ID).Where(g => g.Count() > 1).Select(g => g.Key);
 
-            LogDuplicates(listName, "names", duplicateNames);
-            LogDuplicates(listName, "IDs", duplicateIDs);
+        private bool CheckForDuplicates(List<UniqueIds> list, string listName)
+        {
+            try
+            {
+                var duplicateNames = list.GroupBy(v => v.Name).Where(g => g.Count() > 1).Select(g => g.Key);
+                var duplicateIDs = list.GroupBy(v => v.ID).Where(g => g.Count() > 1).Select(g => g.Key);
+
+                bool duplicatesFound = false;
+                duplicatesFound |= LogDuplicates(listName, "names", duplicateNames);
+                duplicatesFound |= LogDuplicates(listName, "IDs", duplicateIDs);
+
+                return duplicatesFound;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in CheckForDuplicates: {ex.Message}", LogProviderType.File);
+                return false;
+            }
         }
 
-        private void LogDuplicates(string listName, string propertyName, IEnumerable<string> duplicates)
+
+        private bool LogDuplicates(string listName, string propertyName, IEnumerable<string> duplicates)
         {
+            int duplicatesCount = 0;
             if (duplicates.Any())
             {
                 string errorMessage = $"Duplicate {propertyName} found in {listName}: {string.Join(", ", duplicates)}";
                 _log.LogError(errorMessage, LogProviderType.Console);
-                _log.LogError(errorMessage, LogProviderType.File);
+                //_log.LogError(errorMessage, LogProviderType.File);
+                duplicatesCount++;
             }
+
+            if(duplicatesCount > 0)
+            {
+                return true;
+            }
+
+            return false;
         }
 
-        public List<M_UniqueIds> RetriveUniqeIDsFromDB()
-        {
-            var result = _unitOfWork.UniqueIds.GetAll();     
-            return (List<M_UniqueIds>) result;
-        }
-
-        public M_SeperatedScopes SortUniqeIDsFromDbByScope(List<M_UniqueIds> ListFromDB)
+        public List<UniqueIds> RetriveUniqeIDsFromDB()
         {
             try
             {
-                M_SeperatedScopes DbInObjects = new M_SeperatedScopes();
+                var result = _unitOfWork.UniqueIds.GetAll();
+                return (List<UniqueIds>)result;
+            }
+            catch (Exception ex)
+            {
+                //_log.LogError($"An error occurred in RetriveUniqeIDsFromDB: {ex.Message}", LogProviderType.File);
+                return null;
+            }
+        }
+
+        public SeperatedScopes SortUniqeIDsFromDbByScope(List<UniqueIds> ListFromDB)
+        {
+            try
+            {
+                SeperatedScopes DbInObjects = new SeperatedScopes();
 
                 foreach (var obj in ListFromDB)
                 {
@@ -128,23 +201,58 @@ namespace Entity
 
         }
 
-        public async Task<bool> CompareXmlScopesWithDBScopesAsync(M_SeperatedScopes xmlSeperatedScopes, M_SeperatedScopes DbSeperatedScopes)
+        public bool CompareXmlScopesWithDBScopes(SeperatedScopes xmlSeperatedScopes, SeperatedScopes DbSeperatedScopes)
         {
             try
             {
-                var taskAlarm = Task.Run(() => _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList));
-                var taskEvent = Task.Run(() => _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList));
-                var taskVariable = Task.Run(() => _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList));
-
-                var results = await Task.WhenAll(taskAlarm, taskEvent, taskVariable);
-   
-                return results.All(r => r == true);
+                return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList) &&
+                        _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList) &&
+                        _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                //_log.LogError($"An error occurred in CompareXmlScopesWithDBScopes: {ex.Message}", LogProviderType.File);
+                return false;
+            }
+        }
 
-                throw;
-            }  
+        //public async Task<bool> CompareXmlScopesWithDBScopes(M_SeperatedScopes xmlSeperatedScopes, M_SeperatedScopes DbSeperatedScopes)
+        //{
+        //    var taskAlarm = Task.Run(() => _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList));
+        //    var taskEvent = Task.Run(() => _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList));
+        //    var taskVariable = Task.Run(() => _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList));
+
+        //    var results = await Task.WhenAll(taskAlarm, taskEvent, taskVariable);
+
+        //    return results.All(r => r);
+        //}
+
+        public void UpdateDatabaseWithNewUniqueIds()
+        {
+            try
+            {
+                UpdateDatabaseWithScanner(_alarmScanner);
+                UpdateDatabaseWithScanner(_eventScanner);
+                UpdateDatabaseWithScanner(_variableScanner);
+
+                _unitOfWork.Complete();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.Console);
+                //_log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.File);
+            }
+        }
+
+        private void UpdateDatabaseWithScanner(BaseScanner scanner)
+        {
+            var newIds = scanner.newUniqueIdsFromXml;
+
+            if (newIds != null && newIds.Any())
+            {
+                _unitOfWork.UniqueIds.AddRange(newIds);
+                scanner.newUniqueIdsFromXml.Clear();
+            }
         }
     }
 }

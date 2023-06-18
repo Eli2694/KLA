@@ -7,21 +7,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utility_LOG;
 
 namespace Repository.Core
 {
-    public class UniqueIdsRepository : Repository<M_UniqueIds>, IUniqueIdsRepository
+    public class UniqueIdsRepository : Repository<UniqueIds>, IUniqueIdsRepository
     {
-        public UniqueIdsRepository(KlaContext context) : base(context)
+        public UniqueIdsRepository(KlaContext context, LogManager log) : base(context, log)
         {
         }
 
-        public IEnumerable<M_UniqueIds> GetSpecificScope(string scope)
+        public IEnumerable<UniqueIds> GetSpecificScope(string scope)
         {
-            return _context.Unique_Ids
-                .Where(x => x.Scope == scope)
-                .ToList();
-        }
+            try
+            {
+                return _context.Unique_Ids
+                                .Where(x => x.Scope == scope)
+                                .ToList();
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
+            
+        }
     }
 }

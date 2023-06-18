@@ -24,46 +24,45 @@ try
 }
 catch (Exception ex)
 {
-  Console.WriteLine(ex.ToString());
+    logManager.LogException(ex.Message, ex, LogProviderType.File);
 }
 
 
 static IHostBuilder CreateHostBuilder(string[] args)
 {
 
-    var config = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("UniqeIdsScanner_ENVIRONMENT") ?? "Production"}.json", optional: true)
-        .AddEnvironmentVariables()
-        .Build();
+	var config = new ConfigurationBuilder()
+		.SetBasePath(Directory.GetCurrentDirectory())
+		.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+		.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("UniqeIdsScanner_ENVIRONMENT") ?? "Production"}.json", optional: true)
+		.AddEnvironmentVariables()
+		.Build();
 
-    // var connectionString = GetConnectionString(); 
-    var connectionString = config["ConnectionString:Value"];
+	// var connectionString = GetConnectionString(); 
+	var connectionString = config["ConnectionString:Value"];
 
 
-    return Host.CreateDefaultBuilder(args)
-     .ConfigureServices((hostContext, services) =>
-     {
-         services.AddSingleton<App>();
-         services.AddDbContext<KlaContext>(options =>
-             options.UseSqlServer(connectionString)
-             .UseLoggerFactory(LoggerFactory.Create(builder =>
-             {
-                 builder.AddFilter((category, level) =>
-                     category != null &&
-                     !category.Equals("Microsoft.EntityFrameworkCore.Database.Command") || level == LogLevel.Error);
-             }))
-         );
-         services.AddSingleton<LogManager>();
-         services.AddTransient<IUnitOfWork, UnitOfWork>();
-         services.AddTransient<IUniqueIdsRepository, UniqueIdsRepository>();
-         services.AddTransient<IUserRepository, UserRepository>();
-         services.AddTransient<AlarmScanner>();
-         services.AddTransient<EventScanner>();
-         services.AddTransient<VariableScanner>();
-         services.AddSingleton<MainManager>();
-     });
+	return Host.CreateDefaultBuilder(args)
+	 .ConfigureServices((hostContext, services) =>
+	 {
+		 services.AddSingleton<App>();
+		 services.AddDbContext<KlaContext>(options =>
+			 options.UseSqlServer(connectionString)
+			 .UseLoggerFactory(LoggerFactory.Create(builder =>
+			 {
+				 builder.AddFilter((category, level) =>
+					 !category.Equals("Microsoft.EntityFrameworkCore.Database.Command") || level == LogLevel.Error);
+			 }))
+		 );
+		 services.AddSingleton<LogManager>();
+		 services.AddTransient<IUnitOfWork, UnitOfWork>();
+		 services.AddTransient<IUniqueIdsRepository, UniqueIdsRepository>();
+		 services.AddTransient<IUserRepository, UserRepository>();
+		 services.AddTransient<AlarmScanner>();
+		 services.AddTransient<EventScanner>();
+		 services.AddTransient<VariableScanner>();
+		 services.AddSingleton<MainManager>();
+	 });
 
 
 }

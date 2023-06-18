@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Model
 {
     
-    public class M_User
+    public class User
     {
         [Key]
         [StringLength(256)]

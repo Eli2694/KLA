@@ -8,71 +8,92 @@ using Utility_LOG;
 
 namespace Entity.Scanners
 {
-    public  class BaseScanner
+    public abstract class BaseScanner
     {
         protected readonly LogManager _log;
-        private List<M_UniqueIds> newUniqueIdsFromXml;
+
+        public List<UniqueIds> newUniqueIdsFromXml;
 
         public BaseScanner(LogManager log)
         {
+            newUniqueIdsFromXml = new List<UniqueIds>();
             _log = log;
-            newUniqueIdsFromXml = new List<M_UniqueIds>();
         }
-        public bool CompareXmlScopeWithDBScope(List<M_UniqueIds> xml, List<M_UniqueIds> db)
+
+        public bool CompareXmlScopeWithDBScope(List<UniqueIds> xml, List<UniqueIds> db)
         {
-            var dbDictionary = db.ToDictionary(k => k.ID, v => v);
-            var dbByNameDictionary = db.ToDictionary(k => k.Name, v => v);
-            bool isValid = true;
-            foreach (var xmlElement in xml)
+            try
             {
-                bool hasDifferentName =  HasDifferentNameAsync(xmlElement, dbDictionary);
-                bool hasDifferentID =  HasDifferentIDAsync(xmlElement, dbByNameDictionary);
+                var dbByIdDictionary = db.ToDictionary(k => k.ID, v => v);
+                var dbByNameDictionary = db.ToDictionary(k => k.Name, v => v);
+                var errorMessages = new List<string>();
 
-                if (hasDifferentName && hasDifferentID)
-                {
-                    this.newUniqueIdsFromXml.Add(xmlElement);
-                }
-                else
-                {
-                    isValid = false;
-                }
+                ValidateElements(xml, dbByIdDictionary, dbByNameDictionary, errorMessages);
 
-            }
-            return isValid;
-        }
-
-        private bool HasDifferentNameAsync(M_UniqueIds xmlElement, Dictionary<string, M_UniqueIds> db)
-        {
-                if (db.TryGetValue(xmlElement.ID, out var dbElementByID))
+                if (errorMessages.Count > 0)
                 {
-                    if (dbElementByID.Name != xmlElement.Name)
+                    foreach (var errorMessage in errorMessages)
                     {
-                        _log.LogError($"ID '{xmlElement.ID}' has a different name in the XML and DB.", LogProviderType.Console);
+                        _log.LogError(errorMessage, LogProviderType.Console);
+                        //_log.LogError(errorMessage, LogProviderType.File);
                     }
                     return false;
                 }
-                return true;         
+
+                AddUniqueIdsFromXmlToList(xml, dbByIdDictionary);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //_log.LogError($"An error occurred in CompareXmlScopeWithDBScope: {ex.Message}", LogProviderType.File);
+                return false;
+            }
         }
 
-        private bool HasDifferentIDAsync(M_UniqueIds xmlElement, Dictionary<string, M_UniqueIds> db)
+        private void ValidateElements(List<UniqueIds> xml, Dictionary<string, UniqueIds> dbByIdDictionary, Dictionary<string, UniqueIds> dbByNameDictionary, List<string> errorMessages)
         {
-            if (db.TryGetValue(xmlElement.Name, out var dbElementByName))
+            foreach (var xmlElement in xml)
+            {
+                ValidateNames(xmlElement, dbByIdDictionary, errorMessages);
+                ValidateIds(xmlElement, dbByNameDictionary, errorMessages);
+            }
+        }
+
+        private void ValidateNames(UniqueIds xmlElement, Dictionary<string, UniqueIds> dbByIdDictionary, List<string> errorMessages)
+        {
+            if (dbByIdDictionary.TryGetValue(xmlElement.ID, out var dbElementByID))
+            {
+                if (dbElementByID.Name != xmlElement.Name)
+                {
+                    errorMessages.Add($"ID '{xmlElement.ID}' has a different name in the XML and DB.");
+                }
+            }
+        }
+
+        private void ValidateIds(UniqueIds xmlElement, Dictionary<string, UniqueIds> dbByNameDictionary, List<string> errorMessages)
+        {
+            if (dbByNameDictionary.TryGetValue(xmlElement.Name, out var dbElementByName))
             {
                 if (dbElementByName.ID != xmlElement.ID)
                 {
-                     _log.LogError($"Name '{xmlElement.Name}' has a different ID in the XML and DB.", LogProviderType.Console);
+                    errorMessages.Add($"Name '{xmlElement.Name}' has a different ID in the XML and DB.");
                 }
-              return false;
             }
-            return true;
         }
-        public void ReportNewUniqueIds()
+
+        private void AddUniqueIdsFromXmlToList(List<UniqueIds> xml, Dictionary<string, UniqueIds> db)
         {
-            Console.WriteLine("Unique IDs present in XML but not in DB:");
+            newUniqueIdsFromXml = xml.Where(variableXML => !db.ContainsKey(variableXML.ID)).ToList();
+            ReportNewUniqueIds();
+        }
+
+        private void ReportNewUniqueIds()
+        {
             foreach (var uniqueId in newUniqueIdsFromXml)
             {
-                Console.WriteLine($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}, Scope: {uniqueId.Scope}, Timestamp: {uniqueId.Timestamp}");
+                _log.LogEvent($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}", LogProviderType.Console);
             }
         }
     }
+
 }

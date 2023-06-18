@@ -14,7 +14,7 @@ namespace Utility_LOG
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
         private readonly Task _dequeueTask;
-        private readonly Task _houseKeepingTask;
+        //private readonly Task _houseKeepingTask;
 
         private static System.Collections.Generic.Queue<SingleLogData> LogQueue;
 		private LogFile? _fileInstance;
@@ -28,7 +28,7 @@ namespace Utility_LOG
 
             // Start the log processing and housekeeping tasks
             _dequeueTask = Task.Run(DequeueMyLog);
-            _houseKeepingTask = Task.Run(CheckHouseKeeping);
+            //_houseKeepingTask = Task.Run(CheckHouseKeeping);
         }
 		
 
@@ -93,14 +93,14 @@ namespace Utility_LOG
             }
         }
 
-        private async Task CheckHouseKeeping()
-        {
-            while (!_cts.Token.IsCancellationRequested)
-            {
-                _fileInstance.LogCheckHouseKeeping();
-                await Task.Delay(TimeSpan.FromHours(1),_cts.Token);
-            }
-        }
+        //private async Task CheckHouseKeeping()
+        //{
+        //    while (!_cts.Token.IsCancellationRequested)
+        //    {
+        //        _fileInstance.LogCheckHouseKeeping();
+        //        await Task.Delay(TimeSpan.FromHours(1),_cts.Token);
+        //    }
+        //}
 
         // ------------------------------------------------------------------------------------
         public void Dispose()
@@ -111,7 +111,8 @@ namespace Utility_LOG
                 _cts.Cancel();
 
                 // Give the tasks a certain amount of time to finish
-                Task.WaitAll(new[] { _dequeueTask, _houseKeepingTask });
+                // Task.WaitAll(new[] { _dequeueTask, _houseKeepingTask });
+                Task.WaitAll(new[] { _dequeueTask });
             }
             catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is TaskCanceledException))
             {

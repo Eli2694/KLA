@@ -12,24 +12,30 @@ namespace Entity.Scanners
 {
     public class AlarmScanner : BaseScanner, IScanner 
     {
-        
-        public AlarmScanner(LogManager log) : base(log)
+		public AlarmScanner(LogManager log ) : base(log)
         {
         }
 
-        public List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
+
+		public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
-            return ktgemvar.Alarms.Select(alarm => new M_UniqueIds
+            try
             {
-                EntityType = "Alarm",
-                ID = alarm.Id.ToString(),
-                Name = alarm.Name,
-                Scope = "alarm",
-                Timestamp = DateTime.Now
-            }).ToList();
+                return ktgemvar.Alarms.Select(alarm => new UniqueIds
+                {
+                    EntityType = "Alarm",
+                    ID = alarm.Id.ToString(),
+                    Name = alarm.Name,
+                    Scope = "alarm",
+                    Timestamp = DateTime.Now
+                }).ToList();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
-
-        
     }
-
 }

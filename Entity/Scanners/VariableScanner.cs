@@ -10,47 +10,103 @@ using Utility_LOG;
 
 namespace Entity.Scanners
 {
-    public class VariableScanner : BaseScanner, IScanner
-    {
+	public class VariableScanner : BaseScanner, IScanner
+	{
 
-        public VariableScanner(LogManager log) : base(log)
-        {
-        }
+		public VariableScanner(LogManager log) : base(log)
+		{
+		}
 
-        public List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
-        {
-            try
-            {
-                List<M_UniqueIds> dataVariablesList = new List<M_UniqueIds>();
+		public List<UniqueIds> ScanCode(KlaXML ktgemvar)
+		{
+			try
+			{
+				var variableList = new List<UniqueIds>();
 
-                foreach (var datavar in ktgemvar.DataVariables)
-                {
-                    dataVariablesList.Add(new M_UniqueIds { EntityType = "DataVariable", ID = datavar.Id.ToString(), Name = datavar.ExternalName, Scope = "variable", Timestamp = DateTime.Now });
-                }
+				variableList.AddRange(GetVariableList(ktgemvar.DataVariables, "DataVariable"));
+				variableList.AddRange(GetVariableList(ktgemvar.EquipmentConstants, "EquipmentConstant"));
+				variableList.AddRange(GetVariableList(ktgemvar.DynamicVariables, "DynamicVariable"));
+				variableList.AddRange(GetVariableList(ktgemvar.StatusVariables, "StatusVariable"));
 
-                foreach (var Equipment in ktgemvar.EquipmentConstants)
-                {
-                    dataVariablesList.Add(new M_UniqueIds { EntityType = "EquipmentConstant", ID = Equipment.Id.ToString(), Name = Equipment.ExternalName, Scope = "variable", Timestamp = DateTime.Now });
-                }
+				return variableList;
+			}
+			catch (Exception ex)
+			{
+				// Log the exception
+				_log.LogException("error", ex, LogProviderType.Console);
+				throw;
+			}
+		}
 
-                foreach (var Dynamic in ktgemvar.DynamicVariables)
-                {
-                    dataVariablesList.Add(new M_UniqueIds { EntityType = "DynamicVariable", ID = Dynamic.Id.ToString(), Name = Dynamic.ExternalName, Scope = "variable", Timestamp = DateTime.Now });
-                }
+		private List<UniqueIds> GetVariableList<T>(IEnumerable<T> variables, string entityType)
+		{
+			return variables.Select(variable =>
+				new UniqueIds
+				{
+					EntityType = entityType,
+					ID = variable.GetType().GetProperty("Id").GetValue(variable).ToString(),
+					Name = variable.GetType().GetProperty("ExternalName").GetValue(variable).ToString(),
+					Scope = "variable",
+					Timestamp = DateTime.Now
+				}).ToList();
+		}
 
-                foreach (var Status in ktgemvar.StatusVariables)
-                {
-                    dataVariablesList.Add(new M_UniqueIds { EntityType = "StatusVariable", ID = Status.Id.ToString(), Name = Status.ExternalName, Scope = "variable", Timestamp = DateTime.Now });
-                }
 
-                return dataVariablesList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
 
-    }
+		//public List<UniqueIds> ScanCode(KlaXML ktgemvar)
+		//{
+		//	try
+		//	{
+		//		var dataVariablesList = ktgemvar.DataVariables.Select(datavar =>
+		//			new UniqueIds
+		//			{
+		//				EntityType = "DataVariable",
+		//				ID = datavar.Id.ToString(),
+		//				Name = datavar.ExternalName,
+		//				Scope = "variable",
+		//				Timestamp = DateTime.Now
+		//			});
 
+		//		var equipmentConstantsList = ktgemvar.EquipmentConstants.Select(equipment =>
+		//			new UniqueIds
+		//			{
+		//				EntityType = "EquipmentConstant",
+		//				ID = equipment.Id.ToString(),
+		//				Name = equipment.ExternalName,
+		//				Scope = "variable",
+		//				Timestamp = DateTime.Now
+		//			});
+
+		//		var dynamicVariablesList = ktgemvar.DynamicVariables.Select(dynamic =>
+		//			new UniqueIds
+		//			{
+		//				EntityType = "DynamicVariable",
+		//				ID = dynamic.Id.ToString(),
+		//				Name = dynamic.ExternalName,
+		//				Scope = "variable",
+		//				Timestamp = DateTime.Now
+		//			});
+
+		//		var statusVariablesList = ktgemvar.StatusVariables.Select(status =>
+		//			new UniqueIds
+		//			{
+		//				EntityType = "StatusVariable",
+		//				ID = status.Id.ToString(),
+		//				Name = status.ExternalName,
+		//				Scope = "variable",
+		//				Timestamp = DateTime.Now
+		//			});
+
+		//		return dataVariablesList.Concat(equipmentConstantsList)
+		//								.Concat(dynamicVariablesList)
+		//								.Concat(statusVariablesList)
+		//								.ToList();
+		//	}
+		//	catch (Exception)
+		//	{
+		//		throw;
+		//	}
+		//}
+	}
 }
+

@@ -7,21 +7,29 @@ namespace Entity.Scanners
     public class EventScanner : BaseScanner, IScanner
     {
         
-
         public EventScanner(LogManager log) : base(log)
         {
         }
 
-        public List<M_UniqueIds> ScanCode(M_KlaXML ktgemvar)
+        public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
-            List<M_UniqueIds> eventScopeList = new List<M_UniqueIds>();
-
-            foreach (var evnt in ktgemvar.Events)
+            try
             {
-                eventScopeList.Add(new M_UniqueIds { EntityType = "Event", ID = evnt.Id.ToString(), Name = evnt.Name, Scope = "event", Timestamp = DateTime.Now });
+                return ktgemvar.Events.Select(evnt => new UniqueIds
+                {
+                    EntityType = "Event",
+                    ID = evnt.Id.ToString(),
+                    Name = evnt.Name,
+                    Scope = "event",
+                    Timestamp = DateTime.Now
+                })
+                            .ToList();
             }
-            return eventScopeList;
+            catch (Exception)
+            {
+
+                throw;
+            }     
         } 
     }
-
 }

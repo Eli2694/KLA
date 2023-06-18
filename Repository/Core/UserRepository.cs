@@ -7,18 +7,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utility_LOG;
 
 namespace Repository.Core
 {
-    public class UserRepository : Repository<M_User>, IUserRepository
+    public class UserRepository : Repository<User>, IUserRepository
     {
-        public UserRepository(KlaContext context) : base(context)
+        public UserRepository(KlaContext context, LogManager log) : base(context, log)
         {
         }
 
-        public M_User? GetValidatedUser(string userId)
+        public User GetValidatedUser(string userId)
         {
-            return _context.Allowd_User.SingleOrDefault(n => n.UserID == userId);
+            try
+            {
+                return _context.Users.SingleOrDefault(n => n.UserID == userId);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         } 
 
     }

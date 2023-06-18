@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Repository.Interfaces
 {
-    public interface IUniqueIdsRepository : IRepository<M_UniqueIds>
+    public interface IUniqueIdsRepository : IRepository<UniqueIds>
     {
-        IEnumerable<M_UniqueIds> GetSpecificScope(string scope);
+        IEnumerable<UniqueIds> GetSpecificScope(string scope);
     }
 }

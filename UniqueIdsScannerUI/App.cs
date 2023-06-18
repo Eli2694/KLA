@@ -1,89 +1,187 @@
-﻿using CommandLine.Text;
-using CommandLine;
-using Microsoft.Identity.Client;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
+﻿using CommandLine;
 using Utility_LOG;
-using static Utility_LOG.LogManager;
 using UniqueIdsScannerUI;
 using Model;
 using Entity;
+using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 public class App
 {
-	private readonly LogManager _log;
+    private readonly LogManager _log;
     private readonly MainManager _mainManager;
+    private readonly IConfiguration _settings;
 
-    public App(LogManager log, MainManager mainManager)
+    public App(LogManager log, MainManager mainManager, IConfiguration settings)
     {
-		_log = log;
+        _log = log;
         _mainManager = mainManager;
+        _settings = settings;
     }
+
     internal void Run(string[] args)
     {
 
-        args = new string[3];
-        args[0] = "--update"; args[1] = "-f"; args[2] = @"E:/CodingPlayground/XMLSerializerExmaple/XmlSerizalizeExample/XmlSerizalizeExample/bin/Debug/net6.0/ATLAS.reassign.xml"; // Uniqe.exe --update -f/-c/-a path = verify&update else = verify
-        //args[0] = "-f"; args[1] = "path";
-
-        if (args.Length == 0)
+        try
         {
+            if (args.Length == 0)
+            {
 
-            Console.WriteLine("Hello please enter a valid option: ");
-            var result = Parser.Default.ParseArguments<CliOptions>(args);
-            var parser = new Parser(config => config.HelpWriter = Console.Out);
+                DisplayInstructions();
+            }
+            else
+            {
+                ParseArgumentsAndRunOptions(args);
+            }
+        }
+        catch (Exception ex)
+        {
+            _log.LogException("Exception in Run method", ex, LogProviderType.File);
+        }
+    }
+
+    private void DisplayInstructions()
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("Welcome to Unique IDs Scanner!");
+        Console.WriteLine("================================");
+        Console.WriteLine("Instructions:");
+        Console.WriteLine("1. Configure XML paths in the appsettings.json configuration file.");
+        Console.WriteLine("2. If you want to only verify the content of XML files, use:");
+        Console.WriteLine("   UniqueIdsScanner.exe --verify");
+        Console.WriteLine("   or specify a specific file with:");
+        Console.WriteLine("   UniqueIdsScanner.exe --verify -f 'Path To XML File'");
+        Console.WriteLine("3. If you want to verify and update the database, use:");
+        Console.WriteLine("   UniqueIdsScanner.exe --update");
+        Console.WriteLine("   or specify a specific file with:");
+        Console.WriteLine("   UniqueIdsScanner.exe --update -f 'Path To XML File'");
+        Console.WriteLine();
+        Console.WriteLine("Example Usages:");
+        Console.WriteLine("---------------");
+        Console.WriteLine("1. Verifying XML content using paths from the appsettings.json:");
+        Console.WriteLine("   UniqueIdsScanner.exe --verify");
+        Console.WriteLine();
+        Console.WriteLine("2. Verifying specific XML file:");
+        Console.WriteLine("   UniqueIdsScanner.exe --verify -f 'C:\\folder\\file.xml'");
+        Console.WriteLine();
+        Console.WriteLine("3. Updating the database using paths from the appsettings.json:");
+        Console.WriteLine("   UniqueIdsScanner.exe --update");
+        Console.WriteLine();
+        Console.WriteLine("4. Updating the database with a specific XML file:");
+        Console.WriteLine("   UniqueIdsScanner.exe --update -f 'C:\\folder\\file.xml'");
+        Console.WriteLine();
+        Console.WriteLine("** Please follow the instructions carefully. **");
+        Console.WriteLine("==============================================");
+        Console.WriteLine("Press any key to quit.");
+        Console.ResetColor();
+        Console.ReadKey();
+    }
+
+
+    private void ParseArgumentsAndRunOptions(string[] args)
+    {
+        using (var parser = new CommandLine.Parser((settings) => { settings.CaseSensitive = true; }))
+        {
+            Parser.Default.ParseArguments<CliOptions>(args)
+                .WithParsed<CliOptions>(options => RunOptions(options))
+                .WithNotParsed(HandleParseError);
+        }
+    }
+
+    private void HandleParseError(IEnumerable<Error> errors)
+    {
+        throw new ArgumentException($"Failed to parse command line arguments: {string.Join(", ", errors)}");
+    }
+
+    private void RunOptions(CliOptions options)
+    {
+        List<string> xmlFilePaths = GetFilePaths(options);
+        List<string> validXmlFilePaths = new List<string>();
+        List<string> inValidXmlFilePaths = new List<string>();
+
+        foreach (var xmlFile in xmlFilePaths)
+        {
+            if (_mainManager.ValidateXmlFilePath(xmlFile))
+            {
+                validXmlFilePaths.Add(xmlFile);
+            }
+            else
+            {
+                _log.LogError($"Invalid File Path: {xmlFile}", LogProviderType.Console);
+                _log.LogError($"Invalid File Path: {xmlFile}", LogProviderType.File);
+                inValidXmlFilePaths.Add(xmlFile);
+            }
+        }
+
+        if (inValidXmlFilePaths.Any())
+        {
+            throw new ArgumentException();
+        }
+
+        foreach (var validXmlFile in validXmlFilePaths)
+        {
+            ProcessXmlFile(validXmlFile, options);
+        }
+    }
+
+    private void ProcessXmlFile(string filePath, CliOptions options)
+    {
+        try
+        {
+            bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath) : false;
+
+            if (options.isUpdate)
+            {
+                RunUpdate(CanBeUpdated);
+            }
+        }
+        catch (Exception ex)
+        {
+            _log.LogException($"Exception in ProcessXmlFile method for file {filePath}", ex, LogProviderType.File);
+            throw;
+        }
+    }
+
+    private List<string> GetFilePaths(CliOptions options)
+    {
+        if (options.filePath != null)
+        {
+            return new List<string> { options.filePath };
         }
         else
         {
-            CliOptions cliOptions;
-            using (var parser = new CommandLine.Parser((settings) =>
-            {
-                settings.CaseSensitive = true;
-            }))
-            {
-                //add logs
-                var result = Parser.Default.ParseArguments<CliOptions>(args)
-               .WithParsed<CliOptions>(async Options => {
-                   if (string.IsNullOrWhiteSpace(Options.filePath))
-                   {
-                       Console.WriteLine("Invalid command line arguments");
-                       throw new ArgumentException("filePath is null or empty or white-space");                    
-                   }
-                   else
-                   {
-                       cliOptions = Options;
-                       M_SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(cliOptions.filePath);
-                       M_SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
-                       
-                       Console.WriteLine("verifying: " + cliOptions.filePath.Trim());
-                       //verifying
-                       if (xmlScopes != null)
-                       {
-                           // go through all the dictionaries and compare their values with db
-                           if (await _mainManager.CompareXmlScopesWithDBScopesAsync(xmlScopes, DbScopes))
-                           {
-                               Console.WriteLine("no conflictions");
+            return _settings.GetSection("XmlFilesPath").Get<List<string>>();
+        }
+    }
 
-                               //if user selected the --update cliCommand option
-                               if (cliOptions.isUpdate)
-                               {
-                                   Console.WriteLine("updating");
-                               }
-                           } 
-                       }
-                       else
-                       {
-                           //cant be null to continue
-                           //log
-                           throw new Exception();
-                       }                      
-                   }
-               })
-                //if user enterd wrong arguments
-               .WithNotParsed((errs) => throw new ArgumentException($"Failed to parse command line arguments: {errs}"));
+    private bool RunVerify(string filepath)
+    {
+        try
+        {
+            SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
+
+            if (xmlScopes == null)
+            {
+                _log.LogError($"Can't separate xml file to scopes: {filepath}", LogProviderType.Console);
+                _log.LogError($"Can't separate xml file to scopes: {filepath}", LogProviderType.File);
+                return false;
             }
+
+            SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+            return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes);
+        }
+        catch (Exception ex)
+        {
+            _log.LogException($"Exception in RunVerify method for file {filepath}", ex, LogProviderType.File);
+            throw;
+        }
+    }
+
+    private void RunUpdate(bool isUpdate)
+    {
+        if (isUpdate)
+        {
+            _mainManager.UpdateDatabaseWithNewUniqueIds();
         }
     }
 }
