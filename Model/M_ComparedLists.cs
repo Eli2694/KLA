@@ -10,14 +10,14 @@ namespace Model
     {
         public M_ComparedLists()
         {
-            matchingIdAndName = new List<M_UniqueIds>();
-            matchingIdAndDifferentName = new List<M_UniqueIds>();
-            differentIdAndMatchingName = new List<M_UniqueIds>();
-            differentIdAndDifferentName = new List<M_UniqueIds>();
+            matchingIdAndName = new List<UniqueIds>();
+            matchingIdAndDifferentName = new List<UniqueIds>();
+            differentIdAndMatchingName = new List<UniqueIds>();
+            differentIdAndDifferentName = new List<UniqueIds>();
         }
-        public List<M_UniqueIds> matchingIdAndName { get; set; }
-        public List<M_UniqueIds> matchingIdAndDifferentName { get; set; }
-        public List<M_UniqueIds> differentIdAndMatchingName { get; set; }
-        public List<M_UniqueIds> differentIdAndDifferentName { get; set; }
+        public List<UniqueIds> matchingIdAndName { get; set; }
+        public List<UniqueIds> matchingIdAndDifferentName { get; set; }
+        public List<UniqueIds> differentIdAndMatchingName { get; set; }
+        public List<UniqueIds> differentIdAndDifferentName { get; set; }
     }
 }

@@ -21,7 +21,8 @@ public class App
 
     internal void Run(string[] args)
     {
-
+        args = new string[1];
+        args[0] = "--verify";
         try
         {
             if (args.Length == 0)
@@ -31,7 +32,10 @@ public class App
             }
             else
             {
-                ParseArgumentsAndRunOptions(args);
+                if(isAuthenticatedUser())
+                {
+                    ParseArgumentsAndRunOptions(args);
+                }
             }
         }
         catch (Exception ex)
@@ -183,6 +187,20 @@ public class App
         {
             _mainManager.UpdateDatabaseWithNewUniqueIds();
         }
+    }
+
+    private bool isAuthenticatedUser()
+    {
+        List<string>? NameAndPass = _settings.GetSection("UsernameAndPassword").Get<List<string>>();
+        if (NameAndPass != null)
+        {
+             if(_mainManager.isAuthenticatedUser(NameAndPass))
+            {
+                return true;
+            }
+            _log.LogError("Invalid Username Or Password",LogProviderType.Console);
+        }
+        return false;
     }
 }
 
