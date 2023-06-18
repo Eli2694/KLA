@@ -47,7 +47,7 @@ namespace Entity
             catch (Exception ex)
             {
                 _log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.Console);
-                _log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.File);
+                //_log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.File);
                 return false;
             }
         }
@@ -100,7 +100,7 @@ namespace Entity
             catch (Exception ex)
             {
                 _log.LogException("Exception In XmlToSeperatedScopes Function", ex, LogProviderType.Console);
-                _log.LogException("Exception In XmlToSeperatedScopes Function", ex, LogProviderType.File);
+                //_log.LogException("Exception In XmlToSeperatedScopes Function", ex, LogProviderType.File);
                 throw;
             }
         }
@@ -144,7 +144,7 @@ namespace Entity
             {
                 string errorMessage = $"Duplicate {propertyName} found in {listName}: {string.Join(", ", duplicates)}";
                 _log.LogError(errorMessage, LogProviderType.Console);
-                _log.LogError(errorMessage, LogProviderType.File);
+                //_log.LogError(errorMessage, LogProviderType.File);
                 duplicatesCount++;
             }
 
@@ -165,7 +165,7 @@ namespace Entity
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in RetriveUniqeIDsFromDB: {ex.Message}", LogProviderType.File);
+                //_log.LogError($"An error occurred in RetriveUniqeIDsFromDB: {ex.Message}", LogProviderType.File);
                 return null;
             }
         }
@@ -211,7 +211,7 @@ namespace Entity
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in CompareXmlScopesWithDBScopes: {ex.Message}", LogProviderType.File);
+                //_log.LogError($"An error occurred in CompareXmlScopesWithDBScopes: {ex.Message}", LogProviderType.File);
                 return false;
             }
         }
@@ -240,7 +240,7 @@ namespace Entity
             catch (Exception ex)
             {
                 _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.Console);
-                _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.File);
+                //_log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.File);
             }
         }
 
