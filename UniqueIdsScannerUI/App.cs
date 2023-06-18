@@ -227,13 +227,24 @@ public class App
 
             if (!string.IsNullOrEmpty(reportFilePath))
             {
-                string FileName = $"{DateTime.Now:dd-MM-yyyy}_Report.txt";
-                reportFilePath = Path.Combine(reportFilePath, FileName);
-                _mainManager.GenerateReport(reportFilePath);
+                int counter = 1;
+                string baseFileName = $"{DateTime.Now:dd-MM-yyyy}_Report";
+                string extension = ".txt";
+
+                string FileName = baseFileName + extension;
+                string tempFilePath = Path.Combine(reportFilePath, FileName);
+
+                while (File.Exists(tempFilePath))
+                {
+                    FileName = $"{baseFileName}_{counter++}{extension}";
+                    tempFilePath = Path.Combine(reportFilePath, FileName);
+                }
+
+                _mainManager.GenerateReport(tempFilePath);
             }
             else
             {
-                _log.LogError("File path for generate report was not found",LogProviderType.Console);
+                _log.LogError("File path for generate report was not found", LogProviderType.Console);
             }
 
         }
@@ -243,5 +254,6 @@ public class App
             throw;
         }
     }
+
 }
 
