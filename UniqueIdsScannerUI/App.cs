@@ -36,9 +36,7 @@ public class App
         }
         catch (Exception ex)
         {
-            _log.LogException("Exception in Run method", ex, LogProviderType.Console);
             _log.LogException("Exception in Run method", ex, LogProviderType.File);
-            throw;
         }
     }
 
