@@ -5,6 +5,7 @@ using Model;
 using Entity;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using System.Text.Json;
 
 public class App
 {
@@ -21,8 +22,10 @@ public class App
 
     internal void Run(string[] args)
     {
-        args = new string[1];
-        args[0] = "--verify";
+        args = new string[2];
+        args[0] = "--update";
+        args[1] = "-r";
+
         try
         {
             if (args.Length == 0)
@@ -31,7 +34,7 @@ public class App
             }
             else
             {
-                if(isAuthenticatedUser())
+                if (isAuthenticatedUser())
                 {
                     ParseArgumentsAndRunOptions(args);
                 }
@@ -58,6 +61,10 @@ public class App
         Console.WriteLine("   UniqueIdsScannerUI.exe --update");
         Console.WriteLine("   or specify a specific file with:");
         Console.WriteLine("   UniqueIdsScannerUI.exe --update -f 'Path To XML File'");
+        Console.WriteLine("4. If you want to generate a report, use:");
+        Console.WriteLine("   UniqueIdsScannerUI.exe --generate-report");
+        Console.WriteLine("5. If you want to create a new Alias, use:");
+        Console.WriteLine("   UniqueIdsScannerUI.exe --update -r");
         Console.WriteLine();
         Console.WriteLine("Example Usages:");
         Console.WriteLine("---------------");
@@ -73,12 +80,19 @@ public class App
         Console.WriteLine("4. Updating the database with a specific XML file:");
         Console.WriteLine("   UniqueIdsScannerUI.exe --update -f 'C:\\folder\\file.xml'");
         Console.WriteLine();
+        Console.WriteLine("5. Generating a report:");
+        Console.WriteLine("   UniqueIdsScannerUI.exe --generate-report");
+        Console.WriteLine();
+        Console.WriteLine("6. Creating a new Alias:");
+        Console.WriteLine("   UniqueIdsScannerUI.exe --update -r");
+        Console.WriteLine();
         Console.WriteLine("** Please follow the instructions carefully. **");
         Console.WriteLine("==============================================");
         Console.WriteLine("Press any key to quit.");
         Console.ResetColor();
         Console.ReadKey();
     }
+
 
 
     private void ParseArgumentsAndRunOptions(string[] args)
@@ -98,6 +112,13 @@ public class App
 
     private void RunOptions(CliOptions options)
     {
+
+        if (options.isGenerateReport)
+        {
+            GenerateReport();
+            return;
+        }
+
         List<string> xmlFilePaths = GetFilePaths(options);
         List<string> validXmlFilePaths = new List<string>();
         List<string> inValidXmlFilePaths = new List<string>();
@@ -119,7 +140,7 @@ public class App
 
         if (inValidXmlFilePaths.Any())
         {
-            
+
             throw new ArgumentException();
         }
 
@@ -138,7 +159,7 @@ public class App
 
             if (options.isUpdate)
             {
-                RunUpdate(CanBeUpdated);
+                RunUpdate(CanBeUpdated, options);
             }
         }
         catch (Exception ex)
@@ -183,26 +204,109 @@ public class App
         }
     }
 
-    private void RunUpdate(bool isUpdate)
+    private void RunUpdate(bool isUpdate, CliOptions options)
     {
-        if (isUpdate)
+        try
         {
-            _mainManager.UpdateDatabaseWithNewUniqueIds();
+            if (isUpdate)
+            {
+                _mainManager.UpdateDatabaseWithNewUniqueIds();
+
+                if (options.isRenamed)
+                {
+                    SetUpRename();
+                }
+            }
         }
+        catch (Exception)
+        {
+
+            throw;
+        }
+       
     }
 
     private bool isAuthenticatedUser()
     {
-        List<string>? NameAndPass = _settings.GetSection("UsernameAndPassword").Get<List<string>>();
-        if (NameAndPass != null)
+        try
         {
-             if(_mainManager.isAuthenticatedUser(NameAndPass))
+            List<string>? NameAndPass = _settings.GetSection("UsernameAndPassword").Get<List<string>>();
+            if (NameAndPass != null)
             {
-                return true;
+                if (_mainManager.isAuthenticatedUser(NameAndPass))
+                {
+                    return true;
+                }
+                _log.LogError("Invalid Username Or Password", LogProviderType.Console);
             }
-            _log.LogError("Invalid Username Or Password",LogProviderType.Console);
+            return false;
         }
-        return false;
+        catch (Exception)
+        {
+
+            throw;
+        }
+        
     }
+    public void GenerateReport()
+    {
+        try
+        {
+            string reportFilePath = _settings.GetValue<string>("GenerateReport");
+
+            if (!string.IsNullOrEmpty(reportFilePath))
+            {
+                int counter = 1;
+                string baseFileName = $"{DateTime.Now:dd-MM-yyyy}_Report";
+                string extension = ".txt";
+
+                string FileName = baseFileName + extension;
+                string tempFilePath = Path.Combine(reportFilePath, FileName);
+
+                while (File.Exists(tempFilePath))
+                {
+                    FileName = $"{baseFileName}_{counter++}{extension}";
+                    tempFilePath = Path.Combine(reportFilePath, FileName);
+                }
+
+                _mainManager.GenerateReport(tempFilePath);
+            }
+            else
+            {
+                _log.LogError("File path for generate report was not found", LogProviderType.Console);
+                
+            }
+
+        }
+        catch (Exception ex)
+        {
+            _log.LogException(ex.Message, ex, LogProviderType.File);
+            throw;
+        }
+    }
+
+    public void SetUpRename()
+    {
+        try
+        {
+            var renameDict = _settings.GetSection("Renamed").Get<Dictionary<string, string>>();
+            if (renameDict != null)
+            {
+                _mainManager.ValidateAndPrepareAliases(renameDict);
+            }
+            else
+            {
+                _log.LogError("Can't get 'rename' information", LogProviderType.Console);
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+        
+    }
+
 }
 

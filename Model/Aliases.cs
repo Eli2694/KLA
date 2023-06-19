@@ -13,16 +13,22 @@ namespace Model
         [Key]
         [Column(Order = 0)]
         [StringLength(20)]
-        public string ID { get; set; }
+        public string ID { get; set; } // corresponds to UniqueIds.ID
 
         [Key]
         [Column(Order = 1)]
         [StringLength(256)]
         public string AliasName { get; set; }
 
+        [StringLength(256)]
+        public string OriginalName { get; set; } // corresponds to UniqueIds.Name
+
         [StringLength(255)]
-        public string OriginalName { get; set; }
+        public string UniqueIdScope { get; set; } // corresponds to UniqueIds.Scope
 
         public DateTime? AliasCreated { get; set; }
+
+        [ForeignKey("UniqueIdScope,OriginalName,ID")]
+        public UniqueIds UniqueId { get; set; }
     }
 }
