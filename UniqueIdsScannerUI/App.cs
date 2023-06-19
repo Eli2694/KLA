@@ -88,9 +88,8 @@ public class App
         Console.WriteLine();
         Console.WriteLine("** Please follow the instructions carefully. **");
         Console.WriteLine("==============================================");
-        Console.WriteLine("Press any key to quit.");
         Console.ResetColor();
-        Console.ReadKey();
+        
     }
 
 

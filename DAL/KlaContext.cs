@@ -10,9 +10,8 @@ namespace DAL
     {
         private readonly LogManager _log;
 
-        public KlaContext(DbContextOptions<KlaContext> dbContextOption, LogManager log ) : base(dbContextOption)
+        public KlaContext(DbContextOptions<KlaContext> dbContextOption, LogManager log) : base(dbContextOption)
         {
-
             _log = log;
 
             try
@@ -22,20 +21,20 @@ namespace DAL
                 var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
                 if (databaseCreator != null)
                 {
-                    if (!databaseCreator.CanConnect()) databaseCreator.Create();
-                    if (!databaseCreator.HasTables()) databaseCreator.CreateTables();
+                    if (!databaseCreator.CanConnect())
+                    {
+                        databaseCreator.Create();
+                        databaseCreator.CreateTables();
+                    }
                 }
-
             }
             catch (Exception ex)
             {
                 _log.LogException(ex.Message, ex, LogProviderType.File);
                 throw;
-            }    
+            }
         }
 
-        
-        
         public DbSet<User> Users{ get; set; }
 
         public DbSet<UniqueIds> Unique_Ids { get; set; }

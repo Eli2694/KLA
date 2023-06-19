@@ -39,10 +39,8 @@ static IHostBuilder CreateHostBuilder(string[] args)
 		.AddEnvironmentVariables()
 		.Build();
 
-	// var connectionString = GetConnectionString(); 
-	var connectionString = config["ConnectionString:Value"];
-
-
+	var connectionString = GetConnectionString(config); 
+	
 	return Host.CreateDefaultBuilder(args)
 	 .ConfigureServices((hostContext, services) =>
 	 {
@@ -65,19 +63,19 @@ static IHostBuilder CreateHostBuilder(string[] args)
 		 services.AddTransient<VariableScanner>();
 		 services.AddSingleton<MainManager>();
 	 });
-
-
 }
 
-//static string GetConnectionString()
-//{
-//    var dbHost = Environment.GetEnvironmentVariable("DB_HOST")
-//                 ?? throw new ArgumentNullException("DB_HOST environment variable not found");
-//    var dbName = Environment.GetEnvironmentVariable("DB_NAME")
-//                 ?? throw new ArgumentNullException("DB_NAME environment variable not found");
-//    var dbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD")
-//                 ?? throw new ArgumentNullException("DB_SA_PASSWORD environment variable not found");
+static string GetConnectionString(IConfiguration config)
+{
+    var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+    var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+    var dbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
 
+    if (dbHost == null || dbName == null || dbPassword == null)
+    {
+        // If any of the environment variables were not found, return the connection string from appsettings
+        return config["ConnectionString:Value"];
+    }
 
-//    return $"Data Source={dbHost};Initial Catalog={dbName};User ID=sa; Password={dbPassword};TrustServerCertificate=true";
-//}
+    return $"Data Source={dbHost};Initial Catalog={dbName};User ID=sa; Password={dbPassword};TrustServerCertificate=true";
+}
