@@ -18,11 +18,18 @@ namespace DAL
             {
                 ChangeTracker.LazyLoadingEnabled = false;
 
-                var databaseExists = Database.ExecuteSqlRaw("SELECT database_id FROM sys.databases WHERE Name = 'KLA_Project'") > 0;
+                //var databaseExists = Database.ExecuteSqlRaw("SELECT database_id FROM sys.databases WHERE Name = 'KLA_Project'") > 0;
 
-                if (!databaseExists)
+                //if (!databaseExists)
+                //{
+                //    Database.EnsureCreated();
+                //}
+
+                var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+                if (databaseCreator != null)
                 {
-                    Database.EnsureCreated();
+                    if (!databaseCreator.CanConnect()) databaseCreator.Create();
+                    if (!databaseCreator.HasTables()) databaseCreator.CreateTables();
                 }
 
             }

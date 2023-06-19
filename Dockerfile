@@ -26,6 +26,7 @@ RUN dotnet publish "UniqueIdsScannerUI.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
 COPY InputFiles ./InputFiles
 
 #ENTRYPOINT ["dotnet", "UniqueIdsScannerUI.dll"]
