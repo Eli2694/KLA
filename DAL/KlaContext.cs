@@ -17,17 +17,14 @@ namespace DAL
             try
             {
                 ChangeTracker.LazyLoadingEnabled = false;
-                Database.EnsureCreated();
 
-                //var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
-                //if (databaseCreator != null)
-                //{
-                //    if (!databaseCreator.CanConnect())
-                //    {
-                //        databaseCreator.Create();
-                //        databaseCreator.CreateTables();
-                //    }
-                //}
+                var databaseExists = Database.ExecuteSqlRaw("SELECT database_id FROM sys.databases WHERE Name = 'KLA_Project'") > 0;
+
+                if (!databaseExists)
+                {
+                    Database.EnsureCreated();
+                }
+
             }
             catch (Exception ex)
             {
@@ -35,6 +32,7 @@ namespace DAL
                 throw;
             }
         }
+
 
         public DbSet<User> Users{ get; set; }
 

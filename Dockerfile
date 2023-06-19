@@ -28,4 +28,5 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 COPY InputFiles ./InputFiles
 
-ENTRYPOINT ["dotnet", "UniqueIdsScannerUI.dll"]
+#ENTRYPOINT ["dotnet", "UniqueIdsScannerUI.dll"]
+CMD ["tail", "-f", "/dev/null"]
