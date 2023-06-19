@@ -17,16 +17,17 @@ namespace DAL
             try
             {
                 ChangeTracker.LazyLoadingEnabled = false;
+                Database.EnsureCreated();
 
-                var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
-                if (databaseCreator != null)
-                {
-                    if (!databaseCreator.CanConnect())
-                    {
-                        databaseCreator.Create();
-                        databaseCreator.CreateTables();
-                    }
-                }
+                //var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+                //if (databaseCreator != null)
+                //{
+                //    if (!databaseCreator.CanConnect())
+                //    {
+                //        databaseCreator.Create();
+                //        databaseCreator.CreateTables();
+                //    }
+                //}
             }
             catch (Exception ex)
             {
