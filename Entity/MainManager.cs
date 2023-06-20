@@ -353,7 +353,7 @@ namespace Entity
             else
             {
                 // If alias already exists, logging a message
-                _log.LogError($"Alias '{aliasName}' already exists in the database", LogProviderType.Console);
+                _log.LogWarning($"Alias '{aliasName}' already exists in the database", LogProviderType.Console);
             }
 
             // If alias already exists, returning null

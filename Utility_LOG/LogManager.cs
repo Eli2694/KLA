@@ -165,13 +165,13 @@ namespace Utility_LOG
                 switch (item.EventType)
                 {
                     case LogEventType.Info:
-                        _consoleInstance.LogEvent(item.Message);
+                        _consoleInstance.LogInfo(item.Message);
                         break;
                     case LogEventType.Event:
                         _consoleInstance.LogEvent(item.Message);
                         break;
                     case LogEventType.Warning:
-                        _consoleInstance.LogEvent(item.Message);
+                        _consoleInstance.LogWarning(item.Message);
                         break;
                     case LogEventType.Error:
                         _consoleInstance.LogError(item.Message);
@@ -186,13 +186,13 @@ namespace Utility_LOG
                 switch (item.EventType)
                 {
                     case LogEventType.Info:
-                        _fileInstance.LogEvent(item.Message);
+                        _fileInstance.LogInfo(item.Message);
                         break;
                     case LogEventType.Event:
                         _fileInstance.LogEvent(item.Message);
                         break;
                     case LogEventType.Warning:
-                        _fileInstance.LogEvent(item.Message);
+                        _fileInstance.LogWarning(item.Message);
                         break;
                     case LogEventType.Error:
                         _fileInstance.LogError(item.Message);
