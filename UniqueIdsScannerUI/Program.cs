@@ -58,6 +58,7 @@ static IHostBuilder CreateHostBuilder(string[] args)
 		 services.AddTransient<IUnitOfWork, UnitOfWork>();
 		 services.AddTransient<IUniqueIdsRepository, UniqueIdsRepository>();
 		 services.AddTransient<IUserRepository, UserRepository>();
+		 services.AddTransient<IFileSystem, RealFileSystem>();
 		 services.AddTransient<AlarmScanner>();
 		 services.AddTransient<EventScanner>();
 		 services.AddTransient<VariableScanner>();

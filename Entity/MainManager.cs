@@ -1,20 +1,12 @@
 ﻿using Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Xml;
-using System.Security.Claims;
 using Entity.Scanners;
 using Repository.Interfaces;
 using Utility_LOG;
-using Repository.Core;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Entity.EntityInterfaces;
 
 namespace Entity
 {
@@ -25,14 +17,16 @@ namespace Entity
         private readonly VariableScanner _variableScanner;
         private readonly IUnitOfWork _unitOfWork;
         private readonly LogManager _log;
+        private readonly IFileSystem _fileSystem;
 
-        public MainManager(AlarmScanner alarmScanner, EventScanner eventScanner, VariableScanner variableScanner, IUnitOfWork unitOfWork, LogManager log) 
+        public MainManager(AlarmScanner alarmScanner, EventScanner eventScanner, VariableScanner variableScanner, IUnitOfWork unitOfWork, LogManager log, IFileSystem fileSystem) 
         {
             _alarmScanner = alarmScanner;
             _eventScanner = eventScanner;
             _variableScanner = variableScanner;
             _unitOfWork = unitOfWork;
             _log = log;
+            _fileSystem = fileSystem; 
         }
 
         public bool ValidateXmlFilePath(string filePath)
@@ -41,7 +35,7 @@ namespace Entity
             {
                 bool isValid = true;
 
-                if (!File.Exists(filePath))
+                if (!_fileSystem.FileExists(filePath)) // Use the file system to check if the file exists
                 {
                     _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
                     isValid = false;
@@ -61,9 +55,9 @@ namespace Entity
             try
             {
 
-                if (File.Exists(filePath))
+                if (_fileSystem.FileExists(filePath))
                 {
-                    if (Path.GetExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
+                    if (_fileSystem.GetFileExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
                     {
                         XmlSerializer serializer = new XmlSerializer(typeof(KlaXML));
                         KlaXML? klaXml;
@@ -295,7 +289,7 @@ namespace Entity
 
                 _log.LogEvent($"Generating Report Of Unique Ids....", LogProviderType.Console);
 
-                File.WriteAllText(filePath, json);
+                _fileSystem.WriteAllText(filePath, json);
             }
             catch (Exception)
             {

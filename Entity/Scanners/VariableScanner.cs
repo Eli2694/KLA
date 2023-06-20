@@ -55,62 +55,6 @@ namespace Entity.Scanners
 				}).ToList();
 		}
 
-
-
-		//public List<UniqueIds> ScanCode(KlaXML ktgemvar)
-		//{
-		//	try
-		//	{
-		//		var dataVariablesList = ktgemvar.DataVariables.Select(datavar =>
-		//			new UniqueIds
-		//			{
-		//				EntityType = "DataVariable",
-		//				ID = datavar.Id.ToString(),
-		//				Name = datavar.ExternalName,
-		//				Scope = "variable",
-		//				Timestamp = DateTime.Now
-		//			});
-
-		//		var equipmentConstantsList = ktgemvar.EquipmentConstants.Select(equipment =>
-		//			new UniqueIds
-		//			{
-		//				EntityType = "EquipmentConstant",
-		//				ID = equipment.Id.ToString(),
-		//				Name = equipment.ExternalName,
-		//				Scope = "variable",
-		//				Timestamp = DateTime.Now
-		//			});
-
-		//		var dynamicVariablesList = ktgemvar.DynamicVariables.Select(dynamic =>
-		//			new UniqueIds
-		//			{
-		//				EntityType = "DynamicVariable",
-		//				ID = dynamic.Id.ToString(),
-		//				Name = dynamic.ExternalName,
-		//				Scope = "variable",
-		//				Timestamp = DateTime.Now
-		//			});
-
-		//		var statusVariablesList = ktgemvar.StatusVariables.Select(status =>
-		//			new UniqueIds
-		//			{
-		//				EntityType = "StatusVariable",
-		//				ID = status.Id.ToString(),
-		//				Name = status.ExternalName,
-		//				Scope = "variable",
-		//				Timestamp = DateTime.Now
-		//			});
-
-		//		return dataVariablesList.Concat(equipmentConstantsList)
-		//								.Concat(dynamicVariablesList)
-		//								.Concat(statusVariablesList)
-		//								.ToList();
-		//	}
-		//	catch (Exception)
-		//	{
-		//		throw;
-		//	}
-		//}
 	}
 }
 
