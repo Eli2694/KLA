@@ -162,6 +162,18 @@ public class App
         }   
     }
 
+    private List<string> GetFilePaths(CliOptions options)
+    {
+        if (options.filePath != null)
+        {
+            return new List<string> { options.filePath };
+        }
+        else
+        {
+            return _settings.GetSection("XmlFilesPath").Get<List<string>>();
+        }
+    }
+
     private void ProcessXmlFile(string filePath, CliOptions options)
     {
         try
@@ -180,17 +192,6 @@ public class App
         }
     }
 
-    private List<string> GetFilePaths(CliOptions options)
-    {
-        if (options.filePath != null)
-        {
-            return new List<string> { options.filePath };
-        }
-        else
-        {
-            return _settings.GetSection("XmlFilesPath").Get<List<string>>();
-        }
-    }
 
     private bool RunVerify(string filepath)
     {
@@ -200,8 +201,6 @@ public class App
 
             if (xmlScopes == null)
             {
-                _log.LogError($"Can't separate xml file to scopes: {filepath}", LogProviderType.Console);
-                _log.LogError($"Can't separate xml file to scopes: {filepath}", LogProviderType.File);
                 return false;
             }
 
