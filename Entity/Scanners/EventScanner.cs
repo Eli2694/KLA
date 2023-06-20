@@ -11,7 +11,13 @@ namespace Entity.Scanners
         {
         }
 
-        public List<UniqueIds> ScanCode(KlaXML ktgemvar)
+		public EventScanner() : base(null)
+		{
+		}
+		
+
+
+		public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
             try
             {

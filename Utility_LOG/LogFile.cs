@@ -29,66 +29,66 @@ public class LogFile : ILogger
         private set { _fileName = value; }
     }
 
-    //public void Init()
-    //{
-    //    FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
+	//public void Init()
+	//{
+	//    FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
 
-    //    if (logStreamWriter != null)
-    //    {
-    //        logStreamWriter.Dispose();
-    //        logStreamWriter = null;
-    //    }
+	//    if (logStreamWriter != null)
+	//    {
+	//        logStreamWriter.Dispose();
+	//        logStreamWriter = null;
+	//    }
 
-    //    try
-    //    {
-    //        logStreamWriter = new StreamWriter(FileName, true);
-    //    }
-    //    catch (IOException ex)
-    //    {
-    //        Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
-    //        throw; // Or handle the error as appropriate
-    //    }
-    //}
+	//    try
+	//    {
+	//        logStreamWriter = new StreamWriter(FileName, true);
+	//    }
+	//    catch (IOException ex)
+	//    {
+	//        Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
+	//        throw; // Or handle the error as appropriate
+	//    }
+	//}
 
-    public void Init()
-    {
-        FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
+	public void Init()
+	{
+		FileName = $"{DateTime.Now:dd-MM-yyyy}_Log{count}.txt";
 
-        if (logStreamWriter != null)
-        {
-            logStreamWriter.Dispose();
-            logStreamWriter = null;
-        }
+		if (logStreamWriter != null)
+		{
+			logStreamWriter.Dispose();
+			logStreamWriter = null;
+		}
 
-        const int maxRetries = 5;
-        int retryCount = 0;
-        bool fileOpened = false;
+		const int maxRetries = 5;
+		int retryCount = 0;
+		bool fileOpened = false;
 
-        while (!fileOpened && retryCount < maxRetries)
-        {
-            try
-            {
-                logStreamWriter = new StreamWriter(FileName, true);
-                fileOpened = true;
-            }
-            catch (IOException ex)
-            {
-                Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
-                retryCount++;
-                Thread.Sleep(1000); // Wait for 1 second before retrying
-            }
-        }
+		while (!fileOpened && retryCount < maxRetries)
+		{
+			try
+			{
+				logStreamWriter = new StreamWriter(FileName, true);
+				fileOpened = true;
+			}
+			catch (IOException ex)
+			{
+				Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
+				retryCount++;
+				Thread.Sleep(1000); // Wait for 1 second before retrying
+			}
+		}
 
-        if (!fileOpened)
-        {
-            Console.WriteLine($"Unable to open the file '{FileName}' after {maxRetries} attempts. Aborting.");
-            throw new IOException("Failed to open file after multiple attempts.");
-        }
-    }
+		if (!fileOpened)
+		{
+			Console.WriteLine($"Unable to open the file '{FileName}' after {maxRetries} attempts. Aborting.");
+			//throw new IOException("Failed to open file after multiple attempts.");
+		}
+	}
 
 
 
-    public void LogEvent(string msg)
+	public void LogEvent(string msg)
     {
         WriteLog($"[EVENT][{DateTime.Now}] {msg}");
     }

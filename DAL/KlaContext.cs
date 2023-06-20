@@ -10,7 +10,7 @@ namespace DAL
     {
         private readonly LogManager _log;
 
-        public KlaContext(DbContextOptions<KlaContext> dbContextOption, LogManager log ) : base(dbContextOption)
+        public KlaContext(DbContextOptions<KlaContext> dbContextOption, LogManager log) : base(dbContextOption)
         {
 
             _log = log;
@@ -34,9 +34,12 @@ namespace DAL
             }    
         }
 
-        
-        
-        public DbSet<User> Users{ get; set; }
+		public KlaContext() : base()
+		{
+			
+		}
+
+		public DbSet<User> Users{ get; set; }
 
         public DbSet<UniqueIds> Unique_Ids { get; set; }
 

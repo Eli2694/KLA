@@ -179,7 +179,6 @@ namespace Utility_LOG
                 }
             }
         }
-
-    }
+	}
 
 }

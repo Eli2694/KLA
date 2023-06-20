@@ -1,7 +1,7 @@
-﻿using Entity.Scanners;
-using Model;
+﻿using DAL;
+using Microsoft.EntityFrameworkCore;
 using Moq;
-using Repository.Interfaces;
+using Repository.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Utility_LOG;
 
-namespace Entity.UnitTest
+namespace Repository.UnitTest.CoreTest
 {
 	[TestFixture]
-	public class MainManagerTests
+	public class RepositoryTests
 	{
-
+		
 	}
 }

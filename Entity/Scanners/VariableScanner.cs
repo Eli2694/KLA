@@ -17,6 +17,10 @@ namespace Entity.Scanners
 		{
 		}
 
+		public VariableScanner() : base(null)
+		{
+		}
+
 		public List<UniqueIds> ScanCode(KlaXML ktgemvar)
 		{
 			try
