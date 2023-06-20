@@ -12,12 +12,13 @@ namespace DAL
 
         public KlaContext(DbContextOptions<KlaContext> dbContextOption, LogManager log) : base(dbContextOption)
         {
-
             _log = log;
 
             try
             {
                 ChangeTracker.LazyLoadingEnabled = false;
+
+                
 
                 var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
                 if (databaseCreator != null)
@@ -26,12 +27,19 @@ namespace DAL
                     if (!databaseCreator.HasTables()) databaseCreator.CreateTables();
                 }
 
+                //var databaseExists = Database.ExecuteSqlRaw("SELECT database_id FROM sys.databases WHERE Name = 'KLA_Project'") > 0;
+
+                //if (!databaseExists)
+                //{
+                //    Database.EnsureCreated();
+                //}
+
             }
             catch (Exception ex)
             {
                 _log.LogException(ex.Message, ex, LogProviderType.File);
                 throw;
-            }    
+            }
         }
 
 		public KlaContext() : base()
@@ -48,9 +56,7 @@ namespace DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UniqueIds>()
-                .HasKey(e => new { e.Scope, e.Name, e.ID });
-
-            // Defining unique constraints
+        .HasKey(e => new { e.Scope, e.Name, e.ID });
 
             // M_UniqueIds
             modelBuilder.Entity<UniqueIds>()
@@ -63,19 +69,21 @@ namespace DAL
 
             // M_User
             modelBuilder.Entity<User>()
-            .HasIndex(u => u.UserID)
-            .IsUnique();
+                .HasIndex(u => u.UserID)
+                .IsUnique();
 
             // Aliases
             modelBuilder.Entity<Aliases>(entity =>
             {
                 entity.HasKey(a => new { a.ID, a.AliasName });
-                entity.HasIndex(a => a.AliasName).IsUnique();
+
+                entity.HasOne(a => a.UniqueId)
+                    .WithMany(u => u.Aliases)
+                    .HasForeignKey(a => new { a.UniqueIdScope, a.OriginalName, a.ID });
             });
 
             base.OnModelCreating(modelBuilder);
         }
-
     }
 
 

@@ -22,6 +22,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository.UnitTest", "Repository.UnitTest\Repository.UnitTest.csproj", "{5C4EE322-FCBA-41F0-940B-1B591AA9CF33}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniqueIdsScannerUI.UnitTest", "UniqueIdsScannerUI.UnitTest\UniqueIdsScannerUI.UnitTest.csproj", "{1CA10E23-DB9F-40F8-AFAA-EBF36550815B}"
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{ACE21864-EEC2-40A9-AC01-1E13DB926092}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +70,10 @@ Global
 		{1CA10E23-DB9F-40F8-AFAA-EBF36550815B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CA10E23-DB9F-40F8-AFAA-EBF36550815B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CA10E23-DB9F-40F8-AFAA-EBF36550815B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACE21864-EEC2-40A9-AC01-1E13DB926092}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACE21864-EEC2-40A9-AC01-1E13DB926092}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACE21864-EEC2-40A9-AC01-1E13DB926092}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACE21864-EEC2-40A9-AC01-1E13DB926092}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

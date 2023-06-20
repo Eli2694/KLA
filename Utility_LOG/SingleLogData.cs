@@ -18,6 +18,7 @@ namespace Utility_LOG
     {
         Event,
         Error,
+        Warning,
         Exception
     }
     public class SingleLogData

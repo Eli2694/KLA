@@ -27,6 +27,14 @@ namespace Utility_LOG
 			Console.ResetColor();
 		}
 
+
+        public void LogWarning(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("[WARNING][" + DateTime.Now + "] " + message);
+            Console.ResetColor();
+        }
+
         public void LogException(string message, Exception ex)
         {
 			Console.ForegroundColor = ConsoleColor.Red;

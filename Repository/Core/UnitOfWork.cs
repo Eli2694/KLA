@@ -1,5 +1,6 @@
 ﻿using DAL;
 using Microsoft.EntityFrameworkCore;
+using Model;
 using Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,11 +22,15 @@ namespace Repository.Core
             _log = log;
             UniqueIds = new UniqueIdsRepository(_context, log);
             Users = new UserRepository(_context, log);
+            Aliases = new AliasesRepository(_context, log);
+
         }
 
 
         public IUniqueIdsRepository UniqueIds { get; private set; }
         public IUserRepository Users { get; private set; }
+
+        public IAliasesRepository Aliases { get; private set; }
 
         public void Complete()
         {
@@ -62,6 +67,7 @@ namespace Repository.Core
             catch (Exception ex)
             {
                 _log.LogError($"An error occurred while disposing the database context: {ex.Message}", LogProviderType.File);
+                throw;
             }
         }
     }

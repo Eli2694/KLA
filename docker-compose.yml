@@ -1,0 +1,66 @@
+version: '3.4'
+
+services:
+  uniqueidsscannerui:
+    image: ${DOCKER_REGISTRY-}uniqueidsscannerui
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+    networks:
+      - mynetwork
+    environment:
+      - DB_HOST=mssql
+      - DB_NAME=KLA_Project
+      - DB_SA_PASSWORD=password@12345 
+    tty: true
+    stdin_open: true
+
+  database:
+    container_name: mssql
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    restart: always
+    hostname: 'mssql'
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=password@12345  
+    ports:
+     - 1433:1433
+    networks:
+      - mynetwork
+    volumes:
+     - C:\ZionNet\DevOps\Kla-Project\KLA\mssql\data:/var/opt/mssql/data
+     - C:\ZionNet\DevOps\Kla-Project\KLA\mssql\log:/var/opt/mssql/log
+     - C:\ZionNet\DevOps\Kla-Project\KLA\mssql\secrets:/var/opt/mssql/secrets
+
+  sqlpad:
+    container_name: sqlpad
+    image: sqlpad/sqlpad:5
+    hostname: 'sqlpad'
+    ports:
+      - '3000:3000'
+    networks:
+      - mynetwork
+    environment:
+      SQLPAD_ADMIN: 'admin@sqlpad.com'
+      SQLPAD_ADMIN_PASSWORD: 'admin'
+      SQLPAD_APP_LOG_LEVEL: info
+      SQLPAD_WEB_LOG_LEVEL: warn
+      SQLPAD_CONNECTIONS__sqlserverdemo__name: SQL Server Demo
+      SQLPAD_CONNECTIONS__sqlserverdemo__driver: sqlserver
+      SQLPAD_CONNECTIONS__sqlserverdemo__host: mssql
+      SQLPAD_CONNECTIONS__sqlserverdemo__database: KLA_Project
+      SQLPAD_CONNECTIONS__sqlserverdemo__username: sa
+      SQLPAD_CONNECTIONS__sqlserverdemo__password: password@12345 
+    volumes:
+      - sqlpad-volume:/var/lib/sqlpad
+    depends_on:
+      - database
+     
+volumes:
+  sqlpad-volume:
+
+networks:
+  mynetwork:

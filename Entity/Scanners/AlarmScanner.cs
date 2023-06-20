@@ -15,6 +15,9 @@ namespace Entity.Scanners
 		public AlarmScanner(LogManager log) : base(log)
         {
         }
+        public AlarmScanner() : base(null)
+        {
+        }
 
 		public AlarmScanner() : base(null)
 		{
@@ -22,7 +25,7 @@ namespace Entity.Scanners
 
 
 
-		public List<UniqueIds> ScanCode(KlaXML ktgemvar)
+        public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
             try
             {

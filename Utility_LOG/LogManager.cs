@@ -138,6 +138,12 @@ namespace Utility_LOG
             LogQueue.Enqueue(item);
         }
 
+        public void LogWarning(string msg, LogProviderType providerType)
+        {
+            SingleLogData item = new SingleLogData(LogEventType.Warning, msg, providerType);
+            LogQueue.Enqueue(item);
+        }
+
         public void LogException(string msg, Exception exception, LogProviderType providerType)
         {
             SingleLogData item = new SingleLogData(LogEventType.Exception, msg, exception, providerType);
@@ -155,6 +161,9 @@ namespace Utility_LOG
                     case LogEventType.Event:
                         _consoleInstance.LogEvent(item.Message);
                         break;
+                    case LogEventType.Warning:
+                        _consoleInstance.LogEvent(item.Message);
+                        break;
                     case LogEventType.Error:
                         _consoleInstance.LogError(item.Message);
                         break;
@@ -168,6 +177,9 @@ namespace Utility_LOG
                 switch (item.EventType)
                 {
                     case LogEventType.Event:
+                        _fileInstance.LogEvent(item.Message);
+                        break;
+                    case LogEventType.Warning:
                         _fileInstance.LogEvent(item.Message);
                         break;
                     case LogEventType.Error:

@@ -10,6 +10,7 @@ namespace Repository.Interfaces
     {
         IUniqueIdsRepository UniqueIds { get; }
         IUserRepository Users { get; }
+        IAliasesRepository Aliases { get; }
         void Complete();
     }
 }

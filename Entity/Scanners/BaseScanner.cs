@@ -47,13 +47,14 @@ namespace Entity.Scanners
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in CompareXmlScopeWithDBScope: {ex.Message}", LogProviderType.File);
+                _log.LogError($"Error in CompareXmlScopeWithDBScope method: {ex.Message}", LogProviderType.File);
                 return false;
             }
         }
 
         private void ValidateElements(List<UniqueIds> xml, Dictionary<string, UniqueIds> dbByIdDictionary, Dictionary<string, UniqueIds> dbByNameDictionary, List<string> errorMessages)
         {
+
             foreach (var xmlElement in xml)
             {
                 ValidateNames(xmlElement, dbByIdDictionary, errorMessages);
@@ -91,11 +92,30 @@ namespace Entity.Scanners
 
         private void ReportNewUniqueIds()
         {
+            int count = 0;  // Counter for the total number of IDs
+
+            _log.LogEvent($"Starting to log unique IDs from XML...", LogProviderType.Console);
+            _log.LogEvent($"For detailed results, please see the generated log file.", LogProviderType.Console);
+
             foreach (var uniqueId in newUniqueIdsFromXml)
             {
-                _log.LogEvent($"Entity Type: {uniqueId.EntityType}, ID: {uniqueId.ID}, Name: {uniqueId.Name}", LogProviderType.Console);
+                count++;
+
+                // Reporting in a clear, easy-to-read format
+                string message =
+                    $"Unique ID Entry #{count}:\n" +
+                    $"Entity Type: {uniqueId.EntityType}\n" +
+                    $"ID: {uniqueId.ID}\n" +
+                    $"Name: {uniqueId.Name}\n" +
+                    $"\n";  // Adding a newline for clarity
+
+                _log.LogEvent(message, LogProviderType.File);
             }
+
+            _log.LogEvent($"Finished logging. Total number of unique IDs reported: {count}. Please refer to the text file for details.", LogProviderType.Console);
         }
+
+
     }
 
 }
