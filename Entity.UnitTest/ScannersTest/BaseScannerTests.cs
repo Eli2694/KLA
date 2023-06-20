@@ -1,6 +1,7 @@
 ﻿using Entity.Scanners;
 using Model;
 using Moq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace Entity.UnitTest.ScannersTest
             var db = CreateUniqueIdsList(("1", "A"), ("2", "B"));
 
             // Act
-            var result = _baseScanner.CompareXmlScopeWithDBScope(xml, db);
+            var result = _baseScanner.CompareXmlScopeWithDBScope(xml, db, false);
 
             // Assert
             Assert.IsTrue(result, "The result should be true when XML and DB are equal.");
@@ -47,7 +48,7 @@ namespace Entity.UnitTest.ScannersTest
             var db = CreateUniqueIdsList(("1", "A"), ("2", "B"));
 
             // Act
-            var result = _baseScanner.CompareXmlScopeWithDBScope(xml, db);
+            var result = _baseScanner.CompareXmlScopeWithDBScope(xml, db,false);
 
             // Assert
             Assert.IsFalse(result, "The result should be false when XML and DB have a mismatched name.");
@@ -62,7 +63,7 @@ namespace Entity.UnitTest.ScannersTest
             var db = CreateUniqueIdsList(("1", "A"), ("2", "B"));
 
             // Act
-            var result = _baseScanner.CompareXmlScopeWithDBScope(xml, db);
+            var result = _baseScanner.CompareXmlScopeWithDBScope(xml, db, false);
 
             // Assert
             Assert.IsFalse(result, "The result should be false when XML and DB have a mismatched ID.");

@@ -242,6 +242,9 @@ namespace Entity
                 UpdateDatabaseWithScanner(_variableScanner);
 
                 _unitOfWork.Complete();
+
+                _log.LogEvent($"The database was updated in the 'Unique_Ids' table using new IDs from an XML file.", LogProviderType.Console);
+
             }
             catch (Exception ex)
             {
@@ -264,6 +267,7 @@ namespace Entity
 
         public bool isAuthenticatedUser(List<string> NameAndPass)
         {
+            _log.LogEvent($"Authenticate User....", LogProviderType.Console);
 
             User user = _unitOfWork.Users.GetValidatedUser(NameAndPass[0]);
             if (user != null)
@@ -288,6 +292,8 @@ namespace Entity
                 };
 
                 var json = JsonSerializer.Serialize(uniqueIdWithAliases, options);
+
+                _log.LogEvent($"Generating Report Of Unique Ids....", LogProviderType.Console);
 
                 File.WriteAllText(filePath, json);
             }
@@ -332,6 +338,7 @@ namespace Entity
 
             if(newAliases.Any())
             {
+                _log.LogEvent($"Updating Database With New Aliases", LogProviderType.Console);
                 UpdateDbWithNewAliases(newAliases);
             }
             
@@ -365,8 +372,17 @@ namespace Entity
 
         public void UpdateDbWithNewAliases(List<Aliases> newAliases)
         {
-            _unitOfWork.Aliases.AddRange(newAliases);
-            _unitOfWork.Complete();
+            try
+            {
+                _unitOfWork.Aliases.AddRange(newAliases);
+                _unitOfWork.Complete();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in UpdateDbWithNewAliases: {ex.Message}", LogProviderType.File);
+                throw;
+            }
+            
         }
 
     }

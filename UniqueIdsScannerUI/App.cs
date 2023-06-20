@@ -22,16 +22,12 @@ public class App
 
     internal void Run(string[] args)
     {
-        _log.LogEvent("App Start Runnig...",LogProviderType.Console);
+        Console.WriteLine("App Start Runnig...",LogProviderType.Console);
 
         try
         {
             if (args.Length == 0)
             {
-                //for (int i = 0; i < 10000; i++)
-                //{
-                //    _log.LogEvent($"test {i}", LogProviderType.File);
-                //}
                 DisplayInstructions();
             }
             else
