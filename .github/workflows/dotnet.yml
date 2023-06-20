@@ -23,6 +23,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore "UniqueIdsScannerUI/UniqueIdsScannerUI.csproj"
     - name: Build
-      run: dotnet build  "UniqueIdsScannerUI.csproj" --no-restore
+      run: dotnet build  "UniqueIdsScannerUI/UniqueIdsScannerUI.csproj" --no-restore
     - name: Test
       run: dotnet test "UniqueIdsScannerUI.UnitTest/UniqueIdsScannerUI.UnitTest.csproj" --no-build --verbosity normal
