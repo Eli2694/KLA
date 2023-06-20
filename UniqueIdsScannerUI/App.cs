@@ -22,6 +22,7 @@ public class App
 
     internal void Run(string[] args)
     {
+        _log.LogEvent("App Start Runnig...",LogProviderType.Console);
 
         try
         {
@@ -54,28 +55,8 @@ public class App
         Console.WriteLine("2. Use the following commands to perform different actions:");
         Console.WriteLine();
 
-        // Debug Environment
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("Debug Environment:");
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine("--verify: Verify the content of XML files.");
-        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --verify");
-        Console.WriteLine("          UniqueIdsScannerUI.exe --verify -f 'Path To XML File'");
-        Console.WriteLine();
-        Console.WriteLine("--update: Verify and update the database.");
-        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --update");
-        Console.WriteLine("          UniqueIdsScannerUI.exe --update -f 'Path To XML File'");
-        Console.WriteLine();
-        Console.WriteLine("--generate-report: Generate a report.");
-        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --generate-report");
-        Console.WriteLine();
-        Console.WriteLine("--update -r: Create a new Alias.");
-        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --update -r");
-        Console.WriteLine();
-
-        // Container/Release Environment
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Container/Release Environment:");
+        Console.WriteLine("Instructions:");
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("--verify: Verify the content of XML files.");
         Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --verify");
@@ -95,8 +76,6 @@ public class App
         Console.WriteLine("** Please follow the instructions carefully. **");
         Console.WriteLine("==============================================");
         Console.ResetColor();
-
-
     }
 
     private void ParseArgumentsAndRunOptions(string[] args)
@@ -178,7 +157,8 @@ public class App
     {
         try
         {
-            bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath) : false;
+            bool getFullInfo = options.Info;
+            bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath, getFullInfo) : false;
 
             if (options.isUpdate)
             {
@@ -193,7 +173,7 @@ public class App
     }
 
 
-    private bool RunVerify(string filepath)
+    private bool RunVerify(string filepath,bool getFullInfo)
     {
         try
         {
@@ -205,7 +185,7 @@ public class App
             }
 
             SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
-            return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes);
+            return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes, getFullInfo);
         }
         catch (Exception ex)
         {

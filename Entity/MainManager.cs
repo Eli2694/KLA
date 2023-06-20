@@ -60,6 +60,7 @@ namespace Entity
         {
             try
             {
+
                 if (File.Exists(filePath))
                 {
                     if (Path.GetExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
@@ -206,13 +207,13 @@ namespace Entity
 
         }
 
-        public bool CompareXmlScopesWithDBScopes(SeperatedScopes xmlSeperatedScopes, SeperatedScopes DbSeperatedScopes)
+        public bool CompareXmlScopesWithDBScopes(SeperatedScopes xmlSeperatedScopes, SeperatedScopes DbSeperatedScopes, bool getFullInfo)
         {
             try
             {
-                return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList) &&
-                        _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList) &&
-                        _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList);
+                return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList, getFullInfo) &&
+                        _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList, getFullInfo) &&
+                        _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList, getFullInfo);
             }
             catch (Exception ex)
             {
@@ -244,13 +245,13 @@ namespace Entity
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.Console);
-                //_log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.File);
+                _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.File);
             }
         }
 
         private void UpdateDatabaseWithScanner(BaseScanner scanner)
         {
+
             var newIds = scanner.newUniqueIdsFromXml;
 
             if (newIds != null && newIds.Any())
@@ -263,7 +264,8 @@ namespace Entity
 
         public bool isAuthenticatedUser(List<string> NameAndPass)
         {
-           User user = _unitOfWork.Users.GetValidatedUser(NameAndPass[0]);
+
+            User user = _unitOfWork.Users.GetValidatedUser(NameAndPass[0]);
             if (user != null)
             {
                 return user.Password == NameAndPass[1];
@@ -275,6 +277,7 @@ namespace Entity
         {
             try
             {
+
                 var uniqueIdWithAliases =  _unitOfWork.UniqueIds.GetUniqueIdsWithAliases();
 
                 // not using ReferenceHandler.Preserve can cause an infinite loop 
