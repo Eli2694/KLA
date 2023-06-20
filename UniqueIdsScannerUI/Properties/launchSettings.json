@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "UniqueIdsScannerUI": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

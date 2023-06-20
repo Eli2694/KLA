@@ -22,9 +22,6 @@ public class App
 
     internal void Run(string[] args)
     {
-        args = new string[2];
-        args[0] = "--update";
-        args[1] = "-r";
 
         try
         {
@@ -88,9 +85,7 @@ public class App
         Console.WriteLine();
         Console.WriteLine("** Please follow the instructions carefully. **");
         Console.WriteLine("==============================================");
-        Console.WriteLine("Press any key to quit.");
-        Console.ResetColor();
-        Console.ReadKey();
+        Console.ResetColor();   
     }
 
 

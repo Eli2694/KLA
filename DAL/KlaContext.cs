@@ -10,14 +10,20 @@ namespace DAL
     {
         private readonly LogManager _log;
 
-        public KlaContext(DbContextOptions<KlaContext> dbContextOption, LogManager log ) : base(dbContextOption)
+        public KlaContext(DbContextOptions<KlaContext> dbContextOption, LogManager log) : base(dbContextOption)
         {
-
             _log = log;
 
             try
             {
                 ChangeTracker.LazyLoadingEnabled = false;
+
+                //var databaseExists = Database.ExecuteSqlRaw("SELECT database_id FROM sys.databases WHERE Name = 'KLA_Project'") > 0;
+
+                //if (!databaseExists)
+                //{
+                //    Database.EnsureCreated();
+                //}
 
                 var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
                 if (databaseCreator != null)
@@ -31,11 +37,10 @@ namespace DAL
             {
                 _log.LogException(ex.Message, ex, LogProviderType.File);
                 throw;
-            }    
+            }
         }
 
-        
-        
+
         public DbSet<User> Users{ get; set; }
 
         public DbSet<UniqueIds> Unique_Ids { get; set; }
