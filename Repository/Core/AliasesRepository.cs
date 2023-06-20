@@ -17,6 +17,11 @@ namespace Repository.Core
         {
         }
 
+        /// <summary>
+        /// this method is used to get all aliases associated with a unique id
+        /// returns null if no aliases are found for the unique id
+        /// 
+
         public UniqueIds GetUniqueIdWithAliases(string id, string scope)
         {
             try
