@@ -11,6 +11,7 @@ namespace Utility_LOG
         void Init();
         void LogEvent(string msg);
         void LogError(string msg);
+        void LogWarning(string msg);
         void LogException(string msg, Exception exce);
         void LogCheckHouseKeeping();
     }

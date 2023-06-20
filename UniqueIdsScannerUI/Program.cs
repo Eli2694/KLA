@@ -21,11 +21,11 @@ try
 {
     var app = services.GetRequiredService<App>();
     app.Run(args);
-    Console.WriteLine("The app has finished running");
+	logManager.LogEvent("The app has finished running", LogProviderType.Console);
 }
 catch (Exception)
 {
-    Console.WriteLine("The app has finished running with exception");
+    logManager.LogError("Application Error: Check Log File",LogProviderType.Console);
 }
 
 

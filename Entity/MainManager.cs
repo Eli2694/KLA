@@ -51,8 +51,7 @@ namespace Entity
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.Console);
-                //_log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.File);
+                _log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.File);
                 return false;
             }
         }

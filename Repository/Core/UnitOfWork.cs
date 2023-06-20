@@ -67,6 +67,7 @@ namespace Repository.Core
             catch (Exception ex)
             {
                 _log.LogError($"An error occurred while disposing the database context: {ex.Message}", LogProviderType.File);
+                throw;
             }
         }
     }

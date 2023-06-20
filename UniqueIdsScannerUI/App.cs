@@ -39,7 +39,8 @@ public class App
         }
         catch (Exception ex)
         {
-            _log.LogException("Exception in Run method", ex, LogProviderType.File);
+            _log.LogException($"Exception in Run method: {ex.Message}", ex, LogProviderType.File);
+            throw;
         }
     }
 
@@ -50,45 +51,53 @@ public class App
         Console.WriteLine("================================");
         Console.WriteLine("Instructions:");
         Console.WriteLine("1. Configure XML paths in the appsettings.json configuration file.");
-        Console.WriteLine("2. If you want to only verify the content of XML files, use:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --verify");
-        Console.WriteLine("   or specify a specific file with:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --verify -f 'Path To XML File'");
-        Console.WriteLine("3. If you want to verify and update the database, use:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --update");
-        Console.WriteLine("   or specify a specific file with:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --update -f 'Path To XML File'");
-        Console.WriteLine("4. If you want to generate a report, use:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --generate-report");
-        Console.WriteLine("5. If you want to create a new Alias, use:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --update -r");
+        Console.WriteLine("2. Use the following commands to perform different actions:");
         Console.WriteLine();
-        Console.WriteLine("Example Usages:");
-        Console.WriteLine("---------------");
-        Console.WriteLine("1. Verifying XML content using paths from the appsettings.json:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --verify");
+
+        // Debug Environment
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("Debug Environment:");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine("--verify: Verify the content of XML files.");
+        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --verify");
+        Console.WriteLine("          UniqueIdsScannerUI.exe --verify -f 'Path To XML File'");
         Console.WriteLine();
-        Console.WriteLine("2. Verifying specific XML file:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --verify -f 'C:\\folder\\file.xml'");
+        Console.WriteLine("--update: Verify and update the database.");
+        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --update");
+        Console.WriteLine("          UniqueIdsScannerUI.exe --update -f 'Path To XML File'");
         Console.WriteLine();
-        Console.WriteLine("3. Updating the database using paths from the appsettings.json:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --update");
+        Console.WriteLine("--generate-report: Generate a report.");
+        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --generate-report");
         Console.WriteLine();
-        Console.WriteLine("4. Updating the database with a specific XML file:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --update -f 'C:\\folder\\file.xml'");
+        Console.WriteLine("--update -r: Create a new Alias.");
+        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --update -r");
         Console.WriteLine();
-        Console.WriteLine("5. Generating a report:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --generate-report");
+
+        // Container/Release Environment
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("Container/Release Environment:");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine("--verify: Verify the content of XML files.");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --verify");
+        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -f 'Path To XML File'");
         Console.WriteLine();
-        Console.WriteLine("6. Creating a new Alias:");
-        Console.WriteLine("   UniqueIdsScannerUI.exe --update -r");
+        Console.WriteLine("--update: Verify and update the database.");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update");
+        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -f 'Path To XML File'");
         Console.WriteLine();
+        Console.WriteLine("--generate-report: Generate a report.");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --generate-report");
+        Console.WriteLine();
+        Console.WriteLine("--update -r: Create a new Alias.");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update -r");
+        Console.WriteLine();
+
         Console.WriteLine("** Please follow the instructions carefully. **");
         Console.WriteLine("==============================================");
-        Console.ResetColor();   
+        Console.ResetColor();
+
+
     }
-
-
 
     private void ParseArgumentsAndRunOptions(string[] args)
     {
@@ -107,44 +116,51 @@ public class App
 
     private void RunOptions(CliOptions options)
     {
-
-        if (options.isGenerateReport)
+        try
         {
-            GenerateReport();
-            return;
-        }
-
-        List<string> xmlFilePaths = GetFilePaths(options);
-        List<string> validXmlFilePaths = new List<string>();
-        List<string> inValidXmlFilePaths = new List<string>();
-
-        foreach (var xmlFile in xmlFilePaths)
-        {
-            if (_mainManager.ValidateXmlFilePath(xmlFile))
+            if (options.isGenerateReport)
             {
-                validXmlFilePaths.Add(xmlFile);
+                GenerateReport();
+                return;
             }
-            else
+
+            List<string> xmlFilePaths = GetFilePaths(options);
+            List<string> validXmlFilePaths = new List<string>();
+            List<string> inValidXmlFilePaths = new List<string>();
+
+            foreach (var xmlFile in xmlFilePaths)
             {
-                string errorMessage = $"Invalid File Path: {xmlFile}";
-                _log.LogError(errorMessage, LogProviderType.Console);
-                _log.LogError(errorMessage, LogProviderType.File);
-                inValidXmlFilePaths.Add(xmlFile);
+                if (_mainManager.ValidateXmlFilePath(xmlFile))
+                {
+                    validXmlFilePaths.Add(xmlFile);
+                }
+                else
+                {
+                    string errorMessage = $"Invalid File Path: {xmlFile}";
+                    _log.LogError(errorMessage, LogProviderType.Console);
+                    _log.LogError(errorMessage, LogProviderType.File);
+                    inValidXmlFilePaths.Add(xmlFile);
+                }
+            }
+
+            if (inValidXmlFilePaths.Any())
+            {
+
+                //throw new ArgumentException("Invalid Xml File Path");
+                return;
+            }
+
+            foreach (var validXmlFile in validXmlFilePaths)
+            {
+                ProcessXmlFile(validXmlFile, options);
             }
         }
-
-        if (inValidXmlFilePaths.Any())
+        catch (Exception ex)
         {
-
-            throw new ArgumentException();
-        }
-
-        foreach (var validXmlFile in validXmlFilePaths)
-        {
-            ProcessXmlFile(validXmlFile, options);
-        }
+            _log.LogException($"Exception in RunOptions method: {ex.Message}", ex, LogProviderType.File);
+            throw;
+        }   
     }
-
 
     private void ProcessXmlFile(string filePath, CliOptions options)
     {
@@ -159,7 +175,7 @@ public class App
         }
         catch (Exception ex)
         {
-            _log.LogException($"Exception in ProcessXmlFile method for file {filePath}", ex, LogProviderType.File);
+            _log.LogException($"Exception in ProcessXmlFile method for file {filePath}: {ex.Message}", ex, LogProviderType.File);
             throw;
         }
     }
@@ -194,7 +210,7 @@ public class App
         }
         catch (Exception ex)
         {
-            _log.LogException($"Exception in RunVerify method for file {filepath}", ex, LogProviderType.File);
+            _log.LogException($"Exception in RunVerify method for file {filepath}: {ex.Message}", ex, LogProviderType.File);
             throw;
         }
     }
@@ -213,9 +229,9 @@ public class App
                 }
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            _log.LogError($"Error in RunUpdate method: {ex.Message}", LogProviderType.File);
             throw;
         }
        
@@ -238,7 +254,6 @@ public class App
         }
         catch (Exception)
         {
-
             throw;
         }
         
@@ -247,35 +262,35 @@ public class App
     {
         try
         {
-            string reportFilePath = _settings.GetValue<string>("GenerateReport");
+            string folderForGenerateReports = _settings.GetValue<string>("GenerateReport");
 
-            if (!string.IsNullOrEmpty(reportFilePath))
+            if (!string.IsNullOrEmpty(folderForGenerateReports))
             {
                 int counter = 1;
                 string baseFileName = $"{DateTime.Now:dd-MM-yyyy}_Report";
                 string extension = ".txt";
 
                 string FileName = baseFileName + extension;
-                string tempFilePath = Path.Combine(reportFilePath, FileName);
+                string tempFilePath = Path.Combine(folderForGenerateReports, FileName);
 
                 while (File.Exists(tempFilePath))
                 {
                     FileName = $"{baseFileName}_{counter++}{extension}";
-                    tempFilePath = Path.Combine(reportFilePath, FileName);
+                    tempFilePath = Path.Combine(folderForGenerateReports, FileName);
                 }
 
                 _mainManager.GenerateReport(tempFilePath);
             }
             else
             {
-                _log.LogError("File path for generate report was not found", LogProviderType.Console);
-                
+                _log.LogError("Error: The folder for report files was not found.", LogProviderType.Console);
+
             }
 
         }
         catch (Exception ex)
         {
-            _log.LogException(ex.Message, ex, LogProviderType.File);
+            _log.LogError($"Error in function GenerateReport(): {ex.Message}",LogProviderType.File);
             throw;
         }
     }
@@ -291,12 +306,12 @@ public class App
             }
             else
             {
-                _log.LogError("Can't get 'rename' information", LogProviderType.Console);
+                _log.LogWarning(" 'Rename' information in Appsettings.json is empty", LogProviderType.Console);
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            _log.LogWarning($"Error in SetUpRename method: {ex.Message}", LogProviderType.File);
             throw;
         }
 
