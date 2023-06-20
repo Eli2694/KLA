@@ -31,9 +31,9 @@ services:
     networks:
       - mynetwork
     volumes:
-     - C:\ZionNet\DevOps\Kla-Project\KLA\mssql\data:/var/opt/mssql/data
-     - C:\ZionNet\DevOps\Kla-Project\KLA\mssql\log:/var/opt/mssql/log
-     - C:\ZionNet\DevOps\Kla-Project\KLA\mssql\secrets:/var/opt/mssql/secrets
+     - C:\level-up\Devops\KLA\KLA\mssql\data:/var/opt/mssql/data
+     - C:\level-up\Devops\KLA\KLA\mssql\log:/var/opt/mssql/log
+     - C:\level-up\Devops\KLA\KLA\mssql\secrets:/var/opt/mssql/secrets
 
   sqlpad:
     container_name: sqlpad

@@ -51,8 +51,7 @@ namespace Entity
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.Console);
-                //_log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.File);
+                _log.LogError($"An error occurred in ValidateXmlFilePath: {ex.Message}", LogProviderType.File);
                 return false;
             }
         }
@@ -92,20 +91,21 @@ namespace Entity
                     else
                     {
                         _log.LogError($"{filePath} - Not Valid", LogProviderType.Console);
+                        return null;
                     }
        
                 }
                 else
                 {
                     _log.LogError($"{filePath} - Not Found", LogProviderType.Console);
+                    return null;
                 }
 
                 return null;
             }
             catch (Exception ex)
             {
-                _log.LogException("Exception In XmlToSeperatedScopes Function", ex, LogProviderType.Console);
-                //_log.LogException("Exception In XmlToSeperatedScopes Function", ex, LogProviderType.File);
+                _log.LogError($"Exception In XmlToSeperatedScopes method: {ex.Message}", LogProviderType.File);
                 throw;
             }
         }
@@ -136,7 +136,7 @@ namespace Entity
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in CheckForDuplicates: {ex.Message}", LogProviderType.File);
+                _log.LogError($"An error occurred in CheckForDuplicates method: {ex.Message}", LogProviderType.File);
                 return false;
             }
         }
@@ -149,7 +149,7 @@ namespace Entity
             {
                 string errorMessage = $"Duplicate {propertyName} found in {listName}: {string.Join(", ", duplicates)}";
                 _log.LogError(errorMessage, LogProviderType.Console);
-                //_log.LogError(errorMessage, LogProviderType.File);
+                _log.LogError(errorMessage, LogProviderType.File);
                 duplicatesCount++;
             }
 
@@ -170,8 +170,8 @@ namespace Entity
             }
             catch (Exception ex)
             {
-                //_log.LogError($"An error occurred in RetriveUniqeIDsFromDB: {ex.Message}", LogProviderType.File);
-                return null;
+                _log.LogError($"An error occurred in RetriveUniqeIDsFromDB method: {ex.Message}", LogProviderType.File);
+                throw;
             }
         }
 
@@ -198,9 +198,9 @@ namespace Entity
                 }
                 return DbInObjects;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _log.LogError($"Error in SortUniqeIDsFromDbByScope method: {ex.Message}", LogProviderType.File);
                 throw;
             }
 
@@ -216,7 +216,7 @@ namespace Entity
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in CompareXmlScopesWithDBScopes: {ex.Message}", LogProviderType.File);
+                _log.LogError($"An error occurred in CompareXmlScopesWithDBScopes method: {ex.Message}", LogProviderType.File);
                 return false;
             }
         }
@@ -353,7 +353,7 @@ namespace Entity
             else
             {
                 // If alias already exists, logging a message
-                _log.LogError($"Alias '{aliasName}' already exists in the database", LogProviderType.Console);
+                _log.LogWarning($"Alias '{aliasName}' already exists in the database", LogProviderType.Console);
             }
 
             // If alias already exists, returning null
@@ -364,7 +364,6 @@ namespace Entity
         {
             _unitOfWork.Aliases.AddRange(newAliases);
             _unitOfWork.Complete();
-
         }
 
     }

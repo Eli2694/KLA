@@ -8,7 +8,7 @@ public class LogFile : ILogger
     private int count = 0;
     private const int MaxFileSize = 50 * 1024 * 1024; //50MB
     private int logWritesSinceHouseKeeping = 0;
-    private const int WritesBeforeHouseKeeping = 50;
+    private const int WritesBeforeHouseKeeping = 10;
     private readonly object lockObject = new object();
     private StreamWriter logStreamWriter;
 
@@ -42,7 +42,6 @@ public class LogFile : ILogger
             catch (IOException ex)
             {
                 Console.WriteLine($"Cannot open file '{FileName}' for writing: {ex.Message}");
-                throw;
             }
         }
     }
@@ -50,6 +49,11 @@ public class LogFile : ILogger
     public void LogEvent(string msg)
     {
         WriteLog($"[EVENT][{DateTime.Now}] {msg}");
+    }
+
+    public void LogWarning(string msg)
+    {
+        WriteLog($"[WARNING][{DateTime.Now}] {msg}");
     }
 
     public void LogError(string msg)
