@@ -43,7 +43,7 @@ namespace Entity.UnitTest.ScannersTest
 
                 UniqueIds uniqueId = result.FirstOrDefault();
                 Assert.IsNotNull(uniqueId, "Mapped M_UniqueIds object should not be null");
-                Assert.AreNotEqual("Alarm", uniqueId.EntityType, "EntityType should be set to 'Alarm'");
+                Assert.AreEqual("Alarm", uniqueId.EntityType, "EntityType should be set to 'Alarm'");
                 Assert.AreEqual(alarmName, uniqueId.Name, "Name should be mapped correctly");
                 Assert.AreEqual(scope, uniqueId.Scope, "Scope should be set to 'alarm'");
             });
