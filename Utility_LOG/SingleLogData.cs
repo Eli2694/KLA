@@ -16,6 +16,7 @@ namespace Utility_LOG
 
     public enum LogEventType
     {
+        Info,
         Event,
         Error,
         Warning,

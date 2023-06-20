@@ -126,6 +126,12 @@ namespace Utility_LOG
 
 
         // -------------------------------------------------------------------------------------
+
+        public void LogInfo(string msg, LogProviderType providerType)
+        {
+            SingleLogData item = new SingleLogData(LogEventType.Info, msg, providerType);
+            LogQueue.Enqueue(item);
+        }
         public void LogEvent(string msg, LogProviderType providerType)
         {
             SingleLogData item = new SingleLogData(LogEventType.Event, msg, providerType);
@@ -158,6 +164,9 @@ namespace Utility_LOG
             {
                 switch (item.EventType)
                 {
+                    case LogEventType.Info:
+                        _consoleInstance.LogEvent(item.Message);
+                        break;
                     case LogEventType.Event:
                         _consoleInstance.LogEvent(item.Message);
                         break;
@@ -176,6 +185,9 @@ namespace Utility_LOG
             {
                 switch (item.EventType)
                 {
+                    case LogEventType.Info:
+                        _fileInstance.LogEvent(item.Message);
+                        break;
                     case LogEventType.Event:
                         _fileInstance.LogEvent(item.Message);
                         break;

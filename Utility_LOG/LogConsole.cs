@@ -12,6 +12,13 @@ namespace Utility_LOG
         {
         }
 
+        public void LogInfo(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("[INFO][" + DateTime.Now + "] " + message);
+            Console.ResetColor();
+        }
+
         public void LogEvent(string message)
         {
             Console.ForegroundColor = ConsoleColor.Green;
