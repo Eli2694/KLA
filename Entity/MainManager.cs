@@ -364,7 +364,6 @@ namespace Entity
         {
             _unitOfWork.Aliases.AddRange(newAliases);
             _unitOfWork.Complete();
-
         }
 
     }
