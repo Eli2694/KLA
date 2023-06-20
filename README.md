@@ -29,12 +29,25 @@ This project is a console-based application designed to deserialize KLA's compan
 - Testing: NUnit
 
 ## 🔧 Installation
-1. Clone the repository: `git clone https://github.com/Eli2694/KLA`
+
+You can install and run the Unique ID Scanner either natively or through Docker. Please choose the most suitable method for you.
+
+### 🖥️ Native Installation
+1. Clone the repository: `git clone https://github.com/Eli2694/KLA.git`
 2. Navigate to the project directory: `cd KLA`
 3. Restore the required dependencies: `dotnet restore UniqueIdsScannerUI/UniqueIdsScannerUI.csproj`
 4. Build the app: `dotnet build UniqueIdsScannerUI/UniqueIdsScannerUI.csproj`
 5. Navigate to the execution directory: `cd UniqueIdsScannerUI/UniqueIdsScannerUI/bin/debug/bin`
 6. Start the application: `UniqueScanner.exe`
+
+### 🐳 Docker Installation
+1. Make sure Docker is up and running on your machine.
+2. Clone the repository: `git clone https://github.com/Eli2694/KLA.git`
+3. Navigate to the project directory: `cd KLA`
+4. Run the Docker Compose command: `docker-compose up -d`
+
+> ⚠️ **Note:** When running the application via Docker, ensure the settings in `appconfig.json` reflect the Docker environment setup.
+
 
 ## ⚙️ Configuration
 Before running the application, users need to update the `appconfig.json` file with the following details:
