@@ -21,7 +21,7 @@ try
 {
     var app = services.GetRequiredService<App>();
     app.Run(args);
-	logManager.LogEvent("The app has finished running", LogProviderType.Console);
+	logManager.LogInfo("The app has finished running", LogProviderType.Console);
 }
 catch (Exception)
 {
