@@ -24,5 +24,11 @@ jobs:
       run: dotnet restore "UniqueIdsScannerUI/UniqueIdsScannerUI.csproj"
     - name: Build
       run: dotnet build  "UniqueIdsScannerUI/UniqueIdsScannerUI.csproj" --no-restore
-    - name: Test
+    - name: TestDAL
+      run: dotnet test "DAL.UnitTest/DAL.UnitTest.csproj" --no-build --verbosity normal 
+    - name: TestEntity
+      run: dotnet test "Entity.UnitTest/Entity.UnitTest.csproj" --no-build --verbosity normal
+    - name: TestRepository
+      run: dotnet test "Repository.UnitTest/Repository.UnitTest.csproj" --no-build --verbosity normal
+    - name: TestUniqueIdsScannerUI
       run: dotnet test "UniqueIdsScannerUI.UnitTest/UniqueIdsScannerUI.UnitTest.csproj" --no-build --verbosity normal
