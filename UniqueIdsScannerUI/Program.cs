@@ -16,7 +16,6 @@ using var scope = host.Services.CreateScope();
 var services = scope.ServiceProvider;
 var logManager = services.GetRequiredService<LogManager>();
 
-
 try
 {
     var app = services.GetRequiredService<App>();
@@ -27,8 +26,6 @@ catch (Exception)
 {
     Console.WriteLine("The app has finished running with exception");
 }
-
-
 static IHostBuilder CreateHostBuilder(string[] args)
 {
 
@@ -64,7 +61,6 @@ static IHostBuilder CreateHostBuilder(string[] args)
 		 services.AddSingleton<MainManager>();
 	 });
 }
-
 static string GetConnectionString(IConfiguration config)
 {
     var dbHost = Environment.GetEnvironmentVariable("DB_HOST");

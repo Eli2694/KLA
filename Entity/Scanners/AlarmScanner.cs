@@ -18,8 +18,7 @@ namespace Entity.Scanners
         public AlarmScanner() : base(null)
         {
         }
-
-
+        
         public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {
             try
@@ -37,8 +36,7 @@ namespace Entity.Scanners
             {
 
                 throw;
-            }
-            
+            }            
         }
     }
 }

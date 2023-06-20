@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Utility_LOG;
 
-namespace Repository.Core
+namespace Repository.Core 
 {
     public class UniqueIdsRepository : Repository<UniqueIds>, IUniqueIdsRepository
     {

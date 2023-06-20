@@ -11,6 +11,5 @@ namespace Entity.EntityInterfaces
     {
         List<UniqueIds> ScanCode(KlaXML ktgemvar);
         bool CompareXmlScopeWithDBScope(List<UniqueIds> xml, List<UniqueIds> db);
-
     }
 }

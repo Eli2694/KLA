@@ -5,8 +5,7 @@ using Utility_LOG;
 namespace Entity.Scanners
 {
     public class EventScanner : BaseScanner, IScanner
-    {
-        
+    {        
         public EventScanner(LogManager log) : base(log)
         {
         }
@@ -26,8 +25,7 @@ namespace Entity.Scanners
                     Name = evnt.Name,
                     Scope = "event",
                     Timestamp = DateTime.Now
-                })
-                            .ToList();
+                }).ToList();
             }
             catch (Exception)
             {

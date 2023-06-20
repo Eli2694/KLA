@@ -18,9 +18,7 @@ namespace Entity.Scanners
         {
             newUniqueIdsFromXml = new List<UniqueIds>();
             _log = log;
-        }
-
-        
+        }        
 
         public bool CompareXmlScopeWithDBScope(List<UniqueIds> xml, List<UniqueIds> db)
         {
@@ -51,6 +49,7 @@ namespace Entity.Scanners
                 return false;
             }
         }
+
 
         private void ValidateElements(List<UniqueIds> xml, Dictionary<string, UniqueIds> dbByIdDictionary, Dictionary<string, UniqueIds> dbByNameDictionary, List<string> errorMessages)
         {
@@ -97,5 +96,4 @@ namespace Entity.Scanners
             }
         }
     }
-
 }

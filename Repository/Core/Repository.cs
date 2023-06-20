@@ -39,6 +39,7 @@ namespace Repository.Core
             }
         }
 
+        // This method is used to get all the entities from the database based on the predicate
         public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
         {
             try
@@ -67,6 +68,7 @@ namespace Repository.Core
             }
         }
 
+        // This method is used to add an entity to the database
         public void Add(TEntity entity)
         {
             try
@@ -81,6 +83,7 @@ namespace Repository.Core
             }
         }
 
+        // This method is used to add a range of entities to the database
         public void AddRange(IEnumerable<TEntity> entities)
         {
             try
@@ -95,6 +98,4 @@ namespace Repository.Core
             }
         }
     }
-
-
 }
