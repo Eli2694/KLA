@@ -28,6 +28,10 @@ public class App
         {
             if (args.Length == 0)
             {
+                //for (int i = 0; i < 10000; i++)
+                //{
+                //    _log.LogEvent($"test {i}", LogProviderType.File);
+                //}
                 DisplayInstructions();
             }
             else

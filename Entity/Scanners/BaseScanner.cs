@@ -21,7 +21,7 @@ namespace Entity.Scanners
             _log = log;
         }
 
-        
+	
 
         public bool CompareXmlScopeWithDBScope(List<UniqueIds> xml, List<UniqueIds> db, bool getFullInfo)
         {

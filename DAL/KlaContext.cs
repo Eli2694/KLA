@@ -42,8 +42,12 @@ namespace DAL
             }
         }
 
+		public KlaContext() : base()
+		{
+			
+		}
 
-        public DbSet<User> Users{ get; set; }
+		public DbSet<User> Users{ get; set; }
 
         public DbSet<UniqueIds> Unique_Ids { get; set; }
 

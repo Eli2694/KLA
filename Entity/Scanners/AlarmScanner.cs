@@ -12,13 +12,12 @@ namespace Entity.Scanners
 {
     public class AlarmScanner : BaseScanner, IScanner 
     {
-		public AlarmScanner(LogManager log ) : base(log)
+		public AlarmScanner(LogManager log) : base(log)
         {
         }
         public AlarmScanner() : base(null)
         {
         }
-
 
         public List<UniqueIds> ScanCode(KlaXML ktgemvar)
         {

@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <Content Include="bin\Debug\net6.0\18-06-2023_Log0.txt" />
+    <Content Include="bin\Debug\net6.0\20-06-2023_Log0.txt" />
   </ItemGroup>
 
   <ItemGroup>
