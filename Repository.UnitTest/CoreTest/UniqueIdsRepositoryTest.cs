@@ -51,7 +51,7 @@ namespace Repository.UnitTest.CoreTest
 			var scope = "test";
 			var uniqueIds = new List<UniqueIds>
 		{
-			new UniqueIds { ID = "1", Scope = "test", Name = "yoyo", EntityType = "alarm" },
+			new UniqueIds { ID = "1", Scope = "test", Name = "yoyo"},
 			new UniqueIds { ID = "2", Scope = "other", Name = "yoyo", EntityType = "alarm" },
 			new UniqueIds { ID = "3", Scope = "test", Name = "yoyo", EntityType = "alarm" }
 		};
