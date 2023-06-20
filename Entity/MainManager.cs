@@ -37,7 +37,7 @@ namespace Entity
 
                 if (!_fileSystem.FileExists(filePath)) // Use the file system to check if the file exists
                 {
-                    _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
+                    _log.LogError($"Xml file path {filePath} is not valid", LogProviderType.Console);
                     isValid = false;
                 }
 
@@ -261,7 +261,7 @@ namespace Entity
 
         public bool isAuthenticatedUser(List<string> NameAndPass)
         {
-            _log.LogEvent($"Authenticate User....", LogProviderType.Console);
+            _log.LogEvent($"Authenticating User....", LogProviderType.Console);
 
             User user = _unitOfWork.Users.GetValidatedUser(NameAndPass[0]);
             if (user != null)

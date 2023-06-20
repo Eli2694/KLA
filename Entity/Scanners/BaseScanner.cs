@@ -96,7 +96,7 @@ namespace Entity.Scanners
         {
             int count = 0;  // Counter for the total number of IDs
 
-            _log.LogInfo($"Starting to log unique IDs from {scope} in XML...\n", LogProviderType.Console);
+            _log.LogInfo($"Initializing verification process of Unique ID's From {scope} in XML...\n", LogProviderType.Console);
 
             foreach (var uniqueId in newUniqueIdsFromXml)
             {
@@ -115,7 +115,7 @@ namespace Entity.Scanners
                     _log.LogInfo(message, LogProviderType.Console);
                 }     
             }
-            _log.LogInfo($"Finished logging. Total number of unique IDs reported in {scope} is: {count}.\n", LogProviderType.Console);
+            _log.LogInfo($"Completed verification process, Total number of unique IDs reported in {scope} is: {count}.\n", LogProviderType.Console);
         }
 
     }

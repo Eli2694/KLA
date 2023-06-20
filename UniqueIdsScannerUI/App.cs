@@ -34,7 +34,8 @@ public class App
             {
                 if (isAuthenticatedUser())
                 {
-                    ParseArgumentsAndRunOptions(args);
+					_log.LogEvent("User successfuly authenticated.", LogProviderType.Console);
+					ParseArgumentsAndRunOptions(args);
                 }
             }
         }
@@ -60,10 +61,12 @@ public class App
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("--verify: Verify the content of XML files.");
         Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --verify");
+        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -i");
         Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -f 'Path To XML File'");
         Console.WriteLine();
         Console.WriteLine("--update: Verify and update the database.");
         Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update -i");
         Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -f 'Path To XML File'");
         Console.WriteLine();
         Console.WriteLine("--generate-report: Generate a report.");
