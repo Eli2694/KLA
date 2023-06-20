@@ -1,4 +1,5 @@
-﻿using Model;
+﻿using Entity.EntityInterfaces;
+using Model;
 using Moq;
 using NUnit.Framework;
 using Repository.Interfaces;
@@ -14,6 +15,7 @@ namespace Entity.UnitTest.MainManagerTests
 	[TestFixture]
 	public class PrepareAliasIfNotExistingUnitTest
 	{
+		private Mock<IFileSystem> _mockFileSystem;
 		[Test]
 		public void PrepareAliasIfNotExisting_AliasDoesNotExist_ReturnsNewAlias()
 		{
@@ -30,9 +32,10 @@ namespace Entity.UnitTest.MainManagerTests
 			var mockLog = new Mock<LogManager>();
 			var mockAliasesRepository = new Mock<IAliasesRepository>();
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
+			_mockFileSystem = new Mock<IFileSystem>();
 			mockUnitOfWork.Setup(uow => uow.Aliases).Returns(mockAliasesRepository.Object);
 
-			var mainManager = new MainManager(null, null, null, mockUnitOfWork.Object, mockLog.Object);
+			var mainManager = new MainManager(null, null, null, mockUnitOfWork.Object, mockLog.Object, _mockFileSystem.Object);
 
 			// Act
 			var result = mainManager.PrepareAliasIfNotExisting(uniqueId, aliasName, existingAliases);
@@ -65,7 +68,7 @@ namespace Entity.UnitTest.MainManagerTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			mockUnitOfWork.Setup(uow => uow.Aliases).Returns(mockAliasesRepository.Object);
 
-			var mainManager = new MainManager(null, null, null, mockUnitOfWork.Object, mockLog.Object);
+			var mainManager = new MainManager(null, null, null, mockUnitOfWork.Object, mockLog.Object, _mockFileSystem.Object);
 
 			// Act
 			var result = mainManager.PrepareAliasIfNotExisting(uniqueId, aliasName, existingAliases);

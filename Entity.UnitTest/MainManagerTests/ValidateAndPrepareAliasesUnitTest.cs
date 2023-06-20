@@ -1,4 +1,5 @@
-﻿using Entity.Scanners;
+﻿using Entity.EntityInterfaces;
+using Entity.Scanners;
 using Model;
 using Moq;
 using NUnit.Framework;
@@ -24,6 +25,7 @@ namespace Entity.UnitTest.MainManagerTests
 		private Mock<AlarmScanner> _alarmScannerMock;
 		private Mock<EventScanner> _eventScannerMock;
 		private Mock<VariableScanner> _variableScannerMock;
+		private Mock<IFileSystem> _mockFileSystem;
 
 		[SetUp]
 		public void Setup()
@@ -35,11 +37,12 @@ namespace Entity.UnitTest.MainManagerTests
 			_alarmScannerMock = new Mock<AlarmScanner>();
 			_eventScannerMock = new Mock<EventScanner>();
 			_variableScannerMock = new Mock<VariableScanner>();
+			_mockFileSystem = new Mock<IFileSystem>();
 
 			_unitOfWorkMock.SetupGet(uow => uow.Aliases).Returns(_aliasesRepositoryMock.Object);
 			_unitOfWorkMock.SetupGet(uow => uow.UniqueIds).Returns(_uniqueIdsRepositoryMock.Object);
 
-			_mainManager = new MainManager(_alarmScannerMock.Object,_eventScannerMock.Object,_variableScannerMock.Object,_unitOfWorkMock.Object,_logManagerMock.Object);
+			_mainManager = new MainManager(_alarmScannerMock.Object,_eventScannerMock.Object,_variableScannerMock.Object,_unitOfWorkMock.Object,_logManagerMock.Object, _mockFileSystem.Object);
 		}
 		[Test]
 		public void ValidateAndPrepareAliases_KeysNotFound_ThrowsKeyNotFoundException()
