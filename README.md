@@ -21,7 +21,7 @@ This project is a console-based application designed to deserialize KLA's compan
 - If the verification process passes without any issues, you can update the database with your new data
 - Generate reports and visualize progress
 
-# <a name="technologies-used"></a>🛠️Technologies Used
+## <a name="technologies-used"></a>🛠️Technologies Used
 - Frontend: CMD, SQLPAD
 - Backend: C#, .NET 6
 - Database: SQL Server
