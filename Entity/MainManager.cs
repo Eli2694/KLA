@@ -1,20 +1,12 @@
 ﻿using Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Xml;
-using System.Security.Claims;
 using Entity.Scanners;
 using Repository.Interfaces;
 using Utility_LOG;
-using Repository.Core;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Entity.EntityInterfaces;
 
 namespace Entity
 {
@@ -25,14 +17,16 @@ namespace Entity
         private readonly VariableScanner _variableScanner;
         private readonly IUnitOfWork _unitOfWork;
         private readonly LogManager _log;
+        private readonly IFileSystem _fileSystem;
 
-        public MainManager(AlarmScanner alarmScanner, EventScanner eventScanner, VariableScanner variableScanner, IUnitOfWork unitOfWork, LogManager log) 
+        public MainManager(AlarmScanner alarmScanner, EventScanner eventScanner, VariableScanner variableScanner, IUnitOfWork unitOfWork, LogManager log, IFileSystem fileSystem) 
         {
             _alarmScanner = alarmScanner;
             _eventScanner = eventScanner;
             _variableScanner = variableScanner;
             _unitOfWork = unitOfWork;
             _log = log;
+            _fileSystem = fileSystem; 
         }
 
         public bool ValidateXmlFilePath(string filePath)
@@ -41,9 +35,9 @@ namespace Entity
             {
                 bool isValid = true;
 
-                if (!File.Exists(filePath))
+                if (!_fileSystem.FileExists(filePath)) // Use the file system to check if the file exists
                 {
-                    _log.LogError($"Xml File Path {filePath} in Appsettings.json is not correct", LogProviderType.Console);
+                    _log.LogError($"Xml file path {filePath} is not valid", LogProviderType.Console);
                     isValid = false;
                 }
 
@@ -60,9 +54,10 @@ namespace Entity
         {
             try
             {
-                if (File.Exists(filePath))
+
+                if (_fileSystem.FileExists(filePath))
                 {
-                    if (Path.GetExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
+                    if (_fileSystem.GetFileExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
                     {
                         XmlSerializer serializer = new XmlSerializer(typeof(KlaXML));
                         KlaXML? klaXml;
@@ -206,13 +201,13 @@ namespace Entity
 
         }
 
-        public bool CompareXmlScopesWithDBScopes(SeperatedScopes xmlSeperatedScopes, SeperatedScopes DbSeperatedScopes)
+        public bool CompareXmlScopesWithDBScopes(SeperatedScopes xmlSeperatedScopes, SeperatedScopes DbSeperatedScopes, bool getFullInfo)
         {
             try
             {
-                return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList) &&
-                        _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList) &&
-                        _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList);
+                return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList, getFullInfo) &&
+                        _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList, getFullInfo) &&
+                        _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList, getFullInfo);
             }
             catch (Exception ex)
             {
@@ -241,16 +236,19 @@ namespace Entity
                 UpdateDatabaseWithScanner(_variableScanner);
 
                 _unitOfWork.Complete();
+
+                _log.LogEvent($"The database was updated in the 'Unique_Ids' table using new IDs from an XML file.", LogProviderType.Console);
+
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.Console);
-                //_log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.File);
+                _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.File);
             }
         }
 
         private void UpdateDatabaseWithScanner(BaseScanner scanner)
         {
+
             var newIds = scanner.newUniqueIdsFromXml;
 
             if (newIds != null && newIds.Any())
@@ -263,7 +261,9 @@ namespace Entity
 
         public bool isAuthenticatedUser(List<string> NameAndPass)
         {
-           User user = _unitOfWork.Users.GetValidatedUser(NameAndPass[0]);
+            _log.LogEvent($"Authenticating User....", LogProviderType.Console);
+
+            User user = _unitOfWork.Users.GetValidatedUser(NameAndPass[0]);
             if (user != null)
             {
                 return user.Password == NameAndPass[1];
@@ -275,6 +275,7 @@ namespace Entity
         {
             try
             {
+
                 var uniqueIdWithAliases =  _unitOfWork.UniqueIds.GetUniqueIdsWithAliases();
 
                 // not using ReferenceHandler.Preserve can cause an infinite loop 
@@ -286,7 +287,9 @@ namespace Entity
 
                 var json = JsonSerializer.Serialize(uniqueIdWithAliases, options);
 
-                File.WriteAllText(filePath, json);
+                _log.LogEvent($"Generating Report Of Unique Ids....", LogProviderType.Console);
+
+                _fileSystem.WriteAllText(filePath, json);
             }
             catch (Exception)
             {
@@ -329,6 +332,7 @@ namespace Entity
 
             if(newAliases.Any())
             {
+                _log.LogEvent($"Updating Database With New Aliases", LogProviderType.Console);
                 UpdateDbWithNewAliases(newAliases);
             }
             
@@ -362,8 +366,17 @@ namespace Entity
 
         public void UpdateDbWithNewAliases(List<Aliases> newAliases)
         {
-            _unitOfWork.Aliases.AddRange(newAliases);
-            _unitOfWork.Complete();
+            try
+            {
+                _unitOfWork.Aliases.AddRange(newAliases);
+                _unitOfWork.Complete();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in UpdateDbWithNewAliases: {ex.Message}", LogProviderType.File);
+                throw;
+            }
+            
         }
 
     }

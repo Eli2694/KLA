@@ -20,7 +20,7 @@ try
 {
     var app = services.GetRequiredService<App>();
     app.Run(args);
-	logManager.LogEvent("The app has finished running", LogProviderType.Console);
+	logManager.LogInfo("The app has finished running", LogProviderType.Console);
 }
 catch (Exception)
 {
@@ -55,6 +55,7 @@ static IHostBuilder CreateHostBuilder(string[] args)
 		 services.AddTransient<IUnitOfWork, UnitOfWork>();
 		 services.AddTransient<IUniqueIdsRepository, UniqueIdsRepository>();
 		 services.AddTransient<IUserRepository, UserRepository>();
+		 services.AddTransient<IFileSystem, RealFileSystem>();
 		 services.AddTransient<AlarmScanner>();
 		 services.AddTransient<EventScanner>();
 		 services.AddTransient<VariableScanner>();

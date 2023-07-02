@@ -2,33 +2,26 @@
 using Entity.Scanners;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using NUnit.Framework.Interfaces;
 using Repository.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Utility_LOG;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
-using UniqueIdsScannerUI;
 using Microsoft.Extensions.Hosting;
 using DAL;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore.InMemory;
-
+using Entity.EntityInterfaces;
 
 namespace UniqueIdsScannerUI.UnitTest
 {
-	[TestFixture]
+    [TestFixture]
 	public class ProgramTest
 	{
 		private Mock<IConfiguration> _configurationMock;
 		private Mock<IUnitOfWork> _unitOfWorkMock;
 		private Mock<IUniqueIdsRepository> _uniqueIdsRepositoryMock;
 		private Mock<IUserRepository> _userRepositoryMock;
-		private Mock<LogManager> _logManagerMock;
+        private Mock<IFileSystem> _fileSystem;
+        private Mock<LogManager> _logManagerMock;
 
 		[SetUp]
 		public void Setup()
@@ -38,7 +31,9 @@ namespace UniqueIdsScannerUI.UnitTest
 			_uniqueIdsRepositoryMock = new Mock<IUniqueIdsRepository>();
 			_userRepositoryMock = new Mock<IUserRepository>();
 			_logManagerMock = new Mock<LogManager>();
-		}
+            _fileSystem = new Mock<IFileSystem>();
+
+        }
 
 		[Test]
 		public void CreateHostBuilder_ValidArgs_ReturnsHostBuilder()
@@ -55,7 +50,8 @@ namespace UniqueIdsScannerUI.UnitTest
 			services.AddTransient<IUnitOfWork>(_ => _unitOfWorkMock.Object);
 			services.AddTransient<IUniqueIdsRepository>(_ => _uniqueIdsRepositoryMock.Object);
 			services.AddTransient<IUserRepository>(_ => _userRepositoryMock.Object);
-			services.AddTransient<AlarmScanner>();
+            services.AddTransient<IFileSystem>(_ => _fileSystem.Object);
+            services.AddTransient<AlarmScanner>();
 			services.AddTransient<EventScanner>();
 			services.AddTransient<VariableScanner>();
 			services.AddSingleton<MainManager>();
@@ -91,7 +87,8 @@ namespace UniqueIdsScannerUI.UnitTest
 					services.AddTransient<IUnitOfWork>(_ => _unitOfWorkMock.Object);
 					services.AddTransient<IUniqueIdsRepository>(_ => _uniqueIdsRepositoryMock.Object);
 					services.AddTransient<IUserRepository>(_ => _userRepositoryMock.Object);
-					services.AddTransient<AlarmScanner>();
+                    services.AddTransient<IFileSystem>(_ => _fileSystem.Object);
+                    services.AddTransient<AlarmScanner>();
 					services.AddTransient<EventScanner>();
 					services.AddTransient<VariableScanner>();
 					services.AddSingleton<MainManager>();

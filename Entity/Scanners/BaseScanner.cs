@@ -1,4 +1,5 @@
-﻿using Model;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Entity.Scanners
 
 	
 
-		public bool CompareXmlScopeWithDBScope(List<UniqueIds> xml, List<UniqueIds> db)
+        public bool CompareXmlScopeWithDBScope(List<UniqueIds> xml, List<UniqueIds> db, bool getFullInfo)
         {
             try
             {
@@ -42,7 +43,7 @@ namespace Entity.Scanners
                     return false;
                 }
 
-                AddUniqueIdsFromXmlToList(xml, dbByIdDictionary);
+                AddUniqueIdsFromXmlToList(xml, dbByIdDictionary, getFullInfo);
                 return true;
             }
             catch (Exception ex)
@@ -84,37 +85,38 @@ namespace Entity.Scanners
             }
         }
 
-        private void AddUniqueIdsFromXmlToList(List<UniqueIds> xml, Dictionary<string, UniqueIds> db)
+        private void AddUniqueIdsFromXmlToList(List<UniqueIds> xml, Dictionary<string, UniqueIds> db, bool getFullInfo)
         {
             newUniqueIdsFromXml = xml.Where(variableXML => !db.ContainsKey(variableXML.ID)).ToList();
-            ReportNewUniqueIds();
+            UniqueIds item = xml[0];
+            ReportNewUniqueIds(item.Scope, getFullInfo);
         }
 
-        private void ReportNewUniqueIds()
+        private void ReportNewUniqueIds(string scope, bool getFullInfo)
         {
             int count = 0;  // Counter for the total number of IDs
 
-            _log.LogEvent($"Starting to log unique IDs from XML...", LogProviderType.Console);
-            _log.LogEvent($"For detailed results, please see the generated log file.", LogProviderType.Console);
+            _log.LogInfo($"Initializing verification process of Unique ID's From {scope} in XML...\n", LogProviderType.Console);
 
             foreach (var uniqueId in newUniqueIdsFromXml)
             {
                 count++;
 
-                // Reporting in a clear, easy-to-read format
-                string message =
-                    $"Unique ID Entry #{count}:\n" +
-                    $"Entity Type: {uniqueId.EntityType}\n" +
-                    $"ID: {uniqueId.ID}\n" +
-                    $"Name: {uniqueId.Name}\n" +
-                    $"\n";  // Adding a newline for clarity
+                if(getFullInfo)
+                {
+                    //Reporting in a clear, easy-to-read format
+                    string message =
+                        $"Unique ID Entry #{count}:\n" +
+                        $"Entity Type: {uniqueId.EntityType}\n" +
+                        $"ID: {uniqueId.ID}\n" +
+                        $"Name: {uniqueId.Name}\n" +
+                        $"\n";
 
-                _log.LogEvent(message, LogProviderType.File);
+                    _log.LogInfo(message, LogProviderType.Console);
+                }     
             }
-
-            _log.LogEvent($"Finished logging. Total number of unique IDs reported: {count}. Please refer to the text file for details.", LogProviderType.Console);
+            _log.LogInfo($"Completed verification process, Total number of unique IDs reported in {scope} is: {count}.\n", LogProviderType.Console);
         }
-
 
     }
 

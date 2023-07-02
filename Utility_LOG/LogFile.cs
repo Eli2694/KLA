@@ -46,6 +46,11 @@ public class LogFile : ILogger
         }
     }
 
+    public void LogInfo(string msg)
+    {
+        WriteLog($"[INFO][{DateTime.Now}] {msg}");
+    }
+
     public void LogEvent(string msg)
     {
         WriteLog($"[EVENT][{DateTime.Now}] {msg}");

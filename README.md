@@ -15,13 +15,13 @@ This project is a console-based application designed to deserialize KLA's compan
 7. [Contributions](#contributions)
 8. [License](#license)
 
-## ⚡ Features
+## <a name="features"></a>⚡Features
 - User authentication
 - Deserialize KLA's XML files and verify the data from the file with the database
 - If the verification process passes without any issues, you can update the database with your new data
 - Generate reports and visualize progress
 
-## 🛠️ Technologies Used
+## <a name="technologies-used"></a>🛠️Technologies Used
 - Frontend: CMD, SQLPAD
 - Backend: C#, .NET 6
 - Database: SQL Server
@@ -38,13 +38,16 @@ You can install and run the Unique ID Scanner either natively or through Docker.
 3. Restore the required dependencies: `dotnet restore UniqueIdsScannerUI/UniqueIdsScannerUI.csproj`
 4. Build the app: `dotnet build UniqueIdsScannerUI/UniqueIdsScannerUI.csproj`
 5. Navigate to the execution directory: `cd UniqueIdsScannerUI/UniqueIdsScannerUI/bin/debug/bin`
-6. Start the application: `UniqueScanner.exe`
+6. Start the application: `dotnet UniqueIdsScannerUI.dll`
 
 ### 🐳 Docker Installation
 1. Make sure Docker is up and running on your machine.
 2. Clone the repository: `git clone https://github.com/Eli2694/KLA.git`
 3. Navigate to the project directory: `cd KLA`
 4. Run the Docker Compose command: `docker-compose up -d`
+5. Run the Docker  command: `docker exec -it [ContainerId] bash`
+6. Start the application: `dotnet UniqueIdsScannerUI.dll`
+
 
 > ⚠️ **Note:** When running the application via Docker, ensure the settings in `appconfig.json` reflect the Docker environment setup.
 
@@ -58,10 +61,10 @@ Before running the application, users need to update the `appconfig.json` file w
 ## 📖 Usage Instructions
 Our application provides both automated and manual modes. Here are the command-line options you can use:
 - `-f`, `--filePath`: The XML file path. Usage: `-f C:\folder\file.xml`
-- `-r`, `--rename`: To create a new alias. Usage: `UniqueScanner.exe --update -r`
-- `--generate-report`: To generate a report. Usage: `UniqueScanner.exe --generate-report`
-- `--update`: To verify and update. Usage: `UniqueScanner.exe --update`
-- `--verify`: To just verify. Usage: `UniqueScanner.exe --verify`
+- `-r`, `--rename`: To create a new alias. Usage: `dotnet UniqueIdsScannerUI.dll --update -r`
+- `--generate-report`: To generate a report. Usage: `dotnet UniqueIdsScannerUI.dll --generate-report`
+- `--update`: To verify and update. Usage: `dotnet UniqueIdsScannerUI.dll --update`
+- `--verify`: To just verify. Usage: `dotnet UniqueIdsScannerUI.dll --verify`
 
 ## 🧪 Running Tests
 We have a comprehensive suite of unit tests implemented via NUnit. Ensure your installation is working as expected by running these tests.

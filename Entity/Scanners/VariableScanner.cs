@@ -52,7 +52,8 @@ namespace Entity.Scanners
 					Scope = "variable",
 					Timestamp = DateTime.Now
 				}).ToList();
-		}		
+		}
+
 	}
 }
 

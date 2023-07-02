@@ -1,6 +1,7 @@
 ﻿using Entity.Scanners;
 using Model;
 using Moq;
+using NUnit.Framework;
 using Utility_LOG;
 
 namespace Entity.UnitTest.ScannersTest

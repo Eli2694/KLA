@@ -22,22 +22,20 @@ public class App
 
     internal void Run(string[] args)
     {
+        Console.WriteLine("App Start Runnig...",LogProviderType.Console);
 
         try
         {
             if (args.Length == 0)
             {
-                //for (int i = 0; i < 10000; i++)
-                //{
-                //    _log.LogEvent($"test {i}", LogProviderType.File);
-                //}
                 DisplayInstructions();
             }
             else
             {
                 if (isAuthenticatedUser())
                 {
-                    ParseArgumentsAndRunOptions(args);
+					_log.LogEvent("User successfuly authenticated.", LogProviderType.Console);
+					ParseArgumentsAndRunOptions(args);
                 }
             }
         }
@@ -48,62 +46,57 @@ public class App
         }
     }
 
-    private void DisplayInstructions()
-    {
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("Welcome to Unique IDs Scanner!");
-        Console.WriteLine("================================");
-        Console.WriteLine("Instructions:");
-        Console.WriteLine("1. Configure XML paths in the appsettings.json configuration file.");
-        Console.WriteLine("2. Use the following commands to perform different actions:");
-        Console.WriteLine();
+	private void DisplayInstructions()
+	{
+		Console.ForegroundColor = ConsoleColor.Cyan;
+		Console.WriteLine("Welcome to Unique IDs Scanner!");
+		Console.WriteLine("================================");
+		Console.WriteLine("Instructions:");
+		Console.WriteLine("1. Configure XML paths in the appsettings.json configuration file.");
+		Console.WriteLine("2. Use the following commands to perform different actions:");
+		Console.WriteLine();
 
-        // Debug Environment
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("Debug Environment:");
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine("--verify: Verify the content of XML files.");
-        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --verify");
-        Console.WriteLine("          UniqueIdsScannerUI.exe --verify -f 'Path To XML File'");
-        Console.WriteLine();
-        Console.WriteLine("--update: Verify and update the database.");
-        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --update");
-        Console.WriteLine("          UniqueIdsScannerUI.exe --update -f 'Path To XML File'");
-        Console.WriteLine();
-        Console.WriteLine("--generate-report: Generate a report.");
-        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --generate-report");
-        Console.WriteLine();
-        Console.WriteLine("--update -r: Create a new Alias.");
-        Console.WriteLine("   Usage: UniqueIdsScannerUI.exe --update -r");
-        Console.WriteLine();
+		Console.ForegroundColor = ConsoleColor.Green;
+		Console.WriteLine("Command Options:");
+		Console.ForegroundColor = ConsoleColor.White;
+		Console.WriteLine("--verify: Verify the content of XML files.");
+		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --verify");
+		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -i");
+		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -f 'Path To XML File'");
+		Console.WriteLine("   Explanation: This command verifies the content of XML files with the database.");
+		Console.WriteLine("                It checks for unique IDs and ensures their correctness.");
 
-        // Container/Release Environment
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Container/Release Environment:");
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine("--verify: Verify the content of XML files.");
-        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --verify");
-        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -f 'Path To XML File'");
-        Console.WriteLine();
-        Console.WriteLine("--update: Verify and update the database.");
-        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update");
-        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -f 'Path To XML File'");
-        Console.WriteLine();
-        Console.WriteLine("--generate-report: Generate a report.");
-        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --generate-report");
-        Console.WriteLine();
-        Console.WriteLine("--update -r: Create a new Alias.");
-        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update -r");
-        Console.WriteLine();
+		Console.WriteLine();
+		Console.WriteLine("--update: Verify and update the database.");
+		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update");
+		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -i");
+		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -f 'Path To XML File'");
+		Console.WriteLine("   Explanation: This command verifies and updates the database.");
+		Console.WriteLine("                It checks for unique IDs, ensures their correctness,");
+		Console.WriteLine("                and updates the associated database records.");
 
-        Console.WriteLine("** Please follow the instructions carefully. **");
-        Console.WriteLine("==============================================");
-        Console.ResetColor();
+		Console.WriteLine();
+		Console.WriteLine("--generate-report: Generate a report.");
+		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --generate-report");
+		Console.WriteLine("   Explanation: This command generates a report based on the verified");
+		Console.WriteLine("                and updated information. The report can be used for");
+		Console.WriteLine("                further analysis or documentation purposes.");
 
+		Console.WriteLine();
+		Console.WriteLine("--update -r: Create a new Alias.");
+		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update -r");
+		Console.WriteLine("   Explanation: This command creates a new Alias for the verified and");
+		Console.WriteLine("                updated records. The Alias can be used to identify or");
+		Console.WriteLine("                reference the records in a more convenient manner.");
 
-    }
+		Console.WriteLine();
 
-    private void ParseArgumentsAndRunOptions(string[] args)
+		Console.WriteLine("** Please follow the instructions carefully. **");
+		Console.WriteLine("==============================================");
+		Console.ResetColor();
+	}
+
+	private void ParseArgumentsAndRunOptions(string[] args)
     {
         using (var parser = new CommandLine.Parser((settings) => { settings.CaseSensitive = true; }))
         {
@@ -182,7 +175,8 @@ public class App
     {
         try
         {
-            bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath) : false;
+            bool getFullInfo = options.Info;
+            bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath, getFullInfo) : false;
 
             if (options.isUpdate)
             {
@@ -197,7 +191,7 @@ public class App
     }
 
 
-    private bool RunVerify(string filepath)
+    private bool RunVerify(string filepath,bool getFullInfo)
     {
         try
         {
@@ -209,7 +203,7 @@ public class App
             }
 
             SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
-            return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes);
+            return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes, getFullInfo);
         }
         catch (Exception ex)
         {
