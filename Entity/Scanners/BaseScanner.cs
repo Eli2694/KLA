@@ -87,9 +87,12 @@ namespace Entity.Scanners
 
         private void AddUniqueIdsFromXmlToList(List<UniqueIds> xml, Dictionary<string, UniqueIds> db, bool getFullInfo)
         {
-            newUniqueIdsFromXml = xml.Where(variableXML => !db.ContainsKey(variableXML.ID)).ToList();
-            UniqueIds item = xml[0];
-            ReportNewUniqueIds(item.Scope, getFullInfo);
+            if (xml.Count > 0)
+            {
+                newUniqueIdsFromXml = xml.Where(variableXML => !db.ContainsKey(variableXML.ID)).ToList();
+                UniqueIds item = xml[0];
+                ReportNewUniqueIds(item.Scope, getFullInfo);
+            }
         }
 
         private void ReportNewUniqueIds(string scope, bool getFullInfo)

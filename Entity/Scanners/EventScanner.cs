@@ -21,15 +21,19 @@ namespace Entity.Scanners
         {
             try
             {
-                return ktgemvar.Events.Select(evnt => new UniqueIds
+                if (ktgemvar.Events != null)
                 {
-                    EntityType = "Event",
-                    ID = evnt.Id.ToString(),
-                    Name = evnt.Name,
-                    Scope = "event",
-                    Timestamp = DateTime.Now
-                })
-                            .ToList();
+                    return ktgemvar.Events.Select(evnt => new UniqueIds
+                    {
+                        EntityType = "Event",
+                        ID = evnt.Id.ToString(),
+                        Name = evnt.Name,
+                        Scope = "event",
+                        Timestamp = DateTime.Now
+                    })
+                       .ToList();
+                }
+                return new List<UniqueIds>();
             }
             catch (Exception)
             {
