@@ -299,17 +299,11 @@ namespace Entity
 
         public List<string> ListOfAllNamesFromAllTablesInDB()
         {
-            List<string> allNames = new List<string>();
+            var uniqueIdNames = _unitOfWork.UniqueIds.GetAll().Select(a => a.Name);
+            var previousAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.AliasPreviousName);
+            var currentAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.AliasCurrentName);
 
-            List<string> uniqueIdNames = _unitOfWork.UniqueIds.GetAll().Select(a => a.Name).ToList();
-            List<string> previousAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.AliasPreviousName).ToList();
-            List<string> currentAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.AliasCurrentName).ToList();
-
-            allNames.AddRange(uniqueIdNames);
-            allNames.AddRange(previousAliasNames);
-            allNames.AddRange(currentAliasNames);
-
-            return allNames;
+            return uniqueIdNames.Concat(previousAliasNames).Concat(currentAliasNames).ToList();
         }
 
         public void ValidateAndPrepareAliases(Dictionary<string, string> renameInfo)
@@ -384,19 +378,23 @@ namespace Entity
                     keyInfoList.Add(uniqueIdKeyInfo);
                 }
 
-                // Retrieve information from Aliases table (AliasPreviousName)
-                var aliasPrevInfo = _unitOfWork.Aliases.GetAll().FirstOrDefault(a => a.AliasPreviousName == key || a.AliasCurrentName == key);
-                if (aliasPrevInfo != null)
+                if(uniqueIdInfo == null)
                 {
-                    var aliasKeyInfo = new Aliases
+                    // Retrieve information from Aliases table (AliasPreviousName)
+                    var aliasPrevInfo = _unitOfWork.Aliases.GetAll().FirstOrDefault(a => a.AliasPreviousName == key || a.AliasCurrentName == key);
+                    if (aliasPrevInfo != null)
                     {
-                        ID = aliasPrevInfo.ID,
-                        AliasPreviousName = key,
-                        Scope = aliasPrevInfo.Scope
-                    };
+                        var aliasKeyInfo = new Aliases
+                        {
+                            ID = aliasPrevInfo.ID,
+                            AliasPreviousName = key,
+                            Scope = aliasPrevInfo.Scope
+                        };
+
+                        keyInfoList.Add(aliasKeyInfo);
+                    }
+                }
                     
-                    keyInfoList.Add(aliasKeyInfo);
-                }      
             }
 
             return keyInfoList;

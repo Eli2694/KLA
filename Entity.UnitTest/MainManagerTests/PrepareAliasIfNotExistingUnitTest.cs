@@ -38,7 +38,7 @@ namespace Entity.UnitTest.MainManagerTests
 			var mainManager = new MainManager(null, null, null, mockUnitOfWork.Object, mockLog.Object, _mockFileSystem.Object);
 
 			// Act
-			var result = mainManager.PrepareAliasIfNotExisting(uniqueId, aliasName, existingAliases);
+			var result = mainManager.PrepareAliasIfNotExisting(uniqueId.ID, uniqueId.Name, uniqueId.Scope, aliasName, existingAliases);
 
 			// Assert
 			Assert.IsNotNull(result);
@@ -71,7 +71,7 @@ namespace Entity.UnitTest.MainManagerTests
 			var mainManager = new MainManager(null, null, null, mockUnitOfWork.Object, mockLog.Object, _mockFileSystem.Object);
 
 			// Act
-			var result = mainManager.PrepareAliasIfNotExisting(uniqueId, aliasName, existingAliases);
+			var result = mainManager.PrepareAliasIfNotExisting(uniqueId.ID, uniqueId.Name, uniqueId.Scope, aliasName, existingAliases);
 
 			// Assert
 			Assert.IsNull(result);
