@@ -297,9 +297,8 @@ namespace Entity
             }
         }
 
-        public void ValidateAndPrepareAliases(Dictionary<string, string> renameInfo)
+        public List<string> ListOfAllNamesFromAllTablesInDB()
         {
-            List<Aliases> newAliases = new List<Aliases>();
             List<string> allNames = new List<string>();
 
             List<string> uniqueIdNames = _unitOfWork.UniqueIds.GetAll().Select(a => a.Name).ToList();
@@ -310,7 +309,16 @@ namespace Entity
             allNames.AddRange(previousAliasNames);
             allNames.AddRange(currentAliasNames);
 
-            var missingKeys = renameInfo.Keys.Except(allNames).ToList();
+            return allNames;
+        }
+
+        public void ValidateAndPrepareAliases(Dictionary<string, string> renameInfo)
+        {
+            List<Aliases> newAliases = new List<Aliases>();
+
+            List<string> listOfAllNames = ListOfAllNamesFromAllTablesInDB();
+
+            var missingKeys = renameInfo.Keys.Except(listOfAllNames).ToList();
 
             if (missingKeys.Any())
             {
@@ -323,42 +331,89 @@ namespace Entity
             // Fetching all existing aliases from the database and storing them in a HashSet for faster lookup
             var existingAliases = new HashSet<string>(_unitOfWork.Aliases.GetAll().Select(a => a.AliasCurrentName));
 
-            var flattenedKeyUniqueIdPairs = renameInfo.Keys
-                .SelectMany(key => _unitOfWork.UniqueIds.Find(a => a.Name == key)
-                .Select(uniqueId => new { Key = key, UniqueId = uniqueId }));
+            // if i can find the key, i want to get all the information about it from the database
+            List<string> keyList = renameInfo.Keys.ToList();
+            var fullInformationAboutEveryKey = GetKeyInfoFromAllTablesInDB(keyList);
 
-            
 
-            foreach (var pair in flattenedKeyUniqueIdPairs)
+            foreach (var keyInfo in fullInformationAboutEveryKey)
             {
-                var newAlias = PrepareAliasIfNotExisting(pair.UniqueId, renameInfo[pair.Key], existingAliases);
-
-                if (newAlias != null)
+                if (keyInfo is UniqueIds uniqueIdInfo)
                 {
-                    newAliases.Add(newAlias);
+                    Aliases newAlias = PrepareAliasIfNotExisting(uniqueIdInfo.ID, uniqueIdInfo.Name, uniqueIdInfo.Scope, renameInfo[uniqueIdInfo.Name], existingAliases);
+                    if (newAlias != null)
+                    {
+                        newAliases.Add(newAlias);
+                    }
+                }
+                else if (keyInfo is Aliases aliasInfo)
+                {
+                    Aliases newAlias = PrepareAliasIfNotExisting(aliasInfo.ID, aliasInfo.AliasPreviousName, aliasInfo.Scope, renameInfo[aliasInfo.AliasPreviousName], existingAliases);
+                    if (newAlias != null)
+                    {
+                        newAliases.Add(newAlias);
+                    }
                 }
             }
 
-            if(newAliases.Any())
+            if (newAliases.Any())
             {
                 _log.LogEvent($"Updating Database With New Aliases", LogProviderType.Console);
                 UpdateDbWithNewAliases(newAliases);
             }
-            
+
         }
 
-        public Aliases PrepareAliasIfNotExisting(UniqueIds uniqueId, string aliasName, HashSet<string> existingAliases)
+        public List<object> GetKeyInfoFromAllTablesInDB(List<string> keys)
+        {
+            List<object> keyInfoList = new List<object>();
+
+            foreach (var key in keys)
+            {
+                // Retrieve information from UniqueIds table
+                var uniqueIdInfo = _unitOfWork.UniqueIds.GetAll().FirstOrDefault(a => a.Name == key);
+                if (uniqueIdInfo != null)
+                {
+
+                    UniqueIds uniqueIdKeyInfo = new UniqueIds
+                    {
+                        ID = uniqueIdInfo.ID,
+                        Name = key,
+                        Scope = uniqueIdInfo.Scope
+                    };
+                    keyInfoList.Add(uniqueIdKeyInfo);
+                }
+
+                // Retrieve information from Aliases table (AliasPreviousName)
+                var aliasPrevInfo = _unitOfWork.Aliases.GetAll().FirstOrDefault(a => a.AliasPreviousName == key || a.AliasCurrentName == key);
+                if (aliasPrevInfo != null)
+                {
+                    var aliasKeyInfo = new Aliases
+                    {
+                        ID = aliasPrevInfo.ID,
+                        AliasPreviousName = key,
+                        Scope = aliasPrevInfo.Scope
+                    };
+                    
+                    keyInfoList.Add(aliasKeyInfo);
+                }      
+            }
+
+            return keyInfoList;
+        }
+
+        public Aliases PrepareAliasIfNotExisting(string id,string previousName, string scope, string newAlias, HashSet<string> existingAliases)
         {
             // Checking if alias already exists in the database
-            if (!existingAliases.Contains(aliasName))
+            if (!existingAliases.Contains(newAlias))
             {
                 // If not, preparing new alias
                 return new Aliases
                 {
-                    ID = uniqueId.ID,
-                    AliasPreviousName = uniqueId.Name,
-                    AliasCurrentName = aliasName,
-                    Scope = uniqueId.Scope,
+                    ID = id,
+                    AliasPreviousName = previousName,
+                    AliasCurrentName = newAlias,
+                    Scope = scope,
                     AliasCreated = DateTime.Now,
 
                 };
@@ -366,7 +421,7 @@ namespace Entity
             else
             {
                 // If alias already exists, logging a message
-                _log.LogWarning($"Alias '{aliasName}' already exists in the database", LogProviderType.Console);
+                _log.LogWarning($"Alias '{newAlias}' already exists in the database", LogProviderType.Console);
             }
 
             // If alias already exists, returning null
