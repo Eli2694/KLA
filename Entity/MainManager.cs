@@ -300,10 +300,17 @@ namespace Entity
         public void ValidateAndPrepareAliases(Dictionary<string, string> renameInfo)
         {
             List<Aliases> newAliases = new List<Aliases>();
+            List<string> allNames = new List<string>();
 
-            var uniqueIdNames = _unitOfWork.UniqueIds.GetAll().Select(a => a.Name).ToList();
+            List<string> uniqueIdNames = _unitOfWork.UniqueIds.GetAll().Select(a => a.Name).ToList();
+            List<string> previousAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.AliasPreviousName).ToList();
+            List<string> currentAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.AliasCurrentName).ToList();
 
-            var missingKeys = renameInfo.Keys.Except(uniqueIdNames).ToList();
+            allNames.AddRange(uniqueIdNames);
+            allNames.AddRange(previousAliasNames);
+            allNames.AddRange(currentAliasNames);
+
+            var missingKeys = renameInfo.Keys.Except(allNames).ToList();
 
             if (missingKeys.Any())
             {
@@ -314,11 +321,13 @@ namespace Entity
             }
 
             // Fetching all existing aliases from the database and storing them in a HashSet for faster lookup
-            var existingAliases = new HashSet<string>(_unitOfWork.Aliases.GetAll().Select(a => a.AliasName));
+            var existingAliases = new HashSet<string>(_unitOfWork.Aliases.GetAll().Select(a => a.AliasCurrentName));
 
             var flattenedKeyUniqueIdPairs = renameInfo.Keys
                 .SelectMany(key => _unitOfWork.UniqueIds.Find(a => a.Name == key)
                 .Select(uniqueId => new { Key = key, UniqueId = uniqueId }));
+
+            
 
             foreach (var pair in flattenedKeyUniqueIdPairs)
             {
@@ -347,9 +356,9 @@ namespace Entity
                 return new Aliases
                 {
                     ID = uniqueId.ID,
-                    OriginalName = uniqueId.Name,
-                    AliasName = aliasName,
-                    UniqueIdScope = uniqueId.Scope,
+                    AliasPreviousName = uniqueId.Name,
+                    AliasCurrentName = aliasName,
+                    Scope = uniqueId.Scope,
                     AliasCreated = DateTime.Now,
 
                 };

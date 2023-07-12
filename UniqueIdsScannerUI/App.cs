@@ -22,7 +22,10 @@ public class App
 
     internal void Run(string[] args)
     {
-        Console.WriteLine("App Start Runnig...",LogProviderType.Console);
+        _log.LogInfo("App Start Runnig...",LogProviderType.Console);
+        args = new string[2];
+        args[0] = "--update";
+        args[1] = "-r";
 
         try
         {

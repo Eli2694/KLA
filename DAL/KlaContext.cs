@@ -27,8 +27,6 @@ namespace DAL
                     if (!databaseCreator.HasTables()) databaseCreator.CreateTables();
                 }
 
-                //var databaseExists = Database.ExecuteSqlRaw("SELECT database_id FROM sys.databases WHERE Name = 'KLA_Project'") > 0;
-
                 //if (!databaseExists)
                 //{
                 //    Database.EnsureCreated();
@@ -56,7 +54,7 @@ namespace DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UniqueIds>()
-        .HasKey(e => new { e.Scope, e.Name, e.ID });
+            .HasKey(e => new { e.Scope, e.Name, e.ID });
 
             // M_UniqueIds
             modelBuilder.Entity<UniqueIds>()
@@ -75,11 +73,11 @@ namespace DAL
             // Aliases
             modelBuilder.Entity<Aliases>(entity =>
             {
-                entity.HasKey(a => new { a.ID, a.AliasName });
+                entity.HasKey(a => new { a.ID, a.AliasCurrentName });
 
                 entity.HasOne(a => a.UniqueId)
                     .WithMany(u => u.Aliases)
-                    .HasForeignKey(a => new { a.UniqueIdScope, a.OriginalName, a.ID });
+                    .HasForeignKey(a => new { a.Scope, a.AliasPreviousName, a.ID });
             });
 
             base.OnModelCreating(modelBuilder);

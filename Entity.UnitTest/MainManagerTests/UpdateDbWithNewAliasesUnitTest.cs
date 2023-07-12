@@ -23,9 +23,9 @@ namespace Entity.UnitTest.MainManagerTests
 			// Arrange
 			var newAliases = new List<Aliases>
 			{
-				new Aliases { ID = "1", OriginalName = "UniqueId1", AliasName = "Alias1", UniqueIdScope = "scope1", AliasCreated = new System.DateTime(2023, 1, 1) },
-				new Aliases { ID = "2", OriginalName = "UniqueId2", AliasName = "Alias2", UniqueIdScope = "scope2", AliasCreated = new System.DateTime(2023, 1, 1) },
-				new Aliases { ID = "3", OriginalName = "UniqueId3", AliasName = "Alias3", UniqueIdScope = "scope3", AliasCreated = new System.DateTime(2023, 1, 1) }
+				new Aliases { ID = "1", AliasPreviousName = "UniqueId1", AliasCurrentName = "Alias1", Scope = "scope1", AliasCreated = new System.DateTime(2023, 1, 1) },
+				new Aliases { ID = "2", AliasPreviousName = "UniqueId2", AliasCurrentName = "Alias2", Scope = "scope2", AliasCreated = new System.DateTime(2023, 1, 1) },
+				new Aliases { ID = "3", AliasPreviousName = "UniqueId3", AliasCurrentName = "Alias3", Scope = "scope3", AliasCreated = new System.DateTime(2023, 1, 1) }
 			};
 
 			var mockAliasesRepository = new Mock<IAliasesRepository>();

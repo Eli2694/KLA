@@ -18,17 +18,17 @@ namespace Model
         [Key]
         [Column(Order = 1)]
         [StringLength(256)]
-        public string AliasName { get; set; }
+        public string AliasCurrentName { get; set; }
 
         [StringLength(256)]
-        public string OriginalName { get; set; } // corresponds to UniqueIds.Name
+        public string AliasPreviousName { get; set; } // corresponds to UniqueIds.Name
 
         [StringLength(255)]
-        public string UniqueIdScope { get; set; } // corresponds to UniqueIds.Scope
+        public string Scope { get; set; } // corresponds to UniqueIds.Scope
 
         public DateTime? AliasCreated { get; set; }
 
-        [ForeignKey("UniqueIdScope,OriginalName,ID")]
+        [ForeignKey("Scope,OriginalName,ID")]
         public UniqueIds UniqueId { get; set; }
     }
 }
