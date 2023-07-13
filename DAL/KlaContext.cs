@@ -54,7 +54,7 @@ namespace DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UniqueIds>()
-            .HasKey(e => new { e.Scope, e.Name, e.ID });
+                .HasKey(e => new { e.Scope, e.Name, e.ID });
 
             // M_UniqueIds
             modelBuilder.Entity<UniqueIds>()
@@ -71,14 +71,8 @@ namespace DAL
                 .IsUnique();
 
             // Aliases
-            modelBuilder.Entity<Aliases>(entity =>
-            {
-                entity.HasKey(a => new { a.ID, a.AliasCurrentName });
-
-                entity.HasOne(a => a.UniqueId)
-                    .WithMany(u => u.Aliases)
-                    .HasForeignKey(a => new { a.Scope, a.AliasPreviousName, a.ID });
-            });
+            modelBuilder.Entity<Aliases>()
+                .HasKey(a => new { a.ID, a.CurrentAliasName,a.Scope });
 
             base.OnModelCreating(modelBuilder);
         }

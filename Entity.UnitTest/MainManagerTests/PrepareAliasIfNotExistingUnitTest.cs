@@ -43,8 +43,8 @@ namespace Entity.UnitTest.MainManagerTests
 			// Assert
 			Assert.IsNotNull(result);
 			Assert.AreEqual(uniqueId.ID, result.ID);
-			Assert.AreEqual(uniqueId.Name, result.AliasPreviousName);
-			Assert.AreEqual(aliasName, result.AliasCurrentName);
+			Assert.AreEqual(uniqueId.Name, result.PreviousAliasName);
+			Assert.AreEqual(aliasName, result.CurrentAliasName);
 			Assert.AreEqual(uniqueId.Scope, result.Scope);
 			mockAliasesRepository.Verify(repo => repo.AddRange(It.IsAny<List<Aliases>>()), Times.Never);
 			mockUnitOfWork.Verify(uow => uow.Complete(), Times.Never);

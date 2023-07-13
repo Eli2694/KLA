@@ -300,8 +300,8 @@ namespace Entity
         public List<string> ListOfAllNamesFromAllTablesInDB()
         {
             var uniqueIdNames = _unitOfWork.UniqueIds.GetAll().Select(a => a.Name);
-            var previousAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.AliasPreviousName);
-            var currentAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.AliasCurrentName);
+            var previousAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.PreviousAliasName);
+            var currentAliasNames = _unitOfWork.Aliases.GetAll().Select(a => a.CurrentAliasName);
 
             return uniqueIdNames.Concat(previousAliasNames).Concat(currentAliasNames).ToList();
         }
@@ -323,7 +323,7 @@ namespace Entity
             }
 
             // Fetching all existing aliases from the database and storing them in a HashSet for faster lookup
-            var existingAliases = new HashSet<string>(_unitOfWork.Aliases.GetAll().Select(a => a.AliasCurrentName));
+            var existingAliases = new HashSet<string>(_unitOfWork.Aliases.GetAll().Select(a => a.CurrentAliasName));
 
             // if i can find the key, i want to get all the information about it from the database
             List<string> keyList = renameInfo.Keys.ToList();
@@ -342,7 +342,7 @@ namespace Entity
                 }
                 else if (keyInfo is Aliases aliasInfo)
                 {
-                    Aliases newAlias = PrepareAliasIfNotExisting(aliasInfo.ID, aliasInfo.AliasPreviousName, aliasInfo.Scope, renameInfo[aliasInfo.AliasPreviousName], existingAliases);
+                    Aliases newAlias = PrepareAliasIfNotExisting(aliasInfo.ID, aliasInfo.PreviousAliasName, aliasInfo.Scope, renameInfo[aliasInfo.PreviousAliasName], existingAliases);
                     if (newAlias != null)
                     {
                         newAliases.Add(newAlias);
@@ -352,8 +352,9 @@ namespace Entity
 
             if (newAliases.Any())
             {
-                _log.LogEvent($"Updating Database With New Aliases", LogProviderType.Console);
+                _log.LogEvent($"Updating Database With New Aliases...", LogProviderType.Console);
                 UpdateDbWithNewAliases(newAliases);
+                _log.LogEvent($"Database Was Updated With New Aliases", LogProviderType.Console);
             }
 
         }
@@ -380,14 +381,14 @@ namespace Entity
 
                 if(uniqueIdInfo == null)
                 {
-                    // Retrieve information from Aliases table (AliasPreviousName)
-                    var aliasPrevInfo = _unitOfWork.Aliases.GetAll().FirstOrDefault(a => a.AliasPreviousName == key || a.AliasCurrentName == key);
+                    // Retrieve information from Aliases table (PreviousAliasName)
+                    var aliasPrevInfo = _unitOfWork.Aliases.GetAll().FirstOrDefault(a => a.PreviousAliasName == key || a.CurrentAliasName == key);
                     if (aliasPrevInfo != null)
                     {
                         var aliasKeyInfo = new Aliases
                         {
                             ID = aliasPrevInfo.ID,
-                            AliasPreviousName = key,
+                            PreviousAliasName = key,
                             Scope = aliasPrevInfo.Scope
                         };
 
@@ -409,8 +410,8 @@ namespace Entity
                 return new Aliases
                 {
                     ID = id,
-                    AliasPreviousName = previousName,
-                    AliasCurrentName = newAlias,
+                    PreviousAliasName = previousName,
+                    CurrentAliasName = newAlias,
                     Scope = scope,
                     AliasCreated = DateTime.Now,
 
