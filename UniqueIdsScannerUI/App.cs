@@ -23,9 +23,6 @@ public class App
     internal void Run(string[] args)
     {
         _log.LogInfo("App Start Runnig...",LogProviderType.Console);
-        args = new string[2];
-        args[0] = "--update";
-        args[1] = "-r";
 
         try
         {
@@ -205,8 +202,20 @@ public class App
                 return false;
             }
 
-            SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
-            return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes, getFullInfo);
+            // Check if the names in xml file are not found in aliases table under the same scope
+            bool notFound = _mainManager.CheckIfNamesExistInAliasLists(xmlScopes);
+
+            if (notFound)
+            {
+                SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+                // return true if there are no errors between XML file and Database
+                return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes, getFullInfo);
+            }
+            else
+            {
+                return false;
+            }
+            
         }
         catch (Exception ex)
         {

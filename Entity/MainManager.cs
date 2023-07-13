@@ -170,6 +170,94 @@ namespace Entity
             }
         }
 
+        public List<Aliases> RetriveAliasesFromDB()
+        {
+            try
+            {
+                var result = _unitOfWork.Aliases.GetAll();
+                return (List<Aliases>)result;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in RetriveAliasesFromDB method: {ex.Message}", LogProviderType.File);
+                throw;
+            }
+        }
+
+        public bool CheckIfNamesExistInAliasLists(SeperatedScopes? xmlScopes)
+        {
+            try
+            {
+                var aliasesFromDb = RetriveAliasesFromDB();
+                var eventAliases = aliasesFromDb.Where(a => a.Scope == "event").ToList();
+                var alarmAliases = aliasesFromDb.Where(a => a.Scope == "alarm").ToList();
+                var variableAliases = aliasesFromDb.Where(a => a.Scope == "variable").ToList();
+
+                bool foundAlias = false; // Flag to track if any name is found as an alias
+
+                if (xmlScopes != null)
+                {
+                    // Check if names in EventsList exist in eventAliases
+                    if (xmlScopes.EventsList != null)
+                    {
+                        foreach (var eventId in xmlScopes.EventsList)
+                        {
+                            var eventName = eventId.Name;
+
+                            if (eventAliases.Any(a => a.CurrentAliasName == eventName))
+                            {
+                                _log.LogError($"Event name '{eventName}' was found as an alias", LogProviderType.Console);
+                                _log.LogError($"Event name '{eventName}' was found as an alias", LogProviderType.File);
+                                foundAlias = true;
+                            }
+                        }
+                    }
+
+                    // Check if names in AlarmsList exist in alarmAliases
+                    if (xmlScopes.AlarmsList != null)
+                    {
+                        foreach (var alarm in xmlScopes.AlarmsList)
+                        {
+                            var alarmName = alarm.Name;
+
+                            if (alarmAliases.Any(a => a.CurrentAliasName == alarmName))
+                            {
+                                _log.LogError($"Alarm name '{alarmName}' was found as an alias", LogProviderType.Console);
+                                _log.LogError($"Alarm name '{alarmName}' was found as an alias", LogProviderType.File);
+                                foundAlias = true;
+                            }
+                        }
+                    }
+
+                    // Check if names in VariablesList exist in variableAliases
+                    if (xmlScopes.VariablesList != null)
+                    {
+                        foreach (var variable in xmlScopes.VariablesList)
+                        {
+                            var variableName = variable.Name;
+
+                            if (variableAliases.Any(a => a.CurrentAliasName == variableName))
+                            {
+                                _log.LogError($"Variable name '{variableName}' was found as an alias", LogProviderType.Console);
+                                _log.LogError($"Variable name '{variableName}' was found as an alias", LogProviderType.File);
+                                foundAlias = true;
+                            }
+                        }
+                    }
+                }
+
+                // Return false if any name was found as an alias, otherwise return true
+                return !foundAlias;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"CheckIfNamesExistInAliasLists method: {ex.Message}", LogProviderType.Console);
+                _log.LogError($"CheckIfNamesExistInAliasLists method: {ex.Message}", LogProviderType.File);
+                throw;
+            }
+            
+        }
+
         public SeperatedScopes SortUniqeIDsFromDbByScope(List<UniqueIds> ListFromDB)
         {
             try
@@ -215,17 +303,6 @@ namespace Entity
                 return false;
             }
         }
-
-        //public async Task<bool> CompareXmlScopesWithDBScopes(M_SeperatedScopes xmlSeperatedScopes, M_SeperatedScopes DbSeperatedScopes)
-        //{
-        //    var taskAlarm = Task.Run(() => _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList));
-        //    var taskEvent = Task.Run(() => _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList));
-        //    var taskVariable = Task.Run(() => _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList));
-
-        //    var results = await Task.WhenAll(taskAlarm, taskEvent, taskVariable);
-
-        //    return results.All(r => r);
-        //}
 
         public void UpdateDatabaseWithNewUniqueIds()
         {

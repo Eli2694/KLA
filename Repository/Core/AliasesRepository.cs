@@ -17,22 +17,5 @@ namespace Repository.Core
         {
         }
 
-        //public UniqueIds GetUniqueIdWithAliases(string id, string scope)
-        //{
-        //    try
-        //    {
-
-
-        //        var uniqueIdWithAliases = _context.Unique_Ids
-        //                                           .Include(u => u.Aliases)
-        //                                           .FirstOrDefault(u => u.ID == id && u.Scope == scope);
-        //        return uniqueIdWithAliases;
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //        throw;
-        //    }
-        //}
     }
 }
