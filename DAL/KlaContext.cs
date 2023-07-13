@@ -40,6 +40,7 @@ namespace DAL
             }
         }
 
+        // For Tests
 		public KlaContext() : base()
 		{
 			
@@ -56,7 +57,6 @@ namespace DAL
             modelBuilder.Entity<UniqueIds>()
                 .HasKey(e => new { e.Scope, e.Name, e.ID });
 
-            // M_UniqueIds
             modelBuilder.Entity<UniqueIds>()
                 .HasIndex(e => new { e.Scope, e.Name })
                 .IsUnique();
@@ -65,17 +65,17 @@ namespace DAL
                 .HasIndex(e => new { e.Scope, e.ID })
                 .IsUnique();
 
-            // M_User
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.UserID)
                 .IsUnique();
 
-            // Aliases
             modelBuilder.Entity<Aliases>()
-                .HasKey(a => new { a.ID, a.CurrentAliasName,a.Scope });
+                .HasKey(a => new { a.ID, a.CurrentAliasName, a.Scope });
 
             base.OnModelCreating(modelBuilder);
         }
+
+
     }
 
 

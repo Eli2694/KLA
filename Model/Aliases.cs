@@ -13,9 +13,8 @@ namespace Model
         [Key]
         [Column(Order = 0)]
         [StringLength(20)]
-        public string ID { get; set; } 
+        public string ID { get; set; }
 
-       
         [Column(Order = 1)]
         [StringLength(256)]
         public string PreviousAliasName { get; set; }
@@ -26,10 +25,10 @@ namespace Model
 
         [Key]
         [StringLength(255)]
-        public string Scope { get; set; } 
+        public string Scope { get; set; }
 
         public DateTime? AliasCreated { get; set; }
-        [NotMapped]
-        public UniqueIds UniqueId { get; set; }
+
     }
+
 }

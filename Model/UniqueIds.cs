@@ -30,6 +30,6 @@ namespace Model
         [StringLength(50)]
         public string EntityType { get; set; }
 
-        public  ICollection<Aliases> Aliases { get; set; }
+        public ICollection<Aliases> Aliases { get; set; }
     }
 }
