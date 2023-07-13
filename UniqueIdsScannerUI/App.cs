@@ -23,6 +23,8 @@ public class App
     internal void Run(string[] args)
     {
         Console.WriteLine("App Start Runnig...",LogProviderType.Console);
+        args = new string[1];
+        args[0] = "--verify"; 
 
         try
         {

@@ -11,31 +11,31 @@ namespace Model
     public class KlaXML
     {
             [XmlElement("header")]
-            public Header Header { get; set; }
+            public Header? Header { get; set; }
 
             [XmlArray("equipmentconstants")]
             [XmlArrayItem("equipmentconstant")]
-            public List<EquipmentConstant> EquipmentConstants { get; set; }
+            public List<EquipmentConstant>? EquipmentConstants { get; set; }
 
             [XmlArray("statusvariables")]
             [XmlArrayItem("statusvariable")]
-            public List<StatusVariable> StatusVariables { get; set; }
+            public List<StatusVariable>? StatusVariables { get; set; }
 
             [XmlArray("datavariables")]
             [XmlArrayItem("datavariable")]
-            public List<DataVariable> DataVariables { get; set; }
+            public List<DataVariable>? DataVariables { get; set; }
 
             [XmlArray("dynamicvariables")]
             [XmlArrayItem("dynamicvariable")]
-            public List<DynamicVariable> DynamicVariables { get; set; }
+            public List<DynamicVariable>? DynamicVariables { get; set; }
 
             [XmlArray("events")]
             [XmlArrayItem("event")]
-            public List<Event> Events { get; set; }
+            public List<Event>? Events { get; set; }
 
             [XmlArray("alarms")]
             [XmlArrayItem("alarm")]
-            public List<Alarm> Alarms { get; set; }
+            public List<Alarm>? Alarms { get; set; }
         }
 
         public class Header

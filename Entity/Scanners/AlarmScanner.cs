@@ -23,14 +23,18 @@ namespace Entity.Scanners
         {
             try
             {
-                return ktgemvar.Alarms.Select(alarm => new UniqueIds
+                if (ktgemvar.Alarms != null)
                 {
-                    EntityType = "Alarm",
-                    ID = alarm.Id.ToString(),
-                    Name = alarm.Name,
-                    Scope = "alarm",
-                    Timestamp = DateTime.Now
-                }).ToList();
+                    return ktgemvar.Alarms.Select(alarm => new UniqueIds
+                    {
+                        EntityType = "Alarm",
+                        ID = alarm.Id.ToString(),
+                        Name = alarm.Name,
+                        Scope = "alarm",
+                        Timestamp = DateTime.Now
+                    }).ToList();
+                }
+                return new List<UniqueIds>();
             }
             catch (Exception)
             {

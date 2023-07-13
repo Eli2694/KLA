@@ -15,13 +15,13 @@ This project is a console-based application designed to deserialize KLA's compan
 7. [Contributions](#contributions)
 8. [License](#license)
 
-## ⚡ Features
+## <a name="features"></a>⚡Features
 - User authentication
 - Deserialize KLA's XML files and verify the data from the file with the database
 - If the verification process passes without any issues, you can update the database with your new data
 - Generate reports and visualize progress
 
-## 🛠️ Technologies Used
+## <a name="technologies-used"></a>🛠️Technologies Used
 - Frontend: CMD, SQLPAD
 - Backend: C#, .NET 6
 - Database: SQL Server
