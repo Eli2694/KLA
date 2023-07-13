@@ -13,7 +13,7 @@ services:
     environment:
       - DB_HOST=mssql
       - DB_NAME=KLA_Project
-      - DB_SA_PASSWORD=password@12345 
+      - DB_SA_PASSWORD=password@12345
     tty: true
     stdin_open: true
 
