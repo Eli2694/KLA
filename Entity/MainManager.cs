@@ -306,12 +306,23 @@ namespace Entity
             return uniqueIdNames.Concat(previousAliasNames).Concat(currentAliasNames).ToList();
         }
 
+        public bool CheckIfAliasFoundInUniqueIds(Dictionary<string, string> renameInfo)
+        {
+            var uniqueIdNames = _unitOfWork.UniqueIds.GetAll().Select(a => a.Name);
+            var foundAliases = renameInfo.Values.Intersect(uniqueIdNames).ToList();
+
+            foreach (var alias in foundAliases)
+            {
+                _log.LogError($"Alias '{alias}' found in UniqueIds Table.", LogProviderType.Console);
+            }
+
+            return foundAliases.Count > 0;
+        }
+
+
         public void ValidateAndPrepareAliases(Dictionary<string, string> renameInfo)
         {
-            List<Aliases> newAliases = new List<Aliases>();
-
-            List<string> listOfAllNames = ListOfAllNamesFromAllTablesInDB();
-
+            var listOfAllNames = ListOfAllNamesFromAllTablesInDB();
             var missingKeys = renameInfo.Keys.Except(listOfAllNames).ToList();
 
             if (missingKeys.Any())
@@ -322,13 +333,16 @@ namespace Entity
                 throw new KeyNotFoundException($"Keys '{keys}' not found in the database");
             }
 
-            // Fetching all existing aliases from the database and storing them in a HashSet for faster lookup
+            bool isAliasFound = CheckIfAliasFoundInUniqueIds(renameInfo);
+            if (isAliasFound)
+            {
+                throw new Exception("Aliases already exists in UniqueIds table.");
+            }
+
             var existingAliases = new HashSet<string>(_unitOfWork.Aliases.GetAll().Select(a => a.CurrentAliasName));
-
-            // if i can find the key, i want to get all the information about it from the database
-            List<string> keyList = renameInfo.Keys.ToList();
+            var newAliases = new List<Aliases>();
+            var keyList = renameInfo.Keys.ToList();
             var fullInformationAboutEveryKey = GetKeyInfoFromAllTablesInDB(keyList);
-
 
             foreach (var keyInfo in fullInformationAboutEveryKey)
             {
@@ -356,8 +370,8 @@ namespace Entity
                 UpdateDbWithNewAliases(newAliases);
                 _log.LogEvent($"Database Was Updated With New Aliases", LogProviderType.Console);
             }
-
         }
+
 
         public List<object> GetKeyInfoFromAllTablesInDB(List<string> keys)
         {
