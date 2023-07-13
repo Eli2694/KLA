@@ -384,7 +384,7 @@ namespace Entity
                 if (uniqueIdInfo != null)
                 {
 
-                    UniqueIds uniqueIdKeyInfo = new UniqueIds
+                    var uniqueIdKeyInfo = new UniqueIds
                     {
                         ID = uniqueIdInfo.ID,
                         Name = key,

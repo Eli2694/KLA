@@ -29,6 +29,9 @@ namespace Model
 
         public DateTime? AliasCreated { get; set; }
 
+        [ForeignKey("Scope,ID")]
+        public UniqueIds UniqueId { get; set; }
+
     }
 
 }

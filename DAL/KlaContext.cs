@@ -58,6 +58,10 @@ namespace DAL
                 .HasKey(e => new { e.Scope, e.Name, e.ID });
 
             modelBuilder.Entity<UniqueIds>()
+                .HasKey(e => new { e.Scope, e.ID });
+
+            // M_UniqueIds
+            modelBuilder.Entity<UniqueIds>()
                 .HasIndex(e => new { e.Scope, e.Name })
                 .IsUnique();
 
@@ -65,18 +69,22 @@ namespace DAL
                 .HasIndex(e => new { e.Scope, e.ID })
                 .IsUnique();
 
+            // M_User
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.UserID)
                 .IsUnique();
 
-            modelBuilder.Entity<Aliases>()
-                .HasKey(a => new { a.ID, a.CurrentAliasName, a.Scope });
+            // Aliases
+            modelBuilder.Entity<Aliases>(entity =>
+            {
+                entity.HasKey(a => new { a.ID, a.Scope, a.CurrentAliasName });
+
+                entity.HasOne(a => a.UniqueId)
+                    .WithMany(u => u.Aliases)
+                    .HasForeignKey(a => new { a.Scope, a.ID });
+            });
 
             base.OnModelCreating(modelBuilder);
         }
-
-
     }
-
-
 }
