@@ -322,9 +322,7 @@ public class App
         {
             _log.LogWarning($"Error in SetUpRename method: {ex.Message}", LogProviderType.File);
             throw;
-        }
-
-        
+        }  
     }
 
 }
