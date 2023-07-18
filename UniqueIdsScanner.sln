@@ -17,11 +17,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utility_LOG", "Utility_LOG\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entity.UnitTest", "Entity.UnitTest\Entity.UnitTest.csproj", "{00CBD45A-F4DC-4697-A579-3417B780988F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL.UnitTest", "DAL.UnitTest\DAL.UnitTest.csproj", "{A5EED019-C5FF-4BD6-A641-8292D91ABA3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL.UnitTest", "DAL.UnitTest\DAL.UnitTest.csproj", "{A5EED019-C5FF-4BD6-A641-8292D91ABA3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository.UnitTest", "Repository.UnitTest\Repository.UnitTest.csproj", "{5C4EE322-FCBA-41F0-940B-1B591AA9CF33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository.UnitTest", "Repository.UnitTest\Repository.UnitTest.csproj", "{5C4EE322-FCBA-41F0-940B-1B591AA9CF33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniqueIdsScannerUI.UnitTest", "UniqueIdsScannerUI.UnitTest\UniqueIdsScannerUI.UnitTest.csproj", "{1CA10E23-DB9F-40F8-AFAA-EBF36550815B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniqueIdsScannerUI.UnitTest", "UniqueIdsScannerUI.UnitTest\UniqueIdsScannerUI.UnitTest.csproj", "{1CA10E23-DB9F-40F8-AFAA-EBF36550815B}"
+EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{ACE21864-EEC2-40A9-AC01-1E13DB926092}"
 EndProject
 Global

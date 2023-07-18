@@ -38,14 +38,14 @@ namespace Entity.UnitTest.MainManagerTests
 			var mainManager = new MainManager(null, null, null, mockUnitOfWork.Object, mockLog.Object, _mockFileSystem.Object);
 
 			// Act
-			var result = mainManager.PrepareAliasIfNotExisting(uniqueId, aliasName, existingAliases);
+			var result = mainManager.PrepareAliasIfNotExisting(uniqueId.ID, uniqueId.Name, uniqueId.Scope, aliasName, existingAliases);
 
 			// Assert
 			Assert.IsNotNull(result);
 			Assert.AreEqual(uniqueId.ID, result.ID);
-			Assert.AreEqual(uniqueId.Name, result.OriginalName);
-			Assert.AreEqual(aliasName, result.AliasName);
-			Assert.AreEqual(uniqueId.Scope, result.UniqueIdScope);
+			Assert.AreEqual(uniqueId.Name, result.PreviousAliasName);
+			Assert.AreEqual(aliasName, result.CurrentAliasName);
+			Assert.AreEqual(uniqueId.Scope, result.Scope);
 			mockAliasesRepository.Verify(repo => repo.AddRange(It.IsAny<List<Aliases>>()), Times.Never);
 			mockUnitOfWork.Verify(uow => uow.Complete(), Times.Never);
 		}
@@ -71,7 +71,7 @@ namespace Entity.UnitTest.MainManagerTests
 			var mainManager = new MainManager(null, null, null, mockUnitOfWork.Object, mockLog.Object, _mockFileSystem.Object);
 
 			// Act
-			var result = mainManager.PrepareAliasIfNotExisting(uniqueId, aliasName, existingAliases);
+			var result = mainManager.PrepareAliasIfNotExisting(uniqueId.ID, uniqueId.Name, uniqueId.Scope, aliasName, existingAliases);
 
 			// Assert
 			Assert.IsNull(result);

@@ -22,7 +22,7 @@ public class App
 
     internal void Run(string[] args)
     {
-        Console.WriteLine("App Start Runnig...",LogProviderType.Console);
+        _log.LogInfo("App Start Running...",LogProviderType.Console);
 
         try
         {
@@ -95,7 +95,6 @@ public class App
 		Console.WriteLine("==============================================");
 		Console.ResetColor();
 	}
-
 	private void ParseArgumentsAndRunOptions(string[] args)
     {
         using (var parser = new CommandLine.Parser((settings) => { settings.CaseSensitive = true; }))
@@ -105,12 +104,10 @@ public class App
                 .WithNotParsed(HandleParseError);
         }
     }
-
     private void HandleParseError(IEnumerable<Error> errors)
     {
         throw new ArgumentException($"Failed to parse command line arguments: {string.Join(", ", errors)}");
     }
-
     private void RunOptions(CliOptions options)
     {
         try
@@ -158,7 +155,6 @@ public class App
             throw;
         }   
     }
-
     private List<string> GetFilePaths(CliOptions options)
     {
         if (options.filePath != null)
@@ -170,7 +166,6 @@ public class App
             return _settings.GetSection("XmlFilesPath").Get<List<string>>();
         }
     }
-
     private void ProcessXmlFile(string filePath, CliOptions options)
     {
         try
@@ -189,8 +184,6 @@ public class App
             throw;
         }
     }
-
-
     private bool RunVerify(string filepath,bool getFullInfo)
     {
         try
@@ -202,8 +195,20 @@ public class App
                 return false;
             }
 
-            SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
-            return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes, getFullInfo);
+            // Check if the names in xml file are not found in aliases table under the same scope
+            bool notFound = _mainManager.CheckIfNamesExistInAliasLists(xmlScopes);
+
+            if (notFound)
+            {
+                SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
+                // return true if there are no errors between XML file and Database
+                return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes, getFullInfo);
+            }
+            else
+            {
+                return false;
+            }
+            
         }
         catch (Exception ex)
         {
@@ -211,7 +216,6 @@ public class App
             throw;
         }
     }
-
     private void RunUpdate(bool isUpdate, CliOptions options)
     {
         try
@@ -233,7 +237,6 @@ public class App
         }
        
     }
-
     private bool isAuthenticatedUser()
     {
         try
@@ -291,7 +294,6 @@ public class App
             throw;
         }
     }
-
     public void SetUpRename()
     {
         try

@@ -26,12 +26,24 @@ namespace Entity.Scanners
 			{
 				var variableList = new List<UniqueIds>();
 
-				variableList.AddRange(GetVariableList(ktgemvar.DataVariables, "DataVariable"));
-				variableList.AddRange(GetVariableList(ktgemvar.EquipmentConstants, "EquipmentConstant"));
-				variableList.AddRange(GetVariableList(ktgemvar.DynamicVariables, "DynamicVariable"));
-				variableList.AddRange(GetVariableList(ktgemvar.StatusVariables, "StatusVariable"));
+				if (ktgemvar.DataVariables != null)
+                {
+                    variableList.AddRange(GetVariableList(ktgemvar.DataVariables, "DataVariable"));
+                }
+				if (ktgemvar.EquipmentConstants != null)
+				{
+					variableList.AddRange(GetVariableList(ktgemvar.EquipmentConstants, "EquipmentConstant"));
+                }
+				if (ktgemvar.DynamicVariables != null)
+				{
+                    variableList.AddRange(GetVariableList(ktgemvar.DynamicVariables, "DynamicVariable"));
+                }
+				if (ktgemvar.StatusVariables != null)
+				{
+                    variableList.AddRange(GetVariableList(ktgemvar.StatusVariables, "StatusVariable"));
+                }
 
-				return variableList;
+                return variableList;
 			}
 			catch (Exception ex)
 			{
