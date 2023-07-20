@@ -1,0 +1,7 @@
+FROM microsoft/windowsservercore:2008r2
+
+RUN dism /online /enable-feature /featurename:AD-Domain-Services
+
+CMD ["net start dcpromo"]
+
+docker build -t dockerized-win2008r2-ad .

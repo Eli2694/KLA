@@ -28,6 +28,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{2AE8BDF2-76F6-4CB1-8513-6930049EC382}"
 	ProjectSection(SolutionItems) = preProject
 		GetUsersLDAP.ps1 = GetUsersLDAP.ps1
+		dockerfile.txt = dockerfile.txt
 	EndProjectSection
 EndProject
 Global
