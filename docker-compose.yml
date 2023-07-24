@@ -31,9 +31,9 @@ services:
     networks:
       - mynetwork
     volumes:
-     - C:\level-up\Devops\KLA\KLA\mssql\data:/var/opt/mssql/data
-     - C:\level-up\Devops\KLA\KLA\mssql\log:/var/opt/mssql/log
-     - C:\level-up\Devops\KLA\KLA\mssql\secrets:/var/opt/mssql/secrets
+     - data:/var/opt/mssql/data
+     - log:/var/opt/mssql/log
+     - secrets:/var/opt/mssql/secrets
 
   sqlpad:
     container_name: sqlpad
@@ -61,6 +61,10 @@ services:
      
 volumes:
   sqlpad-volume:
+  data:
+  log:
+  secrets:
+
 
 networks:
   mynetwork:
