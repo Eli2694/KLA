@@ -1,5 +1,6 @@
 ﻿using Entity.Scanners;
 using Model;
+using Model.XmlModels;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -65,7 +66,7 @@ namespace Entity.UnitTest.ScannersTest
             var ktgemvar = CreateKtgemvarWithVariables(dataVariables, equipmentConstants, dynamicVariables, statusVariables);
 
             // Act
-            List<UniqueIds> result = _target.ScanCode(ktgemvar);
+            List<UniqueIds> result = _target.ScanKtgemContent(ktgemvar);
 
             // Assert
             Assert.Multiple(() =>
@@ -112,7 +113,7 @@ namespace Entity.UnitTest.ScannersTest
             );
 
             // Act
-            List<UniqueIds> result = _target.ScanCode(ktgemvar);
+            List<UniqueIds> result = _target.ScanKtgemContent(ktgemvar);
 
             // Assert
             Assert.IsInstanceOf<List<UniqueIds>>(result, "The result should be a List<M_UniqueIds>");
@@ -130,16 +131,16 @@ namespace Entity.UnitTest.ScannersTest
             );
 
             // Act
-            List<UniqueIds> result = _target.ScanCode(ktgemvar);
+            List<UniqueIds> result = _target.ScanKtgemContent(ktgemvar);
 
             // Assert
             Assert.IsEmpty(result, "The result should be an empty list");
         }
 
 
-        private KlaXML CreateKtgemvarWithVariables(List<DataVariable> dataVariables, List<EquipmentConstant> equipmentConstants, List<DynamicVariable> dynamicVariables, List<StatusVariable> statusVariables)
+        private Ktgem CreateKtgemvarWithVariables(List<DataVariable> dataVariables, List<EquipmentConstant> equipmentConstants, List<DynamicVariable> dynamicVariables, List<StatusVariable> statusVariables)
         {
-            return new KlaXML
+            return new Ktgem
             {
                 DataVariables = dataVariables,
                 EquipmentConstants = equipmentConstants,

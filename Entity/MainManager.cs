@@ -7,6 +7,8 @@ using Utility_LOG;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Entity.EntityInterfaces;
+using Model.XmlModels;
+using System.Linq.Expressions;
 
 namespace Entity
 {
@@ -59,29 +61,20 @@ namespace Entity
                 {
                     if (_fileSystem.GetFileExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
                     {
-                        XmlSerializer serializer = new XmlSerializer(typeof(KlaXML));
-                        KlaXML? klaXml;
+                        SeperatedScopes? dataForDB;
 
-                        using (XmlReader reader = XmlReader.Create(filePath))
+                        string rootElement = GetRootElementName(filePath);
+                        if (rootElement != null)
                         {
-                            klaXml = (KlaXML?)serializer.Deserialize(reader);
-                        }
-
-                        if (klaXml != null)
-                        {
-                            SeperatedScopes dataForDB = new SeperatedScopes();
-
-                            dataForDB.VariablesList = _variableScanner.ScanCode(klaXml);
-                            dataForDB.EventsList = _eventScanner.ScanCode(klaXml);
-                            dataForDB.AlarmsList = _alarmScanner.ScanCode(klaXml);
-                            
-                            if (CheckAllScopesForDuplicates(dataForDB))
+                            switch (rootElement)
                             {
-                                 return null;
+                                case "ktgem":
+                                    return dataForDB = KtgemSerializer(filePath);
+                                default:
+                                    return null;   
                             }
-
-                            return dataForDB;
-                        }                   
+                        }
+                                        
                     }
                     else
                     {
@@ -101,6 +94,69 @@ namespace Entity
             catch (Exception ex)
             {
                 _log.LogError($"Exception In XmlToSeperatedScopes method: {ex.Message}", LogProviderType.File);
+                throw;
+            }
+        }
+
+        // The purpose of this method is to determine the root element of the XML file,
+        // which is the first element encountered while reading through the XML content. 
+        private string GetRootElementName(string filePath)
+        {
+            try
+            {
+                using (XmlReader reader = XmlReader.Create(filePath))
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.NodeType == XmlNodeType.Element)
+                        {
+                            return reader.Name;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"Exception In GetRootElementName method: {ex.Message}", LogProviderType.File);
+            }
+
+            return null;
+        }
+
+        private SeperatedScopes? KtgemSerializer(string filePath)
+        {
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(Ktgem));
+                Ktgem? klaXml;
+
+                using (XmlReader reader = XmlReader.Create(filePath))
+                {
+                    klaXml = (Ktgem?)serializer.Deserialize(reader);
+                }
+
+                if (klaXml != null)
+                {
+                    SeperatedScopes dataForDB = new SeperatedScopes
+                    {
+                        VariablesList = _variableScanner.ScanKtgemContent(klaXml),
+                        EventsList = _eventScanner.ScanKtgemContent(klaXml),
+                        AlarmsList = _alarmScanner.ScanKtgemContent(klaXml)
+                    };
+
+                    if (CheckAllScopesForDuplicates(dataForDB))
+                    {
+                        return null;
+                    }
+
+                    return dataForDB;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"Exception In KtgemSerializer method: {ex.Message}", LogProviderType.File);
                 throw;
             }
         }

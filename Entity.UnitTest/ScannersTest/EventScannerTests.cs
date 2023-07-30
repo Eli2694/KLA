@@ -1,5 +1,6 @@
 ﻿using Entity.Scanners;
 using Model;
+using Model.XmlModels;
 using Moq;
 using NUnit.Framework;
 using Utility_LOG;
@@ -33,7 +34,7 @@ namespace Entity.UnitTest.ScannersTest
             var ktgemvar = CreateKtgemvarWithEvents(events);
 
             // Act
-            List<UniqueIds> result = _target.ScanCode(ktgemvar);
+            List<UniqueIds> result = _target.ScanKtgemContent(ktgemvar);
 
             // Assert
             Assert.Multiple(() =>
@@ -63,7 +64,7 @@ namespace Entity.UnitTest.ScannersTest
             var ktgemvar = CreateKtgemvarWithEvents(events);
 
             // Act
-            List<UniqueIds> result = _target.ScanCode(ktgemvar);
+            List<UniqueIds> result = _target.ScanKtgemContent(ktgemvar);
 
             // Assert
             Assert.IsInstanceOf<List<UniqueIds>>(result, "The result should be a List<M_UniqueIds>");
@@ -76,15 +77,15 @@ namespace Entity.UnitTest.ScannersTest
             var ktgemvar = CreateKtgemvarWithEvents(new List<Event>());
 
             // Act
-            List<UniqueIds> result = _target.ScanCode(ktgemvar);
+            List<UniqueIds> result = _target.ScanKtgemContent(ktgemvar);
 
             // Assert
             Assert.IsEmpty(result, "The result should be an empty list");
         }
 
-        private KlaXML CreateKtgemvarWithEvents(List<Event> events)
+        private Ktgem CreateKtgemvarWithEvents(List<Event> events)
         {
-            return new KlaXML { Events = events };
+            return new Ktgem { Events = events };
         }
     }
 }

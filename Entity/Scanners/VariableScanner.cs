@@ -1,5 +1,6 @@
 ﻿using Entity.EntityInterfaces;
 using Model;
+using Model.XmlModels;
 using Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using Utility_LOG;
 
 namespace Entity.Scanners
 {
-	public class VariableScanner : BaseScanner, IScanner
+    public class VariableScanner : BaseScanner, IScanner
 	{
 
 		public VariableScanner(LogManager log) : base(log)
@@ -21,7 +22,7 @@ namespace Entity.Scanners
 		{
 		}
 
-		public List<UniqueIds> ScanCode(KlaXML ktgemvar)
+		public List<UniqueIds> ScanKtgemContent(Ktgem ktgemvar)
 		{
 			try
 			{

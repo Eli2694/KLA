@@ -1,5 +1,6 @@
 using Entity.Scanners;
 using Model;
+using Model.XmlModels;
 using Moq;
 using NUnit.Framework;
 using Utility_LOG;
@@ -34,7 +35,7 @@ namespace Entity.UnitTest.ScannersTest
             var ktgemvar = CreateKtgemvarWithAlarms(alarms);
 
             // Act
-            List<UniqueIds> result = _target.ScanCode(ktgemvar);
+            List<UniqueIds> result = _target.ScanKtgemContent(ktgemvar);
 
 
             // Assert
@@ -63,7 +64,7 @@ namespace Entity.UnitTest.ScannersTest
             var ktgemvar = CreateKtgemvarWithAlarms(alarms);
 
             // Act
-            List<UniqueIds> result = _target.ScanCode(ktgemvar);
+            List<UniqueIds> result = _target.ScanKtgemContent(ktgemvar);
 
             // Assert
             Assert.Multiple(() =>
@@ -80,15 +81,15 @@ namespace Entity.UnitTest.ScannersTest
             var ktgemvar = CreateKtgemvarWithAlarms(new List<Alarm>());
 
             // Act
-            List<UniqueIds> result = _target.ScanCode(ktgemvar);
+            List<UniqueIds> result = _target.ScanKtgemContent(ktgemvar);
 
             // Assert
             Assert.IsEmpty(result, "The result should be an empty list");
         }
 
-        private KlaXML CreateKtgemvarWithAlarms(List<Alarm> alarms)
+        private Ktgem CreateKtgemvarWithAlarms(List<Alarm> alarms)
         {
-            return new KlaXML { Alarms = alarms };
+            return new Ktgem { Alarms = alarms };
         }
     }
 }

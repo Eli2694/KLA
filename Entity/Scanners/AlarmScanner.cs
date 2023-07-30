@@ -1,5 +1,6 @@
 ﻿using Entity.EntityInterfaces;
 using Model;
+using Model.XmlModels;
 using Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Entity.Scanners
         {
         }
 
-        public List<UniqueIds> ScanCode(KlaXML ktgemvar)
+        public List<UniqueIds> ScanKtgemContent(Ktgem ktgemvar)
         {
             try
             {
