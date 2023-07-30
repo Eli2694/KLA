@@ -264,10 +264,15 @@ public class App
         {
             string folderForGenerateReports = _settings.GetValue<string>("GenerateReport");
 
+            // Get the array from the configuration
+            string[] usernameAndPasswordArray = _settings.GetSection("UsernameAndPassword").Get<string[]>();
+            // Get the username from the array (assuming it's the first element in the array)
+            string username = usernameAndPasswordArray[0];
+
             if (!string.IsNullOrEmpty(folderForGenerateReports))
             {
                 int counter = 1;
-                string baseFileName = $"{DateTime.Now:dd-MM-yyyy}_Report";
+                string baseFileName = $"{username}_Report_{DateTime.Now:dd-MM-yyyy}";
                 string extension = ".txt";
 
                 string FileName = baseFileName + extension;
