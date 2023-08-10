@@ -1,5 +1,6 @@
 ﻿using DAL;
 using Microsoft.EntityFrameworkCore;
+using Model;
 using Repository.Interfaces;
 using Utility_LOG;
 
@@ -35,20 +36,57 @@ namespace Repository.Core
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                _log.LogError($"Concurrency error in Save: {ex.Message}",LogProviderType.File);
+                foreach (var entry in ex.Entries)
+                {
+                    if (entry.State == EntityState.Modified)
+                    {
+                        var existingEntity = _context.Set<UniqueIds>() 
+                            .FirstOrDefault(e => e.Scope == entry.OriginalValues["Scope"] && e.ID == entry.OriginalValues["ID"]);
+
+                        if (existingEntity != null)
+                        {
+                            entry.State = EntityState.Detached;
+                            _context.Attach(existingEntity);
+                            _context.Entry(existingEntity).CurrentValues.SetValues(entry.CurrentValues);
+                        }
+                    }
+
+                    entry.Reload();
+                    _log.LogInfo($"Reloaded Entity: {entry}", LogProviderType.Console);
+                }
+
                 throw;
             }
             catch (DbUpdateException ex)
             {
-                _log.LogError($"Database update error in Save: {ex.Message}", LogProviderType.File);
+                foreach (var entry in ex.Entries)
+                {
+                    if (entry.State == EntityState.Modified)
+                    {
+                        var existingEntity = _context.Set<UniqueIds>() 
+                            .Local
+                            .FirstOrDefault(e => e.Scope == entry.OriginalValues["Scope"] && e.ID == entry.OriginalValues["ID"]);
+
+                        if (existingEntity != null)
+                        {
+                            entry.State = EntityState.Detached;
+                            _context.Attach(existingEntity);
+                            _context.Entry(existingEntity).CurrentValues.SetValues(entry.CurrentValues);
+                        }
+                    }
+
+                    entry.Reload();
+                    _log.LogInfo($"Reloaded Entity: {entry}", LogProviderType.Console);
+                }
+
                 throw;
             }
+
             catch (Exception ex)
             {
                 _log.LogError($"An error occurred in Save: {ex.Message}", LogProviderType.File);
                 throw;
             }
-
         }
 
         public void Dispose()

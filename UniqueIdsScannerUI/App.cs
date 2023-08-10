@@ -4,6 +4,10 @@ using UniqueIdsScannerUI;
 using Model;
 using Entity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Polly;
+using System;
+using Microsoft.Data.SqlClient;
 
 public class App
 {
@@ -174,6 +178,33 @@ public class App
         try
         {
             bool getFullInfo = options.Info;
+
+            var retryPolicy = Policy.Handle<DbUpdateConcurrencyException>()
+                .Or<DbUpdateException>()
+                .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (exception, timeSpan, retryCount, context) =>
+                {
+                    _log.LogWarning($"Retry attempt {retryCount} due to concurrency error: {exception.Message}", LogProviderType.Console);
+                    _log.LogWarning($"Retry attempt {retryCount} due to concurrency error: {exception.Message}", LogProviderType.File);
+                    _log.LogWarning($"Retrying in {timeSpan.TotalSeconds} seconds...", LogProviderType.Console);
+                });
+
+            retryPolicy.Execute(() =>
+            {
+                VerifyAndUpdate(filePath, getFullInfo, options.isUpdate, options);
+            });
+
+        }
+        catch (Exception ex)
+        {
+            _log.LogException($"Exception in ProcessXmlFile method for file {filePath}: {ex.Message}", ex, LogProviderType.File);
+            throw;
+        }
+    }
+
+    private void VerifyAndUpdate(string filePath, bool getFullInfo, bool isUpdate, CliOptions options)
+    {
+        try
+        {
             bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath, getFullInfo) : false;
 
             if (options.isUpdate)
@@ -181,11 +212,22 @@ public class App
                 RunUpdate(CanBeUpdated, options);
             }
         }
-        catch (Exception ex)
+        catch (DbUpdateConcurrencyException)
         {
-            _log.LogException($"Exception in ProcessXmlFile method for file {filePath}: {ex.Message}", ex, LogProviderType.File);
+            _log.LogWarning($"Start retry policy because of DbUpdateConcurrencyException", LogProviderType.Console);
             throw;
         }
+        catch (DbUpdateException)
+        {
+            _log.LogWarning($"Start retry policy because of DbUpdateException", LogProviderType.Console);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _log.LogException($"Exception in VerifyAndUpdate method for file {filePath}: {ex.Message}", ex, LogProviderType.File);
+            throw;
+            
+        }   
     }
 
     private bool RunVerify(string filepath,bool getFullInfo)
@@ -227,7 +269,21 @@ public class App
         {
             if (isUpdate)
             {
-                _mainManager.UpdateDatabaseWithNewUniqueIds();
+                try
+                {
+                    _mainManager.UpdateDatabaseWithNewUniqueIds();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+
+                    throw;
+                }
+                catch (DbUpdateException)
+                {
+
+                    throw;
+                }
+
 
                 if (options.isRenamed)
                 {

@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using Entity.EntityInterfaces;
 using Model.XmlModels;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Entity
 {
@@ -373,6 +374,14 @@ namespace Entity
                 _log.LogEvent($"The database was updated in the 'Unique_Ids' table using new IDs from an XML file.", LogProviderType.Console);
 
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+            catch (DbUpdateException)
+            { 
+                throw;
+            }
             catch (Exception ex)
             {
                 _log.LogError($"An error occurred in UpdateDatabaseWithNewUniqueIds: {ex.Message}", LogProviderType.File);
@@ -381,14 +390,22 @@ namespace Entity
 
         private void UpdateDatabaseWithScanner(BaseScanner scanner)
         {
-
-            var newIds = scanner.newUniqueIdsFromXml;
-
-            if (newIds != null && newIds.Any())
+            try
             {
-                _unitOfWork.UniqueIds.AddRange(newIds);
-                scanner.newUniqueIdsFromXml.Clear();
+                var newIds = scanner.newUniqueIdsFromXml;
+
+                if (newIds != null && newIds.Any())
+                {
+                    _unitOfWork.UniqueIds.AddRange(newIds);
+                    scanner.newUniqueIdsFromXml.Clear();
+                }
             }
+            catch (Exception ex)
+            {
+                _log.LogError($"An error occurred in UpdateDatabaseWithScanner: {ex.Message}", LogProviderType.File);
+                throw;
+            }
+            
         }
 
 
