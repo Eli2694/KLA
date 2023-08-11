@@ -26,6 +26,9 @@ public class App
     {
         _log.LogInfo("App Start Running...",LogProviderType.Console);
 
+        args = new string[1];
+        args[0] = "--update";
+
         try
         {
             if (args.Length == 0)
@@ -183,9 +186,10 @@ public class App
                 .Or<DbUpdateException>()
                 .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (exception, timeSpan, retryCount, context) =>
                 {
-                    _log.LogWarning($"Retry attempt {retryCount} due to concurrency error: {exception.Message}", LogProviderType.Console);
-                    _log.LogWarning($"Retry attempt {retryCount} due to concurrency error: {exception.Message}", LogProviderType.File);
+                    _log.LogWarning($"Retry attempt {retryCount}", LogProviderType.Console);
                     _log.LogWarning($"Retrying in {timeSpan.TotalSeconds} seconds...", LogProviderType.Console);
+                    _log.LogWarning($"Retry attempt {retryCount} due to concurrency error: {exception.Message}", LogProviderType.File);
+
                 });
 
             retryPolicy.Execute(() =>

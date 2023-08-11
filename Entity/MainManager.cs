@@ -10,6 +10,7 @@ using Entity.EntityInterfaces;
 using Model.XmlModels;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Repository.Core;
 
 namespace Entity
 {
@@ -99,8 +100,9 @@ namespace Entity
             }
         }
 
-        // The purpose of this method is to determine the root element of the XML file,
-        // which is the first element encountered while reading through the XML content. 
+        /* The purpose of this method is to determine the root element of the XML file,
+         which is the first element encountered while reading through the XML content. */
+
         private string GetRootElementName(string filePath)
         {
             try
@@ -162,7 +164,6 @@ namespace Entity
             }
         }
 
-
         public bool CheckAllScopesForDuplicates(SeperatedScopes dataForDb)
         {
             bool duplicatesFound = false;
@@ -171,7 +172,6 @@ namespace Entity
             duplicatesFound |= CheckForDuplicates(dataForDb.VariablesList, "VariablesList");
             return duplicatesFound;
         }
-
 
         private bool CheckForDuplicates(List<UniqueIds> list, string listName)
         {
@@ -192,7 +192,6 @@ namespace Entity
                 return false;
             }
         }
-
 
         private bool LogDuplicates(string listName, string propertyName, IEnumerable<string> duplicates)
         {
@@ -365,6 +364,9 @@ namespace Entity
         {
             try
             {
+
+                _unitOfWork.UniqueIds.DetachAll();
+
                 UpdateDatabaseWithScanner(_alarmScanner);
                 UpdateDatabaseWithScanner(_eventScanner);
                 UpdateDatabaseWithScanner(_variableScanner);

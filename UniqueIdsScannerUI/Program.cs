@@ -52,7 +52,7 @@ static IHostBuilder CreateHostBuilder(string[] args)
 			 {
 				 builder.AddFilter((category, level) =>
 					 !category.Equals("Microsoft.EntityFrameworkCore.Database.Command") || level == LogLevel.Error);
-			 })).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+			 }))
          );
 		 services.AddSingleton<LogManager>();
 		 services.AddTransient<IUnitOfWork, UnitOfWork>();

@@ -13,5 +13,7 @@ namespace Repository.Interfaces
         void Add(TEntity entity);
         void AddRange(IEnumerable<TEntity> entities);
 
+        void DetachAll();
+
     }
 }

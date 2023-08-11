@@ -89,7 +89,17 @@ namespace Repository.Core
                 throw new Exception("Error adding a range of entities", ex);
             }
         }
-    }
 
+        public void DetachAll()
+        {
+            foreach (var entry in _context.ChangeTracker.Entries())
+            {
+                if (entry.Entity is TEntity)
+                {
+                    entry.State = EntityState.Detached;
+                }
+            }
+        }
+    }
 
 }

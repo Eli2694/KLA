@@ -21,7 +21,6 @@ namespace Repository.Core
 
         }
 
-
         public IUniqueIdsRepository UniqueIds { get; private set; }
         public IUserRepository Users { get; private set; }
 
@@ -36,70 +35,42 @@ namespace Repository.Core
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                foreach (var entry in ex.Entries)
-                {
-                    if (entry.State == EntityState.Modified)
-                    {
-                        var existingEntity = _context.Set<UniqueIds>() 
-                            .FirstOrDefault(e => e.Scope == entry.OriginalValues["Scope"] && e.ID == entry.OriginalValues["ID"]);
-
-                        if (existingEntity != null)
-                        {
-                            entry.State = EntityState.Detached;
-                            _context.Attach(existingEntity);
-                            _context.Entry(existingEntity).CurrentValues.SetValues(entry.CurrentValues);
-                        }
-                    }
-
-                    entry.Reload();
-                    _log.LogInfo($"Reloaded Entity: {entry}", LogProviderType.Console);
-                }
-
-                throw;
+                HandleDbUpdateException(ex, "Reloaded Entity");
             }
             catch (DbUpdateException ex)
             {
-                foreach (var entry in ex.Entries)
-                {
-                    if (entry.State == EntityState.Modified)
-                    {
-                        var existingEntity = _context.Set<UniqueIds>() 
-                            .Local
-                            .FirstOrDefault(e => e.Scope == entry.OriginalValues["Scope"] && e.ID == entry.OriginalValues["ID"]);
-
-                        if (existingEntity != null)
-                        {
-                            entry.State = EntityState.Detached;
-                            _context.Attach(existingEntity);
-                            _context.Entry(existingEntity).CurrentValues.SetValues(entry.CurrentValues);
-                        }
-                    }
-
-                    entry.Reload();
-                    _log.LogInfo($"Reloaded Entity: {entry}", LogProviderType.Console);
-                }
-
-                throw;
+                HandleDbUpdateException(ex, "Reloaded Entity");
             }
-
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred in Save: {ex.Message}", LogProviderType.File);
-                throw;
+                HandleGeneralException(ex, "An error occurred in Save");
             }
+        }
+
+        private void HandleDbUpdateException(DbUpdateException ex, string action)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                entry.Reload();
+            }
+            throw ex;
+        }
+
+        private void HandleGeneralException(Exception ex, string message)
+        {
+            _log.LogError($"{message}: {ex.Message}", LogProviderType.File);
+            throw ex;
         }
 
         public void Dispose()
         {
-
             try
             {
                 _context.Dispose();
             }
             catch (Exception ex)
             {
-                _log.LogError($"An error occurred while disposing the database context: {ex.Message}", LogProviderType.File);
-                throw;
+                HandleGeneralException(ex, "An error occurred while disposing the database context");
             }
         }
     }
