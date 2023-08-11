@@ -367,13 +367,19 @@ namespace Entity
 
                 _unitOfWork.UniqueIds.DetachAll();
 
-                UpdateDatabaseWithScanner(_alarmScanner);
-                UpdateDatabaseWithScanner(_eventScanner);
-                UpdateDatabaseWithScanner(_variableScanner);
+                bool anyScannerUpdated = UpdateDatabaseWithScanner(_alarmScanner) ||
+                                  UpdateDatabaseWithScanner(_eventScanner) ||
+                                  UpdateDatabaseWithScanner(_variableScanner);
 
-                _unitOfWork.Complete();
-
-                _log.LogEvent($"The database was updated in the 'Unique_Ids' table using new IDs from an XML file.", LogProviderType.Console);
+                if (anyScannerUpdated)
+                {
+                    _unitOfWork.Complete();
+                    _log.LogEvent($"Unique_Ids Table In The database was updated with new IDs from an XML file.", LogProviderType.Console);
+                }
+                else
+                {
+                    _log.LogEvent($"No updates were performed in the database.", LogProviderType.Console);
+                }
 
             }
             catch (DbUpdateConcurrencyException)
@@ -390,7 +396,7 @@ namespace Entity
             }
         }
 
-        private void UpdateDatabaseWithScanner(BaseScanner scanner)
+        private bool UpdateDatabaseWithScanner(BaseScanner scanner)
         {
             try
             {
@@ -400,7 +406,9 @@ namespace Entity
                 {
                     _unitOfWork.UniqueIds.AddRange(newIds);
                     scanner.newUniqueIdsFromXml.Clear();
+                    return true;
                 }
+                return false;
             }
             catch (Exception ex)
             {
