@@ -26,10 +26,6 @@ public class App
     {
         _log.LogInfo("App Start Running...",LogProviderType.Console);
 
-        args = new string[1];
-        args[0] = "--update";
-        // args[1] = "-r";
-
         try
         {
             if (args.Length == 0)
@@ -153,10 +149,18 @@ public class App
                 return;
             }
 
+            // Iterates through and verify all XML files
             foreach (var validXmlFile in validXmlFilePaths)
             {
                 ProcessXmlFile(validXmlFile, options);
             }
+
+            // Add aliases from config file  
+            if (options.isRenamed)
+            {
+                SetUpRename();
+            }
+
         }
         catch (Exception ex)
         {
@@ -195,7 +199,6 @@ public class App
 
             retryPolicy.Execute(() =>
             {
-
                 VerifyAndUpdate(filePath, getFullInfo, options.isUpdate, options);
             });
 
@@ -273,29 +276,17 @@ public class App
         }
     }
 
-    private static int renameCount = 0;
     private void RunUpdate(bool isUpdate, CliOptions options, string filePath)
     {
         try
         {
             if (isUpdate)
-            {
-                
-
+            {   
                  string fileName = Path.GetFileName(filePath);
                 _log.LogEvent($"Updating File: {fileName}", LogProviderType.Console);
 
+                // Update database with unique ids 
                 _mainManager.UpdateDatabaseWithNewUniqueIds();
-
-                if (options.isRenamed)
-                {
-                    renameCount++;
-
-                    if(renameCount < 2) 
-                    {
-                        SetUpRename();
-                    }     
-                }
             }
         }
         catch (DbUpdateConcurrencyException)
