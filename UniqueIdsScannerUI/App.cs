@@ -48,53 +48,48 @@ public class App
         }
     }
 
-	private void DisplayInstructions()
-	{
-		Console.ForegroundColor = ConsoleColor.Cyan;
-		Console.WriteLine("Welcome to Unique IDs Scanner!");
-		Console.WriteLine("================================");
-		Console.WriteLine("Instructions:");
-		Console.WriteLine("1. Configure XML paths in the appsettings.json configuration file.");
-		Console.WriteLine("2. Use the following commands to perform different actions:");
-		Console.WriteLine();
+    private void DisplayInstructions()
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("Welcome to Unique IDs Scanner!");
+        Console.WriteLine("================================");
+        Console.WriteLine("Instructions:");
+        Console.WriteLine("1. Configure XML paths in the appsettings.json configuration file.");
+        Console.WriteLine("2. Use the following commands to perform different actions:\n");
 
-		Console.ForegroundColor = ConsoleColor.Green;
-		Console.WriteLine("Command Options:");
-		Console.ForegroundColor = ConsoleColor.White;
-		Console.WriteLine("--verify: Verify the content of XML files.");
-		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --verify");
-		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -f 'Path To XML File'");
-		Console.WriteLine("   Explanation: This command verifies the content of XML files with the database.");
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("Command Options:");
+        Console.ForegroundColor = ConsoleColor.White;
 
-		Console.WriteLine();
-		Console.WriteLine("--update: Verify and update the database.");
-		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update");
-		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -i");
-        Console.WriteLine("   -i -> Display more information in console");
+        Console.WriteLine("--verify: Verify the content of XML files.");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --verify");
+        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -f 'Path To XML File'");
+        Console.WriteLine("   Explanation: Verifies XML file content against the database.\n");
+
+        Console.WriteLine("--update: Verify and update the database.");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update");
+        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -i");
         Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -f 'Path To XML File'");
-		Console.WriteLine("   Explanation: This command verifies and updates the database.");
-		
-		Console.WriteLine();
-		Console.WriteLine("--generate-report: Generate a report.");
-		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --generate-report");
-		Console.WriteLine("   Explanation: This command generates a report based on the verified");
-		Console.WriteLine("                and updated information. The report can be used for");
-		Console.WriteLine("                further analysis or documentation purposes.");
+        Console.WriteLine("   Explanation: Verifies XML files and updates the database.");
+        Console.WriteLine("                Use the '-i' option to display detailed information");
+        Console.WriteLine("                about the verification and update process in the console.\n");
 
-		Console.WriteLine();
-		Console.WriteLine("--rename || -r: Create a new Alias.");
-		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --rename");
-        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --r");
-        Console.WriteLine("   Explanation: This command add new Aliases");
+        Console.WriteLine("--generate-report: Generate a report.");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --generate-report");
+        Console.WriteLine("   Explanation: Generates a report based on verified and updated data in the database.\n");
 
-		Console.WriteLine();
+        Console.WriteLine("--rename || -r: Create a new Alias.");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --rename");
+        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --r");
+        Console.WriteLine("   Explanation: Adds a new Alias.\n");
 
-		Console.WriteLine("** Please follow the instructions carefully. **");
-		Console.WriteLine("==============================================");
-		Console.ResetColor();
-	}
+        Console.WriteLine("** Note: Please follow the instructions carefully. **");
+        Console.WriteLine("==============================================");
+        Console.ResetColor();
+    }
 
-	private void ParseArgumentsAndRunOptions(string[] args)
+
+    private void ParseArgumentsAndRunOptions(string[] args)
     {
         using (var parser = new CommandLine.Parser((settings) => { settings.CaseSensitive = true; }))
         {
