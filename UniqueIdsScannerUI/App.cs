@@ -117,45 +117,33 @@ public class App
     {
         try
         {
+            // Generate report if requested
             if (options.isGenerateReport)
             {
                 GenerateReport();
                 return;
             }
 
+            // Get a list of XML file paths
             List<string> xmlFilePaths = GetFilePaths(options);
+
             List<string> validXmlFilePaths = new List<string>();
-            List<string> inValidXmlFilePaths = new List<string>();
+            List<string> invalidXmlFilePaths = new List<string>();
 
-            foreach (var xmlFile in xmlFilePaths)
+
+            // Validate XML file paths 
+            ValidateXmlFilePaths(xmlFilePaths, validXmlFilePaths, invalidXmlFilePaths);
+
+
+            if (invalidXmlFilePaths.Any())
             {
-                if (_mainManager.ValidateXmlFilePath(xmlFile))
-                {
-                    validXmlFilePaths.Add(xmlFile);
-                }
-                else
-                {
-                    string errorMessage = $"Invalid File Path: {xmlFile}";
-                    _log.LogError(errorMessage, LogProviderType.Console);
-                    _log.LogError(errorMessage, LogProviderType.File);
-                    inValidXmlFilePaths.Add(xmlFile);
-                }
-            }
-
-            if (inValidXmlFilePaths.Any())
-            {
-
-                //throw new ArgumentException("Invalid Xml File Path");
                 return;
             }
 
-            // Iterates through and verify all XML files
-            foreach (var validXmlFile in validXmlFilePaths)
-            {
-                ProcessXmlFile(validXmlFile, options);
-            }
+            // Process each valid XML file
+            ProcessValidXmlFiles(validXmlFilePaths, options);
 
-            // Add aliases from config file  
+            // Add aliases from config file if requested
             if (options.isRenamed)
             {
                 SetUpRename();
@@ -165,8 +153,47 @@ public class App
         catch (Exception ex)
         {
             _log.LogException($"Exception in RunOptions method: {ex.Message}", ex, LogProviderType.File);
+            return;
+        }   
+    }
+
+    private void ProcessValidXmlFiles(List<string> validFilePaths, CliOptions options)
+    {
+        try
+        {
+            foreach (var validXmlFile in validFilePaths)
+            {
+                ProcessXmlFile(validXmlFile, options);
+            }
+        }
+        catch (Exception ex)
+        {
+            _log.LogException($"Exception while processing XML file: {ex.Message}", ex, LogProviderType.File);
             throw;
         }   
+    }
+
+    private void ValidateXmlFilePaths(List<string> filePaths, List<string> validPaths, List<string> invalidPaths)
+    {
+        try
+        {
+            foreach (var filePath in filePaths)
+            {
+                if (_mainManager.ValidateXmlFilePath(filePath))
+                {
+                    validPaths.Add(filePath);
+                }
+                else
+                {
+                    invalidPaths.Add(filePath);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _log.LogException($"Exception while validating XML file path: {ex.Message}", ex, LogProviderType.File);
+            throw;
+        }  
     }
 
     private List<string> GetFilePaths(CliOptions options)
@@ -261,7 +288,7 @@ public class App
                 SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
 
                 // return true if there are no errors between data from Xml File and data from Database
-                return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes, getFullInfo);
+                return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes, getFullInfo, filepath);
             }
             else
             {
