@@ -8,9 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Entity.EntityInterfaces;
 using Model.XmlModels;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Repository.Core;
 
 namespace Entity
 {
@@ -58,36 +56,26 @@ namespace Entity
         {
             try
             {
-
-                if (_fileSystem.FileExists(filePath))
+                if (_fileSystem.GetFileExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (_fileSystem.GetFileExtension(filePath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
-                    {
-                        SeperatedScopes? dataForDB;
+                    SeperatedScopes? dataForDB;
 
-                        string rootElement = GetRootElementName(filePath);
-                        if (rootElement != null)
-                        {
-                            switch (rootElement)
-                            {
-                                case "ktgem":
-                                    return dataForDB = KtgemSerializer(filePath);
-                                default:
-                                    return null;   
-                            }
-                        }
-                                        
-                    }
-                    else
+                    string rootElement = GetRootElementName(filePath);
+                    if (rootElement != null)
                     {
-                        _log.LogError($"{filePath} - Not Valid", LogProviderType.Console);
-                        return null;
+                        switch (rootElement)
+                        {
+                            case "ktgem":
+                                return dataForDB = KtgemSerializer(filePath);
+                            default:
+                                return null;
+                        }
                     }
-       
+
                 }
                 else
                 {
-                    _log.LogError($"{filePath} - Not Found", LogProviderType.Console);
+                    _log.LogError($"{filePath} - Not Valid", LogProviderType.Console);
                     return null;
                 }
 
@@ -107,12 +95,15 @@ namespace Entity
         {
             try
             {
+                // Create an XmlReader to read the XML file
                 using (XmlReader reader = XmlReader.Create(filePath))
                 {
                     while (reader.Read())
                     {
+                        // Check if the current node is an element (start tag)
                         if (reader.NodeType == XmlNodeType.Element)
                         {
+                            // Return the name of the first element node encountered
                             return reader.Name;
                         }
                     }
@@ -123,16 +114,20 @@ namespace Entity
                 _log.LogError($"Exception In GetRootElementName method: {ex.Message}", LogProviderType.File);
             }
 
+            // Return null if no root element is found or an exception occurs
             return null;
         }
+
 
         private SeperatedScopes? KtgemSerializer(string filePath)
         {
             try
             {
+                // Create an XmlSerializer to deserialize the XML file content into Ktgem object
                 XmlSerializer serializer = new XmlSerializer(typeof(Ktgem));
                 Ktgem? klaXml;
 
+                // Read and deserialize the XML content
                 using (XmlReader reader = XmlReader.Create(filePath))
                 {
                     klaXml = (Ktgem?)serializer.Deserialize(reader);
@@ -140,6 +135,7 @@ namespace Entity
 
                 if (klaXml != null)
                 {
+                    // Scan the Ktgem content and separate into different scope lists
                     SeperatedScopes dataForDB = new SeperatedScopes
                     {
                         VariablesList = _variableScanner.ScanKtgemContent(klaXml),
@@ -147,6 +143,7 @@ namespace Entity
                         AlarmsList = _alarmScanner.ScanKtgemContent(klaXml)
                     };
 
+                    // Check for duplicates in XML file 
                     if (CheckAllScopesForDuplicates(dataForDB))
                     {
                         return null;
@@ -177,6 +174,7 @@ namespace Entity
         {
             try
             {
+                // Group items in the list by Name and ID and identify duplicates
                 var duplicateNames = list.GroupBy(v => v.Name).Where(g => g.Count() > 1).Select(g => g.Key);
                 var duplicateIDs = list.GroupBy(v => v.ID).Where(g => g.Count() > 1).Select(g => g.Key);
 
@@ -240,11 +238,14 @@ namespace Entity
             }
         }
 
+        // Check if any names in the XML scopes exist in the alias lists from the database
         public bool CheckIfNamesExistInAliasLists(SeperatedScopes? xmlScopes)
         {
             try
             {
                 var aliasesFromDb = RetriveAliasesFromDB();
+
+                // Separate aliases by scope
                 var eventAliases = aliasesFromDb.Where(a => a.Scope == "event").ToList();
                 var alarmAliases = aliasesFromDb.Where(a => a.Scope == "alarm").ToList();
                 var variableAliases = aliasesFromDb.Where(a => a.Scope == "variable").ToList();
@@ -314,6 +315,7 @@ namespace Entity
             
         }
 
+        // Sorts UniqueIds from the database into separate scopes
         public SeperatedScopes SortUniqeIDsFromDbByScope(List<UniqueIds> ListFromDB)
         {
             try
@@ -325,7 +327,7 @@ namespace Entity
                     switch (obj.Scope)
                     {
                         case "event":
-                            DbInObjects.EventsList.Add( obj);
+                            DbInObjects.EventsList.Add(obj);
                             break;
                         case "alarm":
                             DbInObjects.AlarmsList.Add(obj);
@@ -345,6 +347,7 @@ namespace Entity
 
         }
 
+        // Compares XML scopes with database scopes
         public bool CompareXmlScopesWithDBScopes(SeperatedScopes xmlSeperatedScopes, SeperatedScopes DbSeperatedScopes, bool getFullInfo, string filePath)
         {
             try
@@ -353,6 +356,7 @@ namespace Entity
                 string fileName = Path.GetFileName(filePath);
                 _log.LogEvent($"Verifying File: {fileName}...", LogProviderType.Console);
 
+                // Compare each scope's objects between XML and the database
                 return _alarmScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.AlarmsList, DbSeperatedScopes.AlarmsList, getFullInfo) &&
                         _eventScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.EventsList, DbSeperatedScopes.EventsList, getFullInfo) &&
                         _variableScanner.CompareXmlScopeWithDBScope(xmlSeperatedScopes.VariablesList, DbSeperatedScopes.VariablesList, getFullInfo);

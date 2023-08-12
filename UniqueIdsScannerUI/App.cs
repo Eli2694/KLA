@@ -6,8 +6,6 @@ using Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Polly;
-using System;
-using Microsoft.Data.SqlClient;
 
 public class App
 {
@@ -116,6 +114,11 @@ public class App
 
             // Get a list of XML file paths
             List<string> xmlFilePaths = GetFilePaths(options);
+            if(xmlFilePaths.Count == 0) 
+            {
+                _log.LogError($"File paths are not found", LogProviderType.Console);
+                return;
+            }
 
             List<string> validXmlFilePaths = new List<string>();
             List<string> invalidXmlFilePaths = new List<string>();

@@ -1,6 +1,5 @@
 ﻿using DAL;
 using Microsoft.EntityFrameworkCore;
-using Model;
 using Repository.Interfaces;
 using Utility_LOG;
 
