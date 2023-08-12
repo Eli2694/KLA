@@ -92,13 +92,24 @@ namespace Repository.Core
 
         public void DetachAll()
         {
-            foreach (var entry in _context.ChangeTracker.Entries())
+            try
             {
-                if (entry.Entity is TEntity)
+                foreach (var entry in _context.ChangeTracker.Entries())
                 {
-                    entry.State = EntityState.Detached;
+                    if (entry.Entity is TEntity)
+                    {
+                        entry.State = EntityState.Detached;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+
+                _log.LogException("Error in DetachAll method", ex, LogProviderType.File);
+                throw new Exception("Error in DetachAll method", ex);
+            }
+
+            
         }
     }
 

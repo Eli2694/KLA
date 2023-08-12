@@ -28,6 +28,7 @@ public class App
 
         args = new string[1];
         args[0] = "--update";
+        // args[1] = "-r"
 
         try
         {
@@ -213,7 +214,7 @@ public class App
 
             if (options.isUpdate)
             {
-                RunUpdate(CanBeUpdated, options);
+                RunUpdate(CanBeUpdated, options, filePath);
             }
         }
         catch (DbUpdateConcurrencyException)
@@ -238,6 +239,7 @@ public class App
     {
         try
         {
+            // Seperate XML data to lists by scope
             SeperatedScopes? xmlScopes = _mainManager.XmlToSeperatedScopes(filepath);
 
             if (xmlScopes == null)
@@ -250,8 +252,10 @@ public class App
 
             if (notFound)
             {
+                // Seperate Unique Ids from database to lists by scope
                 SeperatedScopes? DbScopes = _mainManager.SortUniqeIDsFromDbByScope(_mainManager.RetriveUniqeIDsFromDB());
-                // return true if there are no errors between XML file and Database
+
+                // return true if there are no errors between data from Xml File and data from Database
                 return _mainManager.CompareXmlScopesWithDBScopes(xmlScopes, DbScopes, getFullInfo);
             }
             else
@@ -267,33 +271,39 @@ public class App
         }
     }
 
-    private void RunUpdate(bool isUpdate, CliOptions options)
+    private static int renameCount = 0;
+    private void RunUpdate(bool isUpdate, CliOptions options, string filePath)
     {
         try
         {
             if (isUpdate)
             {
-                try
-                {
-                    _mainManager.UpdateDatabaseWithNewUniqueIds();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
+                string fileName = Path.GetFileName(filePath);
+                _log.LogEvent($"Updating File: {fileName}", LogProviderType.Console);
 
-                    throw;
-                }
-                catch (DbUpdateException)
-                {
-
-                    throw;
-                }
-
+                _mainManager.UpdateDatabaseWithNewUniqueIds();
 
                 if (options.isRenamed)
                 {
-                    SetUpRename();
+                    renameCount++;
+
+                    if(renameCount < 2) 
+                    {
+                        SetUpRename();
+                    }
+                    
                 }
             }
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+
+            throw;
+        }
+        catch (DbUpdateException)
+        {
+
+            throw;
         }
         catch (Exception ex)
         {
@@ -301,6 +311,35 @@ public class App
             throw;
         }
        
+    }
+
+    public void SetUpRename()
+    {
+        try
+        {
+            var renameDict = _settings.GetSection("Renamed").Get<Dictionary<string, string>>();
+            if (renameDict != null)
+            {
+                _mainManager.ValidateAndPrepareAliases(renameDict);
+            }
+            else
+            {
+                _log.LogWarning(" 'Rename' information in Appsettings.json is empty", LogProviderType.Console);
+            }
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw;
+        }
+        catch (DbUpdateException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _log.LogWarning($"Error in SetUpRename method: {ex.Message}", LogProviderType.File);
+            throw;
+        }
     }
 
     private bool isAuthenticatedUser()
@@ -366,29 +405,6 @@ public class App
             throw;
         }
     }
-
-    public void SetUpRename()
-    {
-        try
-        {
-            var renameDict = _settings.GetSection("Renamed").Get<Dictionary<string, string>>();
-            if (renameDict != null)
-            {
-                _mainManager.ValidateAndPrepareAliases(renameDict);
-            }
-            else
-            {
-                _log.LogWarning(" 'Rename' information in Appsettings.json is empty", LogProviderType.Console);
-            }
-        }
-        catch (Exception ex)
-        {
-            _log.LogWarning($"Error in SetUpRename method: {ex.Message}", LogProviderType.File);
-            throw;
-        }  
-    }
-
-
 
 }
 

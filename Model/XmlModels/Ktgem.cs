@@ -162,7 +162,7 @@ namespace Model.XmlModels
     public class DDMappingRoot
     {
         [XmlElement("XMLElement")]
-        public List<XmlElement> XmlElements { get; set; }
+        public List<XmlElement>? XmlElements { get; set; }
     }
 
     public class XmlElement

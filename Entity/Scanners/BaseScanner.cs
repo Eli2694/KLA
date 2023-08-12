@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utility_LOG;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace Entity.Scanners
 {
@@ -26,12 +27,19 @@ namespace Entity.Scanners
         {
             try
             {
+
+                // Create a dictionary where the keys are ID values and the values are the corresponding items from the 'db' collection
                 var dbByIdDictionary = db.ToDictionary(k => k.ID, v => v);
+
+                // Create another dictionary where the keys are Name values and the values are the corresponding items from the 'db' collection
                 var dbByNameDictionary = db.ToDictionary(k => k.Name, v => v);
+
                 var errorMessages = new List<string>();
 
+                // Validate the elements in the XML against the DB
                 ValidateElements(xml, dbByIdDictionary, dbByNameDictionary, errorMessages);
 
+                // Check if there are any validation errors
                 if (errorMessages.Count > 0)
                 {
                     foreach (var errorMessage in errorMessages)
@@ -42,8 +50,11 @@ namespace Entity.Scanners
                     return false;
                 }
 
+                // If validation passed, add unique IDs from XML to the DB
                 AddUniqueIdsFromXmlToList(xml, dbByIdDictionary, getFullInfo);
-                return true;
+
+                // Return true indicating successful validation and addition
+                return true;  
             }
             catch (Exception ex)
             {
@@ -57,15 +68,20 @@ namespace Entity.Scanners
 
             foreach (var xmlElement in xml)
             {
+                // Validate the names of elements in the XML against the DB
                 ValidateNames(xmlElement, dbByIdDictionary, errorMessages);
+
+                // Validate the IDs of elements in the XML against the DB
                 ValidateIds(xmlElement, dbByNameDictionary, errorMessages);
             }
         }
 
         private void ValidateNames(UniqueIds xmlElement, Dictionary<string, UniqueIds> dbByIdDictionary, List<string> errorMessages)
         {
+            // Check if the ID from the XML exists in the DB
             if (dbByIdDictionary.TryGetValue(xmlElement.ID, out var dbElementByID))
             {
+                // Compare the name from the XML with the corresponding name in the DB
                 if (dbElementByID.Name != xmlElement.Name)
                 {
                     errorMessages.Add($"ID '{xmlElement.ID}' has a different name in the XML and DB.");
@@ -75,8 +91,10 @@ namespace Entity.Scanners
 
         private void ValidateIds(UniqueIds xmlElement, Dictionary<string, UniqueIds> dbByNameDictionary, List<string> errorMessages)
         {
+            // Check if the Name from the XML exists in the DB
             if (dbByNameDictionary.TryGetValue(xmlElement.Name, out var dbElementByName))
             {
+                // Compare the ID from the XML with the corresponding ID in the DB
                 if (dbElementByName.ID != xmlElement.ID)
                 {
                     errorMessages.Add($"Name '{xmlElement.Name}' has a different ID in the XML and DB.");
@@ -88,7 +106,10 @@ namespace Entity.Scanners
         {
             if (xml.Count > 0)
             {
+                // Find new unique IDs from the XML that are not present in the 'db' dictionary
                 newUniqueIdsFromXml = xml.Where(variableXML => !db.ContainsKey(variableXML.ID)).ToList();
+
+                // Take the first item from the 'xml' list (assuming it's representative) and report new unique IDs
                 UniqueIds item = xml[0];
                 ReportNewUniqueIds(item.Scope, getFullInfo);
             }
@@ -98,15 +119,16 @@ namespace Entity.Scanners
         {
             int count = 0;  // Counter for the total number of IDs
 
-            _log.LogInfo($"Initializing verification process of Unique ID's From {scope} in XML...\n", LogProviderType.Console);
+            _log.LogInfo($"Initializing verification process of Unique IDs From {scope} in XML...\n", LogProviderType.Console);
 
+            // Iterate through the newUniqueIdsFromXml list and report the unique IDs
             foreach (var uniqueId in newUniqueIdsFromXml)
             {
                 count++;
 
-                if(getFullInfo)
+                if (getFullInfo)
                 {
-                    //Reporting in a clear, easy-to-read format
+                    // Report detailed information about the unique ID if getFullInfo is true
                     string message =
                         $"Unique ID Entry #{count}:\n" +
                         $"Entity Type: {uniqueId.EntityType}\n" +
@@ -115,11 +137,9 @@ namespace Entity.Scanners
                         $"\n";
 
                     _log.LogInfo(message, LogProviderType.Console);
-                }     
+                }
             }
             _log.LogInfo($"Completed verification process, Total number of unique IDs reported in {scope} is: {count}.\n", LogProviderType.Console);
         }
-
     }
-
 }
