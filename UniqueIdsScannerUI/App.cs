@@ -26,9 +26,9 @@ public class App
     {
         _log.LogInfo("App Start Running...",LogProviderType.Console);
 
-        args = new string[2];
+        args = new string[1];
         args[0] = "--update";
-        args[1] = "-r";
+        // args[1] = "-r";
 
         try
         {
@@ -282,7 +282,7 @@ public class App
             {
                 
 
-                string fileName = Path.GetFileName(filePath);
+                 string fileName = Path.GetFileName(filePath);
                 _log.LogEvent($"Updating File: {fileName}", LogProviderType.Console);
 
                 _mainManager.UpdateDatabaseWithNewUniqueIds();
@@ -294,8 +294,7 @@ public class App
                     if(renameCount < 2) 
                     {
                         SetUpRename();
-                    }
-                    
+                    }     
                 }
             }
         }
