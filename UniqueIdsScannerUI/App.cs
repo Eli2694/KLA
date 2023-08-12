@@ -26,9 +26,9 @@ public class App
     {
         _log.LogInfo("App Start Running...",LogProviderType.Console);
 
-        args = new string[1];
+        args = new string[2];
         args[0] = "--update";
-        // args[1] = "-r"
+        args[1] = "-r";
 
         try
         {
@@ -195,6 +195,7 @@ public class App
 
             retryPolicy.Execute(() =>
             {
+
                 VerifyAndUpdate(filePath, getFullInfo, options.isUpdate, options);
             });
 
@@ -211,6 +212,7 @@ public class App
         try
         {
             bool CanBeUpdated = options.isVerify || options.isUpdate ? RunVerify(filePath, getFullInfo) : false;
+
 
             if (options.isUpdate)
             {
@@ -278,6 +280,8 @@ public class App
         {
             if (isUpdate)
             {
+                
+
                 string fileName = Path.GetFileName(filePath);
                 _log.LogEvent($"Updating File: {fileName}", LogProviderType.Console);
 

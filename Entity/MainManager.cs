@@ -674,9 +674,6 @@ namespace Entity
             
         }
 
-
-        
-
         public void UpdateDbWithNewAliases(List<Aliases> newAliases)
         {
             try
