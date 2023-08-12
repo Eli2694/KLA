@@ -88,7 +88,6 @@ public class App
         Console.ResetColor();
     }
 
-
     private void ParseArgumentsAndRunOptions(string[] args)
     {
         using (var parser = new CommandLine.Parser((settings) => { settings.CaseSensitive = true; }))
