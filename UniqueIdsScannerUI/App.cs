@@ -63,20 +63,17 @@ public class App
 		Console.ForegroundColor = ConsoleColor.White;
 		Console.WriteLine("--verify: Verify the content of XML files.");
 		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --verify");
-		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -i");
 		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --verify -f 'Path To XML File'");
 		Console.WriteLine("   Explanation: This command verifies the content of XML files with the database.");
-		Console.WriteLine("                It checks for unique IDs and ensures their correctness.");
 
 		Console.WriteLine();
 		Console.WriteLine("--update: Verify and update the database.");
 		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update");
 		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -i");
-		Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -f 'Path To XML File'");
+        Console.WriteLine("   -i -> Display more information in console");
+        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --update -f 'Path To XML File'");
 		Console.WriteLine("   Explanation: This command verifies and updates the database.");
-		Console.WriteLine("                It checks for unique IDs, ensures their correctness,");
-		Console.WriteLine("                and updates the associated database records.");
-
+		
 		Console.WriteLine();
 		Console.WriteLine("--generate-report: Generate a report.");
 		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --generate-report");
@@ -85,11 +82,10 @@ public class App
 		Console.WriteLine("                further analysis or documentation purposes.");
 
 		Console.WriteLine();
-		Console.WriteLine("--update -r: Create a new Alias.");
-		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --update -r");
-		Console.WriteLine("   Explanation: This command creates a new Alias for the verified and");
-		Console.WriteLine("                updated records. The Alias can be used to identify or");
-		Console.WriteLine("                reference the records in a more convenient manner.");
+		Console.WriteLine("--rename || -r: Create a new Alias.");
+		Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --rename");
+        Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --r");
+        Console.WriteLine("   Explanation: This command add new Aliases");
 
 		Console.WriteLine();
 
