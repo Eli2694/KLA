@@ -27,10 +27,6 @@ namespace DAL
                     if (!databaseCreator.HasTables()) databaseCreator.CreateTables();
                 }
 
-                //if (!databaseExists)
-                //{
-                //    Database.EnsureCreated();
-                //}
 
             }
             catch (Exception ex)
