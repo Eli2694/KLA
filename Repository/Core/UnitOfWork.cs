@@ -32,35 +32,20 @@ namespace Repository.Core
                 _log.LogEvent("Save changes to database", LogProviderType.File);
                 _context.SaveChanges();
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
-                HandleDbUpdateException(ex, "Reloaded Entity");
+                throw;
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException)
             {
-                HandleDbUpdateException(ex, "Reloaded Entity");
+                throw;
             }
             catch (Exception ex)
             {
-                HandleGeneralException(ex, "An error occurred in Save");
+                _log.LogError($"{ex.Message}", LogProviderType.File);
+                throw;
             }
         }
-
-        private void HandleDbUpdateException(DbUpdateException ex, string action)
-        {
-            foreach (var entry in ex.Entries)
-            {
-                entry.Reload();
-            }
-            throw ex;
-        }
-
-        private void HandleGeneralException(Exception ex, string message)
-        {
-            _log.LogError($"{message}: {ex.Message}", LogProviderType.File);
-            throw ex;
-        }
-
         public void Dispose()
         {
             try
@@ -69,7 +54,8 @@ namespace Repository.Core
             }
             catch (Exception ex)
             {
-                HandleGeneralException(ex, "An error occurred while disposing the database context");
+                _log.LogError($"An error occurred while disposing the database context, {ex.Message}", LogProviderType.File);
+                throw;
             }
         }
     }

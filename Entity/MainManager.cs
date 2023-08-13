@@ -61,6 +61,7 @@ namespace Entity
                     SeperatedScopes? dataForDB;
 
                     string rootElement = GetRootElementName(filePath);
+
                     if (rootElement != null)
                     {
                         switch (rootElement)

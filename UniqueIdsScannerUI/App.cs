@@ -78,7 +78,7 @@ public class App
 
         Console.WriteLine("--rename || -r: Create a new Alias.");
         Console.WriteLine("   Usage: dotnet UniqueIdsScannerUI.dll --rename");
-        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll --r");
+        Console.WriteLine("          dotnet UniqueIdsScannerUI.dll -r");
         Console.WriteLine("   Explanation: Adds a new Alias.\n");
 
         Console.WriteLine("** Note: Please follow the instructions carefully. **");
@@ -120,11 +120,11 @@ public class App
                 return;
             }
 
-            List<string> validXmlFilePaths = new List<string>();
-            List<string> invalidXmlFilePaths = new List<string>();
 
 
             // Validate XML file paths 
+            List<string> validXmlFilePaths = new List<string>();
+            List<string> invalidXmlFilePaths = new List<string>();
             ValidateXmlFilePaths(xmlFilePaths, validXmlFilePaths, invalidXmlFilePaths);
 
 
@@ -272,7 +272,7 @@ public class App
                 return false;
             }
 
-            // Check if the names in xml file are not found in aliases table under the same scope
+            // Check if the names in XML file are not found in aliases table under the same scope
             bool notFound = _mainManager.CheckIfNamesExistInAliasLists(xmlScopes);
 
             if (notFound)
