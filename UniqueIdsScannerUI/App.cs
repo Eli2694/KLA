@@ -24,7 +24,7 @@ public class App
     {
         _log.LogInfo("App Start Running...",LogProviderType.Console);
 
-        try
+		try
         {
             if (args.Length == 0)
             {
@@ -32,7 +32,7 @@ public class App
             }
             else
             {
-                if (isAuthenticatedUser())
+				if (isAuthenticatedUser())
                 {
 					_log.LogEvent("User successfuly authenticated.", LogProviderType.Console);
 					ParseArgumentsAndRunOptions(args);
@@ -88,7 +88,8 @@ public class App
 
     private void ParseArgumentsAndRunOptions(string[] args)
     {
-        using (var parser = new CommandLine.Parser((settings) => { settings.CaseSensitive = true; }))
+		
+		using (var parser = new CommandLine.Parser((settings) => { settings.CaseSensitive = true; }))
         {
             Parser.Default.ParseArguments<CliOptions>(args)
                 .WithParsed<CliOptions>(options => RunOptions(options))
